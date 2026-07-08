@@ -50,6 +50,6 @@ export default async function handler(req, res) {
     res.setHeader('allow', 'GET, PUT, POST');
     return res.status(405).json({ error: 'method not allowed' });
   } catch (e) {
-    return res.status(500).json({ error: 'storage unavailable' });
+    return res.status(500).json({ error: 'storage unavailable', detail: String((e && e.message) || e) });
   }
 }
