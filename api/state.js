@@ -1,11 +1,13 @@
-// Sync endpoint for the wealth dashboard — PRIVATE Vercel Blob store.
-// Stores ONE opaque, client-side-encrypted blob per key. The key is derived
-// from the user's password in the browser (PBKDF2) — this server never sees
-// the password or any readable financial data. With a private store, blobs
-// are not reachable by URL at all; every read/write is authenticated
-// (OIDC or BLOB_READ_WRITE_TOKEN, handled by the SDK automatically).
+// Sync endpoint for the wealth dashboard — private Vercel Blob store.
+// One opaque, client-side-encrypted blob per key; the server never sees
+// the password or readable data. Namespace import + runtime feature
+// detection so no SDK version difference can crash the function.
 
-import { put, get } from '@vercel/blob';
+import * as blob from '@vercel/blob';
+
+function authToken() {
+  return process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_OIDC_TOKEN || '';
+}
 
 async function bodyText(result) {
   if (!result) return null;
@@ -18,30 +20,57 @@ async function bodyText(result) {
   return null;
 }
 
+async function readBlob(pathname) {
+  // Preferred: SDK get() (private-store aware, cache-bypassing)
+  if (typeof blob.get === 'function') {
+    try {
+      const result = await blob.get(pathname, { access: 'private', useCache: false });
+      const text = await bodyText(result);
+      return text == null ? { status: 404 } : { status: 200, text };
+    } catch (e) {
+      const msg = String((e && e.message) || e);
+      if (/not.?found|does not exist|404/i.test(msg)) return { status: 404 };
+      throw e;
+    }
+  }
+  // Fallback: locate via list(), fetch with Authorization header
+  const { blobs } = await blob.list({ prefix: pathname, limit: 1 });
+  if (!blobs.length) return { status: 404 };
+  const r = await fetch(blobs[0].url, {
+    cache: 'no-store',
+    headers: { authorization: 'Bearer ' + authToken() },
+  });
+  if (r.status === 404) return { status: 404 };
+  if (!r.ok) throw new Error('blob fetch failed: ' + r.status);
+  return { status: 200, text: await r.text() };
+}
+
+async function writeBlob(pathname, body) {
+  const base = { addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', cacheControlMaxAge: 60 };
+  try {
+    return await blob.put(pathname, body, Object.assign({ access: 'private' }, base));
+  } catch (e) {
+    const msg = String((e && e.message) || e);
+    // Older SDKs only accept access:'public'; public stores reject 'private'.
+    if (/access/i.test(msg) && /private|public|invalid/i.test(msg)) {
+      return await blob.put(pathname, body, Object.assign({ access: 'public' }, base));
+    }
+    throw e;
+  }
+}
+
 export default async function handler(req, res) {
   const key = String(req.query.k || '').toLowerCase().replace(/[^a-f0-9]/g, '');
-  if (key.length !== 64) {
-    return res.status(400).json({ error: 'bad key' });
-  }
+  if (key.length !== 64) return res.status(400).json({ error: 'bad key' });
   const pathname = `wealthdash/${key}.json`;
 
   try {
     if (req.method === 'GET') {
-      let result;
-      try {
-        result = await get(pathname, { access: 'private', useCache: false });
-      } catch (e) {
-        const msg = String((e && e.message) || e);
-        if (/not.?found|does not exist|404/i.test(msg)) {
-          return res.status(404).json({ error: 'not found' });
-        }
-        throw e;
-      }
-      const text = await bodyText(result);
-      if (text == null) return res.status(404).json({ error: 'not found' });
+      const out = await readBlob(pathname);
+      if (out.status === 404) return res.status(404).json({ error: 'not found' });
       res.setHeader('content-type', 'application/json');
       res.setHeader('cache-control', 'no-store');
-      return res.status(200).send(text);
+      return res.status(200).send(out.text);
     }
 
     if (req.method === 'PUT' || req.method === 'POST') {
@@ -58,13 +87,7 @@ export default async function handler(req, res) {
       if (!parsed || parsed.v !== 2 || !parsed.ct || !parsed.iv || !parsed.s) {
         return res.status(400).json({ error: 'not an encrypted envelope' });
       }
-      await put(pathname, body, {
-        access: 'private',
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        contentType: 'application/json',
-        cacheControlMaxAge: 60,
-      });
+      await writeBlob(pathname, body);
       return res.status(200).json({ ok: true });
     }
 
