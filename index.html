@@ -378,6 +378,21 @@ body{margin:0;background:
 .when-tag{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
 .when-tag.setup{color:var(--estate)}
 
+/* password gate */
+body.locked .wrap,body.locked .modal-overlay,body.locked .toast{display:none!important}
+.gate{display:none;position:fixed;inset:0;z-index:500;background:var(--ink);align-items:center;justify-content:center;padding:22px}
+body.locked .gate{display:flex}
+.gate-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line-strong);border-radius:18px;padding:34px 32px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.gate-logo{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:600;font-size:15px;color:var(--muted);margin-bottom:22px}
+.gate-logo .dot{width:9px;height:9px;border-radius:50%;background:var(--brass);box-shadow:0 0 12px var(--brass)}
+.gate-card h2{font-family:var(--disp);font-weight:600;font-size:22px;margin:0 0 8px}
+.gate-sub{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 20px}
+.gate-card input{width:100%;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:14px;padding:12px 14px;margin-bottom:10px}
+.gate-card input:focus{outline:none;border-color:var(--brass)}
+.gate-card .btn-primary{width:100%;justify-content:center;padding:12px;margin-top:6px}
+.gate-err{color:var(--debt);font-size:12.5px;min-height:18px;margin-top:10px}
+.gate-note{color:var(--muted-2);font-size:11px;line-height:1.6;margin:14px 0 0}
+
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .anim{opacity:0;animation:rise .55s cubic-bezier(.22,.61,.36,1) forwards}
 @media(prefers-reduced-motion:reduce){.anim{animation:none;opacity:1}}
@@ -400,7 +415,7 @@ body{margin:0;background:
 :focus-visible{outline:2px solid var(--brass);outline-offset:2px;border-radius:6px}
 </style>
 </head>
-<body>
+<body class="locked">
 <div class="wrap">
 
   <header class="top">
@@ -412,6 +427,7 @@ body{margin:0;background:
       <button class="btn-primary" id="updateBtn"><span class="plus">＋</span> Update</button>
       <button class="btn-ghost" id="exportBtn" title="Download a JSON backup">Export</button>
       <button class="btn-ghost" id="importBtn" title="Restore from a backup">Import</button>
+      <button class="btn-ghost" id="lockBtn" title="Lock the dashboard">Lock</button>
       <div class="datechip" id="dateChip">UPDATED · 1 JUL 2026</div>
     </div>
     <input type="file" id="importFile" accept="application/json" hidden>
@@ -430,13 +446,13 @@ body{margin:0;background:
       <div class="hero-grid">
         <div>
           <div class="eyebrow">Net worth</div>
-          <div class="netnum"><span id="netVal">211.286</span><span class="cur">€</span></div>
-          <div class="foot">Assets <b id="footAssets">346.757 €</b> &nbsp;−&nbsp; Debt <b id="footDebt">135.471 €</b></div>
+          <div class="netnum"><span id="netVal">—</span><span class="cur">€</span></div>
+          <div class="foot">Assets <b id="footAssets">—</b> &nbsp;−&nbsp; Debt <b id="footDebt">—</b></div>
         </div>
         <div class="beam-wrap">
-          <div class="beam-label"><span id="beamAssetsLbl">ASSETS · 346.757 €</span><span>COMPOSITION</span></div>
+          <div class="beam-label"><span id="beamAssetsLbl">ASSETS</span><span>COMPOSITION</span></div>
           <div class="beam" id="beam" role="img" aria-label="Asset composition bar"></div>
-          <div class="beam-label" style="margin-top:11px"><span id="beamDebtLbl">DEBT · 135.471 €</span><span>against assets</span></div>
+          <div class="beam-label" style="margin-top:11px"><span id="beamDebtLbl">DEBT</span><span>against assets</span></div>
           <div class="beam debt"><span id="beamDebt" style="width:39.07%;background:var(--debt)"></span></div>
           <div class="beam-legend" id="beamLegend"></div>
         </div>
@@ -444,11 +460,11 @@ body{margin:0;background:
     </div>
 
     <div class="kpis k5 anim" style="animation-delay:.05s">
-      <div class="kpi"><div class="k">Equity + savings + cash</div><div class="v" id="kpiFinAssets">155.011 €</div><div class="n">financial assets</div></div>
-      <div class="kpi"><div class="k">Invested equity</div><div class="v" id="kpiInvested">71.189 €</div><div class="n">VWCE + Degiro</div></div>
-      <div class="kpi pos"><div class="k">Property equity</div><div class="v" id="kpiPropEq">34.529 €</div><div class="n">170k − 135,5k mortgage</div></div>
-      <div class="kpi"><div class="k">Receivables</div><div class="v" id="kpiRecv">23.289 €</div><div class="n">Owed back to you</div></div>
-      <div class="kpi debt-kpi"><div class="k">Mortgage</div><div class="v" id="kpiMort">135.471 €</div><div class="n">Your 50% · Caixa</div></div>
+      <div class="kpi"><div class="k">Equity + savings + cash</div><div class="v" id="kpiFinAssets">—</div><div class="n">financial assets</div></div>
+      <div class="kpi"><div class="k">Invested equity</div><div class="v" id="kpiInvested">—</div><div class="n">VWCE + Degiro</div></div>
+      <div class="kpi pos"><div class="k">Property equity</div><div class="v" id="kpiPropEq">—</div><div class="n">170k − 135,5k mortgage</div></div>
+      <div class="kpi"><div class="k">Receivables</div><div class="v" id="kpiRecv">—</div><div class="n">Owed back to you</div></div>
+      <div class="kpi debt-kpi"><div class="k">Mortgage</div><div class="v" id="kpiMort">—</div><div class="n">Your 50% · Caixa</div></div>
     </div>
 
     <div class="section-head anim"><h2>Where it sits today</h2><span class="hint">Gross assets by category, and every account</span></div>
@@ -456,7 +472,7 @@ body{margin:0;background:
       <div class="card donut-card anim">
         <div class="donut-flex">
           <div class="donut"><svg width="200" height="200" viewBox="0 0 200 200" id="donut" aria-hidden="true"></svg>
-            <div class="center"><div class="cl">Gross assets</div><div class="cv" id="donutCenter">346.757 €</div></div></div>
+            <div class="center"><div class="cl">Gross assets</div><div class="cv" id="donutCenter">—</div></div></div>
           <div class="alloc-legend" id="allocLegend"></div>
         </div>
       </div>
@@ -473,9 +489,9 @@ body{margin:0;background:
   <!-- ============ TAB 2 · INVESTMENTS ============ -->
   <section class="panel" id="tab-inv" role="tabpanel">
     <div class="kpis k5 anim">
-      <div class="kpi brass-kpi"><div class="k">VWCE now</div><div class="v" id="kpiVwceNow">45.336 €</div><div class="n">FTSE All‑World (Acc)</div></div>
-      <div class="kpi"><div class="k">Degiro now</div><div class="v" id="kpiDegiro">27.396 €</div><div class="n">Stocks + EM trackers</div></div>
-      <div class="kpi pos"><div class="k">Total invested</div><div class="v" id="kpiTotalInv">72.732 €</div><div class="n">VWCE + Degiro, at market</div></div>
+      <div class="kpi brass-kpi"><div class="k">VWCE now</div><div class="v" id="kpiVwceNow">—</div><div class="n">FTSE All‑World (Acc)</div></div>
+      <div class="kpi"><div class="k">Degiro now</div><div class="v" id="kpiDegiro">—</div><div class="n">Stocks + EM trackers</div></div>
+      <div class="kpi pos"><div class="k">Total invested</div><div class="v" id="kpiTotalInv">—</div><div class="n">VWCE + Degiro, at market</div></div>
       <div class="kpi"><div class="k">Left to deploy</div><div class="v">75.000 €</div><div class="n">Aug → Dec</div></div>
       <div class="kpi"><div class="k">Target mix</div><div class="v">85 / 7 / 3 / 5</div><div class="n">Equity / bonds / commod. / cash</div></div>
     </div>
@@ -568,7 +584,7 @@ body{margin:0;background:
       <table>
         <thead><tr><th>Holding</th><th>Vehicle</th><th class="r">Value</th></tr></thead>
         <tbody id="invBody"></tbody>
-        <tfoot><tr><td>Held now</td><td></td><td class="r" id="invHeldTotal" style="font-family:var(--mono);font-weight:600">150.958 €</td></tr></tfoot>
+        <tfoot><tr><td>Held now</td><td></td><td class="r" id="invHeldTotal" style="font-family:var(--mono);font-weight:600">—</td></tr></tfoot>
       </table>
     </div>
 
@@ -761,10 +777,10 @@ body{margin:0;background:
 
     <div id="salva-sub-costs" class="subpanel">
       <div class="kpis k4 anim">
-        <div class="kpi brass-kpi"><div class="k">One‑off costs</div><div class="v" id="costOneoffTotal">2.380 €</div><div class="n">furniture &amp; setup so far</div></div>
-        <div class="kpi"><div class="k">Recurring / month</div><div class="v" id="costRecurMonth">105 €</div><div class="n">community + insurance</div></div>
-        <div class="kpi"><div class="k">Recurring / year</div><div class="v" id="costRecurYear">1.255 €</div><div class="n" id="costRecurCount">2 recurring costs</div></div>
-        <div class="kpi pos"><div class="k">First‑year all‑in</div><div class="v" id="costFirstYear">3.635 €</div><div class="n">setup + 1 yr running</div></div>
+        <div class="kpi brass-kpi"><div class="k">One‑off costs</div><div class="v" id="costOneoffTotal">—</div><div class="n">furniture &amp; setup so far</div></div>
+        <div class="kpi"><div class="k">Recurring / month</div><div class="v" id="costRecurMonth">—</div><div class="n">community + insurance</div></div>
+        <div class="kpi"><div class="k">Recurring / year</div><div class="v" id="costRecurYear">—</div><div class="n" id="costRecurCount">2 recurring costs</div></div>
+        <div class="kpi pos"><div class="k">First‑year all‑in</div><div class="v" id="costFirstYear">—</div><div class="n">setup + 1 yr running</div></div>
       </div>
 
       <div class="section-head with-action anim"><h2>One‑off costs</h2><button class="btn-add" id="addCostBtn">＋ Add cost</button></div>
@@ -772,7 +788,7 @@ body{margin:0;background:
         <table>
           <thead><tr><th>When</th><th>Item</th><th>Where</th><th>Who</th><th class="r">Amount</th><th></th></tr></thead>
           <tbody id="costBody2"></tbody>
-          <tfoot><tr><td colspan="4">Total one‑off</td><td class="r" id="costFootTotal" style="font-family:var(--mono);font-weight:600">2.380 €</td><td></td></tr></tfoot>
+          <tfoot><tr><td colspan="4">Total one‑off</td><td class="r" id="costFootTotal" style="font-family:var(--mono);font-weight:600">—</td><td></td></tr></tfoot>
         </table>
       </div>
 
@@ -894,6 +910,20 @@ body{margin:0;background:
   </div>
 </div>
 
+<!-- ===== PASSWORD GATE ===== -->
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Unlock dashboard">
+  <div class="gate-card">
+    <div class="gate-logo"><span class="dot"></span> Wealth Dashboard</div>
+    <h2 id="gateTitle">Unlock</h2>
+    <p class="gate-sub" id="gateSub">Enter your password to decrypt your data.</p>
+    <input type="password" id="gatePass" placeholder="Password" autocomplete="current-password">
+    <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
+    <button class="btn-primary" id="gateGo">Unlock</button>
+    <div class="gate-err" id="gateErr"></div>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.</p>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -925,18 +955,18 @@ body{margin:0;background:
 
   /* ---------- seed accounts ---------- */
   const seed=[
-    {id:'portefeuille',name:'Portefeuille',cat:'Cash',value:2600.00},
-    {id:'argenta',name:'Argenta zichtrek',cat:'Cash',value:88.95},
-    {id:'revolut_cash',name:'Revolut cash',cat:'Cash',value:311.21},
-    {id:'edenred',name:'EdenRed',cat:'Cash',value:342.78},
-    {id:'caixa_cash',name:'Caixa',cat:'Cash',value:711.00},
-    {id:'revolut_sav',name:'Revolut saving',cat:'Savings',value:2238.01},
-    {id:'trade_republic',name:'Trade Republic',cat:'Savings',value:75987.39},
-    {id:'vwce',name:'VWCE',cat:'Equity',value:45336.41},
-    {id:'degiro',name:'Degiro',cat:'Equity',value:27395.70},
-    {id:'salva',name:'Salva 40 (your 50%)',cat:'Real estate',value:170000.00,locked:true},
-    {id:'splitwise',name:'Splitwise',cat:'Receivables',value:1114.11},
-    {id:'lu_debt',name:'House debt · Lu',cat:'Receivables',value:22175.00},
+    {id:'portefeuille',name:'Portefeuille',cat:'Cash',value:0},
+    {id:'argenta',name:'Argenta zichtrek',cat:'Cash',value:0},
+    {id:'revolut_cash',name:'Revolut cash',cat:'Cash',value:0},
+    {id:'edenred',name:'EdenRed',cat:'Cash',value:0},
+    {id:'caixa_cash',name:'Caixa',cat:'Cash',value:0},
+    {id:'revolut_sav',name:'Revolut saving',cat:'Savings',value:0},
+    {id:'trade_republic',name:'Trade Republic',cat:'Savings',value:0},
+    {id:'vwce',name:'VWCE',cat:'Equity',value:0},
+    {id:'degiro',name:'Degiro',cat:'Equity',value:0},
+    {id:'salva',name:'Salva 40 (your 50%)',cat:'Real estate',value:0,locked:true},
+    {id:'splitwise',name:'Splitwise',cat:'Receivables',value:0},
+    {id:'lu_debt',name:'House debt · Lu',cat:'Receivables',value:0},
     {id:'mortgage',name:'Caixa mortgage (your 50%)',cat:'Mortgage',value:simonMort,liability:true,locked:true},
   ];
 
@@ -946,45 +976,44 @@ body{margin:0;background:
     const gross=order.reduce((s,c)=>s+(cats[c]||0),0);return {cats,gross,liab,net:gross-liab};}
   function clone(o){return JSON.parse(JSON.stringify(o));}
 
-  /* ---------- state + persistence ---------- */
-  const LS='wealthDash_v1';
-  let state=null;
-  try{const raw=localStorage.getItem(LS);if(raw)state=JSON.parse(raw);}catch(e){state=null;}
-  if(!state||!state.accounts||!state.history){
-    const t=totalsOf(seed);
-    state={accounts:clone(seed),history:[{ts:Date.parse('2026-07-01T12:00:00'),net:t.net,gross:t.gross,cats:clone(t.cats),liab:t.liab,note:'Starting snapshot'}]};
-  }
-  /* property costs (from the "Buy Furniture" sheet) */
-  const seedCosts=[
-    {item:'Clothes hanger',room:'Living room',brand:'Sklum',amount:118.88,cond:'New',who:'Luciana'},
-    {item:'Living room table',room:'Living room',brand:'Sklum',amount:570,cond:'New',who:'Luciana'},
-    {item:'Microwave',room:'Kitchen',brand:'Mediamarket',amount:70,cond:'New',who:'Luciana'},
-    {item:'Airfryer',room:'Kitchen',brand:'Ninja',amount:75,cond:'New',who:'Luciana'},
-    {item:'Espejo Baño',room:'Toilet guest',brand:'Tikamoon',amount:79,cond:'New',who:'Luciana'},
-    {item:'Small stuff',room:'Everywhere',brand:'Ikea',amount:206.69,cond:'New',who:'Luciana'},
-    {item:'Chairs',room:'Living room',brand:'Wallapop',amount:200,cond:'Second hand',who:'Simon'},
-    {item:'Espejo Baño 2',room:'Toilet room',brand:'Zara Home',amount:70,cond:'New',who:'Luciana'},
-    {item:'Small stuff',room:'Everywhere',brand:'Shein',amount:31,cond:'New',who:'Luciana'},
-    {item:'Mattress couch',room:'Guest room',brand:'Espuma al medio',amount:123.38,cond:'New',who:'Luciana'},
-    {item:'Foldable bed',room:'Guest room',brand:'Amazon',amount:85,cond:'New',who:'Luciana'},
-    {item:'Tabourets',room:'Living room',brand:'Amazon',amount:124,cond:'New',who:'Luciana'},
-    {item:'Bedside tables',room:'Bedroom',brand:'Zara Home',amount:200,cond:'New',who:'Simon'},
-    {item:'Perchero',room:'Living room',brand:'Sklum',amount:130,cond:'New',who:'Simon'},
-    {item:'Small kitchen stuff',room:'Kitchen',brand:'Sklum',amount:83,cond:'New',who:'Simon'},
-    {item:'Small stuff',room:'Everywhere',brand:'Diagonal',amount:78,cond:'New',who:'Simon'},
-    {item:'Cushions & plant pot',room:'Everywhere',brand:'H&M Home',amount:135.92,cond:'New',who:'Simon'},
-  ].map((c,i)=>Object.assign({id:'cost_seed_'+i,when:'setup'},c));
-  if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);
-  if(!state.recurringCosts)state.recurringCosts=[];
-  const seedRecurring=[
-    {id:'recur_seed_comunidad',label:'Community fees (Feliu)',amount:70,freq:'monthly',who:'Both',note:'Comunidad · Salva 40 · Dpto 3‑1'},
-    {id:'recur_seed_hogar',label:'Home insurance (Adeslas)',amount:415.05,freq:'yearly',who:'Both',note:'Hogar Complet · Segurcaixa Adeslas · Apr–Apr'},
-    {id:'recur_seed_simwifi',label:'2 SIM cards + wifi',amount:22.5,freq:'monthly',who:'Luciana',note:'Mobile + home internet'},
-  ];
-  if(!state.seededRecurIds)state.seededRecurIds=state.recurSeeded?['recur_seed_comunidad','recur_seed_hogar']:[];
-  {let added=false;seedRecurring.forEach(s=>{if(state.seededRecurIds.indexOf(s.id)===-1){if(!state.recurringCosts.some(r=>r.id===s.id))state.recurringCosts.push(s);state.seededRecurIds.push(s.id);added=true;}});if(added){state.recurSeeded=true;persist();}}
+  /* ---------- encrypted state + sync ----------
+     All data is AES-GCM-encrypted with a key derived from your password
+     (PBKDF2, 250k iterations). Stored encrypted in this browser and, when
+     hosted, synced encrypted to /api/state — the server never sees a key. */
+  const LS='wealthDash_v1';        /* legacy plaintext (migrated, then removed) */
+  const LS2='wealthDash_v2enc';    /* encrypted envelope */
+  let state=null, pass=null;
+  const SYNC={enabled:(location.protocol==='http:'||location.protocol==='https:'),key:null,warned:false};
+  const seedCosts=[];      /* personal data no longer ships in code */
+  const seedRecurring=[];
+
+  const te=new TextEncoder(),td=new TextDecoder();
+  const b64=b=>btoa(String.fromCharCode.apply(null,new Uint8Array(b)));
+  const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+  function kdfKey(pw,salt){return crypto.subtle.importKey('raw',te.encode(pw),'PBKDF2',false,['deriveKey'])
+    .then(km=>crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']));}
+  function kdfHex(pw){return crypto.subtle.importKey('raw',te.encode(pw),'PBKDF2',false,['deriveBits'])
+    .then(km=>crypto.subtle.deriveBits({name:'PBKDF2',salt:te.encode('wealthdash-sync-path-v1'),iterations:120000,hash:'SHA-256'},km,256))
+    .then(bits=>Array.prototype.map.call(new Uint8Array(bits),x=>x.toString(16).padStart(2,'0')).join(''));}
+  async function encState(pw,obj){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+    const key=await kdfKey(pw,salt);const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,te.encode(JSON.stringify(obj)));
+    return {v:2,s:b64(salt),iv:b64(iv),ct:b64(ct),ts:obj.updatedAt||Date.now()};}
+  async function decState(pw,pkg){const key=await kdfKey(pw,unb64(pkg.s));
+    const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(pkg.iv)},key,unb64(pkg.ct));
+    return JSON.parse(td.decode(pt));}
+
+  async function remoteGet(){if(!SYNC.enabled||!SYNC.key)return undefined;
+    try{const r=await fetch('/api/state?k='+SYNC.key,{cache:'no-store'});
+      if(r.status===404)return null;if(!r.ok)return undefined;return await r.json();}catch(e){return undefined;}}
+  let pushTimer=null;
+  function schedulePush(pkg){if(!SYNC.enabled||!SYNC.key)return;clearTimeout(pushTimer);
+    pushTimer=setTimeout(()=>{fetch('/api/state?k='+SYNC.key,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(pkg)})
+      .then(r=>{if(!r.ok)throw 0;}).catch(()=>{if(!SYNC.warned){SYNC.warned=true;toast('Cloud sync unavailable — saving on this device only');}});},1200);}
+
   function syncMort(){const m=state.accounts.find(a=>a.id==='mortgage');if(m)m.value=simonMort;}
-  function persist(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
+  function persist(){if(!state)return;state.updatedAt=Date.now();
+    if(!pass)return; /* no password session — nothing is written in plaintext */
+    encState(pass,state).then(pkg=>{try{localStorage.setItem(LS2,JSON.stringify(pkg));}catch(e){}schedulePush(pkg);}).catch(()=>{});}
   function snapEntry(note){const t=totalsOf(state.accounts);return {ts:Date.now(),net:t.net,gross:t.gross,cats:clone(t.cats),liab:t.liab,note};}
   function sameDay(a,b){return new Date(a).toDateString()===new Date(b).toDateString();}
   function recordSnapshot(note){const entry=snapEntry(note);const h=state.history,last=h[h.length-1];
@@ -1352,10 +1381,67 @@ body{margin:0;background:
     persist();renderCosts();toast('Recurring cost added');recurModal.hidden=true;
   });
 
-  /* ---------- go ---------- */
-  dedupeHistory();
-  initStatic();
-  renderDynamic();
+  /* ---------- boot (runs after unlock) ---------- */
+  function boot(){
+    if(!state||!state.accounts||!state.history){
+      const t=totalsOf(seed);
+      state={accounts:clone(seed),history:[{ts:Date.now(),net:t.net,gross:t.gross,cats:clone(t.cats),liab:t.liab,note:'Starting snapshot'}]};
+    }
+    if(!state.propertyCosts)state.propertyCosts=[];
+    if(!state.recurringCosts)state.recurringCosts=[];
+    dedupeHistory();
+    initStatic();
+    renderDynamic();
+    persist();                                   /* writes encrypted v2 + pushes to cloud */
+    try{localStorage.removeItem(LS);}catch(e){}  /* remove legacy plaintext copy */
+  }
+
+  /* ---------- password gate ---------- */
+  const gate=$('gate'),gatePass=$('gatePass'),gatePass2=$('gatePass2'),gateGo=$('gateGo'),gateErr=$('gateErr'),gateSub=$('gateSub');
+  function gateError(msg){if(gateErr)gateErr.textContent=msg;if(gateGo){gateGo.disabled=false;gateGo.textContent='Unlock';}}
+  (function initGate(){
+    let hasV2=false;try{hasV2=!!localStorage.getItem(LS2);}catch(e){}
+    if(!hasV2&&gatePass2){gatePass2.hidden=false;
+      if(gateSub)gateSub.textContent='First time on this device: choose a password (or enter your existing one twice to pull your synced data).';}
+  })();
+  async function unlock(){
+    const p=(gatePass&&gatePass.value)||'';
+    if(!p){gateError('Enter a password');return;}
+    if(!(window.crypto&&crypto.subtle)){gateError('This browser blocks encryption on this page (needs https or a local file).');return;}
+    if(gateGo){gateGo.disabled=true;gateGo.textContent='Unlocking…';}
+    if(gateErr)gateErr.textContent='';
+    try{
+      if(SYNC.enabled){try{SYNC.key=await kdfHex(p);}catch(e){SYNC.key=null;}}
+      let localPkg=null;try{const raw=localStorage.getItem(LS2);if(raw)localPkg=JSON.parse(raw);}catch(e){}
+      let chosen=null;
+      if(localPkg){try{chosen=await decState(p,localPkg);}catch(e){/* wrong password (or corrupt) */}}
+      const remotePkg=await remoteGet();
+      if(remotePkg){
+        try{const rst=await decState(p,remotePkg);
+          if(!chosen||((rst.updatedAt||remotePkg.ts||0)>(chosen.updatedAt||0)))chosen=rst;
+        }catch(e){if(!chosen){gateError('Wrong password.');return;}}
+      }
+      if(localPkg&&!chosen){gateError('Wrong password.');return;}
+      if(!chosen){
+        /* nothing decryptable anywhere → first-time setup on this password */
+        if(!gatePass2||gatePass2.hidden||gatePass2.value!==p){
+          if(gatePass2&&gatePass2.hidden){gatePass2.hidden=false;}
+          gateError('New setup: repeat the password to confirm.');return;}
+        let v1=null;try{const raw=localStorage.getItem(LS);if(raw)v1=JSON.parse(raw);}catch(e){}
+        chosen=(v1&&v1.accounts&&v1.history)?v1:null;  /* adopt legacy plaintext data if present */
+      }
+      pass=p;state=chosen;
+      boot();
+      document.body.classList.remove('locked');
+      gatePass.value='';if(gatePass2)gatePass2.value='';
+      if(SYNC.enabled&&!SYNC.key)toast('Sync key unavailable — device‑only mode');
+    }catch(e){gateError('Could not unlock: '+(e&&e.message?e.message:'unknown error'));}
+  }
+  if(gateGo)gateGo.addEventListener('click',unlock);
+  if(gatePass)gatePass.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+  if(gatePass2)gatePass2.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+  const lockBtn=$('lockBtn');
+  if(lockBtn)lockBtn.addEventListener('click',()=>{pass=null;state=null;location.reload();});
 })();
 </script>
 </body>
