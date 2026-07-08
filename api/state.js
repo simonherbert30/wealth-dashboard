@@ -9,14 +9,18 @@ function authToken() {
   return process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_OIDC_TOKEN || '';
 }
 
+async function streamText(stream) {
+  if (!stream) return null;
+  const chunks = [];
+  for await (const c of stream) chunks.push(Buffer.from(c));
+  return Buffer.concat(chunks).toString('utf8');
+}
+
 async function bodyText(result) {
   if (!result) return null;
-  if (typeof result.text === 'function') return await result.text();
-  if (result.body) {
-    const chunks = [];
-    for await (const c of result.body) chunks.push(Buffer.from(c));
-    return Buffer.concat(chunks).toString('utf8');
-  }
+  if (typeof result.text === 'function') return await result.text();   // Response-like
+  if (result.stream) return await streamText(result.stream);           // @vercel/blob >= 2.x get()
+  if (result.body) return await streamText(result.body);               // generic stream holder
   return null;
 }
 
@@ -24,7 +28,15 @@ async function readBlob(pathname) {
   // Preferred: SDK get() (private-store aware, cache-bypassing)
   if (typeof blob.get === 'function') {
     try {
-      const result = await blob.get(pathname, { access: 'private', useCache: false });
+      let result;
+      try {
+        result = await blob.get(pathname, { access: 'private', useCache: false });
+      } catch (e1) {
+        // some versions may not know useCache — retry without it
+        result = await blob.get(pathname, { access: 'private' });
+      }
+      if (!result) return { status: 404 };                        // v2 returns null when missing
+      if (result.statusCode && result.statusCode !== 200) return { status: 404 };
       const text = await bodyText(result);
       return text == null ? { status: 404 } : { status: 200, text };
     } catch (e) {
