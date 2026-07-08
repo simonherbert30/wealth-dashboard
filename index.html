@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wealth Dashboard — 1 Jul 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C1018; --ink-2:#10151F; --surface:#151B27; --surface-2:#1B2230;
+  --line:rgba(255,255,255,.07); --line-strong:rgba(255,255,255,.13);
+  --text:#EBEEF5; --muted:#8B94A9; --muted-2:#616B80;
+  --brass:#C9A96A; --grow:#5FB89A; --cash:#6E88B0; --estate:#9C82BC; --recv:#7E8AA0;
+  --debt:#C56B5A; --alert:#D8925C;
+  --radius:16px;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:'Space Grotesk',system-ui,sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(201,169,106,.08), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(95,184,154,.06), transparent 55%),
+    var(--ink);
+  color:var(--text);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased;letter-spacing:.1px}
+.wrap{max-width:1180px;margin:0 auto;padding:34px 26px 80px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--muted);font-weight:500}
+
+/* header + tabs */
+.top{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+.brandmark{display:flex;align-items:center;gap:12px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--brass);box-shadow:0 0 0 4px rgba(201,169,106,.14)}
+.top h1{font-family:var(--disp);font-weight:600;font-size:19px;margin:0}
+.top .sub{color:var(--muted);font-size:13px;margin-top:1px}
+.datechip{font-family:var(--mono);font-size:12px;color:var(--text);border:1px solid var(--line-strong);padding:8px 13px;border-radius:999px;background:var(--surface)}
+
+.tabbar{position:sticky;top:0;z-index:20;display:flex;gap:4px;padding:7px;margin:0 0 26px;
+  background:rgba(14,18,27,.82);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px}
+.tab{flex:1;appearance:none;background:transparent;border:none;color:var(--muted);cursor:pointer;
+  font-family:var(--disp);font-weight:500;font-size:14px;padding:12px 14px;border-radius:9px;transition:.2s;
+  display:flex;align-items:center;justify-content:center;gap:9px}
+.tab:hover{color:var(--text);background:var(--surface)}
+.tab.active{color:var(--ink);background:var(--brass);font-weight:600}
+.tab .ti{font-family:var(--mono);font-size:11px;opacity:.7}
+.tab.active .ti{opacity:.85}
+
+.panel{display:none}
+.panel.active{display:block;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.panel.active{animation:none}}
+
+/* hero */
+.hero{background:linear-gradient(180deg,var(--surface),var(--ink-2));border:1px solid var(--line);border-radius:22px;padding:30px 32px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 240px at 90% 0%, rgba(201,169,106,.10), transparent 60%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;position:relative}
+.netnum{font-family:var(--mono);font-weight:600;font-size:clamp(40px,7vw,66px);line-height:1;letter-spacing:-2px;margin:10px 0 6px}
+.netnum .cur{color:var(--brass);font-size:.55em;vertical-align:top;margin-left:4px}
+.hero .foot{color:var(--muted);font-size:13px}.hero .foot b{color:var(--text);font-weight:600}
+.beam-wrap{align-self:center}
+.beam-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:7px}
+.beam{height:20px;border-radius:6px;overflow:hidden;display:flex;background:var(--ink);border:1px solid var(--line)}
+.beam span{height:100%;display:block}.beam.debt{margin-top:9px;height:12px}
+.beam-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:14px}
+.lg{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.lg i{width:9px;height:9px;border-radius:3px;display:inline-block}.lg b{color:var(--text);font-family:var(--mono);font-weight:500}
+
+/* kpi */
+.kpis{display:grid;gap:14px;margin:16px 0 30px}
+.kpis.k5{grid-template-columns:repeat(5,1fr)}.kpis.k4{grid-template-columns:repeat(4,1fr)}.kpis.k3{grid-template-columns:repeat(3,1fr)}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.kpi .k{font-family:var(--mono);font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-family:var(--mono);font-weight:600;font-size:19px;margin-top:8px;letter-spacing:-.4px}
+.kpi .n{font-size:11.5px;color:var(--muted-2);margin-top:3px}
+.kpi.pos .v{color:var(--grow)}.kpi.debt-kpi .v{color:var(--debt)}.kpi.brass-kpi .v{color:var(--brass)}
+
+.section-head{display:flex;align-items:baseline;gap:14px;margin:38px 0 16px;flex-wrap:wrap}
+.section-head h2{font-family:var(--disp);font-weight:600;font-size:18px;margin:0}
+.section-head .hint{color:var(--muted);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.split{display:grid;grid-template-columns:340px 1fr;gap:16px}
+
+/* donut */
+.donut-card{padding:22px}
+.donut-flex{display:flex;flex-direction:column;align-items:center;gap:16px}
+.donut{position:relative;width:200px;height:200px}
+.donut svg{transform:rotate(-90deg)}
+.donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.donut .center .cl{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.donut .center .cv{font-family:var(--mono);font-weight:600;font-size:22px;margin-top:3px;letter-spacing:-.5px}
+.alloc-legend{width:100%;display:flex;flex-direction:column;gap:2px}
+.alloc-row{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:8px}
+.alloc-row:hover{background:var(--surface-2)}
+.alloc-row i{width:10px;height:10px;border-radius:3px;flex:none}
+.alloc-row .nm{flex:1;font-size:13px}
+.alloc-row .vl{font-family:var(--mono);font-size:12.5px}
+.alloc-row .pc{font-family:var(--mono);font-size:11.5px;color:var(--muted);width:44px;text-align:right}
+
+/* ledger */
+.ledger{padding:8px 6px 10px}
+.ledger table{width:100%;border-collapse:collapse}
+.ledger th{font-family:var(--mono);font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 14px 10px;border-bottom:1px solid var(--line)}
+.ledger th.r,.ledger td.r{text-align:right}
+.ledger td{padding:11px 14px;font-size:13.5px;border-bottom:1px solid rgba(255,255,255,.045)}
+.ledger tr:last-child td{border-bottom:none}
+.ledger td.acct{font-weight:500}
+.ledger td.val{font-family:var(--mono);font-weight:500}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}.tag i{width:8px;height:8px;border-radius:2px}
+.ledger tr.liab td.val{color:var(--debt)}
+.ledger tfoot td{padding:13px 14px;font-family:var(--mono);font-weight:600;font-size:14px;border-top:1px solid var(--line-strong)}
+
+/* deployment ladder */
+.deploy{display:grid;grid-template-columns:1fr 380px;gap:16px}
+.ladder{padding:24px 26px}
+.ladder .lead{color:var(--muted);font-size:13.5px;margin:0 0 20px}.ladder .lead b{color:var(--text)}
+.rungs{display:flex;flex-direction:column}
+.rung{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:16px;padding:14px 0;border-bottom:1px dashed rgba(255,255,255,.08)}
+.rung:last-child{border-bottom:none}
+.rung .mo{font-family:var(--mono);font-size:12px;color:var(--brass)}.rung .mo small{display:block;color:var(--muted-2);font-size:10px}
+.rung .bar{height:26px;border-radius:6px;background:linear-gradient(90deg,rgba(201,169,106,.85),rgba(201,169,106,.35));display:flex;align-items:center;padding-left:12px;font-family:var(--mono);font-size:12px;color:#1a1305;font-weight:600;min-width:60px}
+.rung .tot{font-family:var(--mono);font-size:13px;text-align:right}.rung .tot small{display:block;color:var(--muted);font-size:10.5px}
+.rung.now .bar{background:linear-gradient(90deg,rgba(110,136,176,.7),rgba(110,136,176,.25));color:#0b1220}
+.growth{padding:24px 26px}
+.growth h3{font-family:var(--disp);font-weight:600;font-size:14px;margin:0 0 4px}
+.growth .cap{color:var(--muted);font-size:12px;margin:0 0 20px}
+.gbars{display:flex;align-items:flex-end;gap:10px;height:180px;padding-top:8px}
+.gcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
+.gcol .gb{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--brass),rgba(201,169,106,.3));min-height:4px}
+.gcol.now .gb{background:linear-gradient(180deg,var(--cash),rgba(110,136,176,.3))}
+.gcol .gl{font-family:var(--mono);font-size:10px;color:var(--muted)}.gcol .gv{font-family:var(--mono);font-size:10px}
+.src-note{margin-top:18px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;line-height:1.6}.src-note b{color:var(--text)}
+
+/* pots */
+.pots{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pot{padding:22px;position:relative;overflow:hidden}
+.pot .pk{font-family:var(--mono);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.pot .pv{font-family:var(--mono);font-weight:600;font-size:26px;margin:10px 0 4px;letter-spacing:-.6px}
+.pot .pd{font-size:13px;color:var(--muted);line-height:1.55}
+.pot .strip{position:absolute;left:0;top:0;bottom:0;width:4px}
+.pot.fuel .strip{background:var(--brass)}.pot.fuel .pv{color:var(--brass)}
+.pot.buffer .strip{background:var(--alert)}.pot.buffer .pv{color:var(--alert)}
+.pot.reserve .strip{background:var(--grow)}.pot.reserve .pv{color:var(--grow)}
+.flag{margin-top:18px;background:rgba(216,146,92,.09);border:1px solid rgba(216,146,92,.28);border-radius:12px;padding:15px 18px;display:flex;gap:13px;align-items:flex-start}
+.flag .ic{font-family:var(--mono);color:var(--alert);font-weight:600;font-size:15px;flex:none;margin-top:1px}
+.flag p{margin:0;font-size:13.5px}.flag p b{color:var(--alert)}.flag .muted{color:var(--muted)}
+
+/* dip ladder */
+.dip{padding:8px 0 4px}
+.dip-phase{padding:22px 26px}.dip-phase + .dip-phase{border-top:1px solid var(--line)}
+.dip-phase h3{font-family:var(--disp);font-weight:600;font-size:15px;margin:0 0 3px;display:flex;align-items:center;gap:10px}
+.phasetag{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--ink);background:var(--brass);padding:3px 8px;border-radius:5px;text-transform:uppercase;font-weight:600}.phasetag.b{background:var(--alert)}
+.dip-phase .pl{color:var(--muted);font-size:13px;margin:0 0 16px}
+.tiers{display:flex;flex-direction:column;gap:9px}
+.tier{display:grid;grid-template-columns:96px 1fr 130px;align-items:center;gap:16px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:13px 16px}
+.tier .dd{font-family:var(--mono);font-weight:600;font-size:16px}.tier .dd small{display:block;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:400;margin-top:2px}
+.tier .desc{font-size:13px}.tier .desc small{color:var(--muted)}
+.tier .act{font-family:var(--mono);font-size:13px;text-align:right;font-weight:500}
+.tier.t1 .dd,.tier.t1 .act{color:#E0B77A}.tier.t2 .dd,.tier.t2 .act{color:var(--alert)}
+.tier.t3 .dd,.tier.t3 .act{color:#CE7E5E}.tier.t4 .dd,.tier.t4 .act{color:var(--debt)}
+.dip-rules{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 22px}
+.dip-rules li{font-size:12.5px;color:var(--muted);padding-left:18px;position:relative;line-height:1.5}
+.dip-rules li::before{content:"›";position:absolute;left:2px;color:var(--brass);font-family:var(--mono)}
+.dip-rules li b{color:var(--text);font-weight:500}
+
+/* no sell */
+.nosell{padding:26px 28px;position:relative;overflow:hidden;background:linear-gradient(180deg,var(--surface),var(--ink-2));border-color:var(--line-strong)}
+.nosell .lock{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.nosell .lock .ic{width:32px;height:32px;border-radius:9px;background:rgba(197,107,90,.14);border:1px solid rgba(197,107,90,.35);display:flex;align-items:center;justify-content:center;color:var(--debt);font-size:15px}
+.nosell h2{font-family:var(--disp);font-weight:600;font-size:19px;margin:0}
+.nosell .tl{color:var(--muted);font-size:13px;margin:0 0 20px 44px}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rules .r{display:flex;gap:14px;padding:15px 16px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px}
+.rules .r .no{font-family:var(--mono);font-weight:600;color:var(--debt);font-size:13px;flex:none}
+.rules .r p{margin:0;font-size:13.5px}.rules .r p small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+
+/* holdings mini */
+.holdings{padding:8px 6px 10px}
+.holdings table{width:100%;border-collapse:collapse}
+.holdings th{font-family:var(--mono);font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 14px 10px;border-bottom:1px solid var(--line)}
+.holdings th.r,.holdings td.r{text-align:right}
+.holdings td{padding:12px 14px;font-size:13.5px;border-bottom:1px solid rgba(255,255,255,.045)}
+.holdings tr:last-child td{border-bottom:none}
+.holdings td.val{font-family:var(--mono);font-weight:500}
+.holdings .sub{color:var(--muted);font-size:11.5px;margin-top:2px}
+.mini-split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* VWCE explainer */
+.vwce-explain{padding:26px 28px}
+.vwce-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:28px}
+.why-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:13px}
+.why-list li{font-size:13.5px;line-height:1.55;padding-left:26px;position:relative}
+.why-list li::before{content:"✓";position:absolute;left:0;top:0;color:var(--brass);font-family:var(--mono);font-weight:600}
+.why-list li b{font-weight:600}
+.vwce-facts{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:16px 20px;align-self:start}
+.vwce-facts .fr{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.vwce-facts .fr:last-child{border-bottom:none}
+.vwce-facts .fk{color:var(--muted)}.vwce-facts .fv{font-family:var(--mono);text-align:right}
+.vwce-facts .fv.b{color:var(--brass)}
+
+/* pies */
+.pie-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pie-card{padding:20px 22px}
+.pie-card h3{font-family:var(--disp);font-weight:600;font-size:14px;margin:0 0 4px}
+.pie-card .cap{color:var(--muted);font-size:11.5px;margin:0 0 16px}
+.pie-wrap{display:flex;flex-direction:column;align-items:center;gap:16px}
+.pie{width:148px;height:148px;position:relative;flex:none}
+.pie svg{transform:rotate(-90deg)}
+.pie .pc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.pie .pc b{font-family:var(--mono);font-size:16px;letter-spacing:-.5px}
+.pie .pc span{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.pie-legend{width:100%;display:flex;flex-direction:column;gap:4px}
+.ple{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:1px 0}
+.ple i{width:8px;height:8px;border-radius:2px;flex:none}.ple .pn{flex:1;color:var(--muted)}.ple .pp{font-family:var(--mono)}
+.tophold-card{padding:18px 24px}
+.tophold-card h3{font-family:var(--disp);font-weight:600;font-size:14px;margin:0 0 2px;display:inline}
+.tophold-card .sub{color:var(--muted);font-size:12px;margin-left:8px}
+.tophold{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12.5px;display:flex;gap:8px;align-items:baseline}
+.chip .cn{font-weight:500}.chip .cv{font-family:var(--mono);color:var(--brass);font-size:11.5px}
+
+/* diversify */
+.diversify-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.div-card{padding:24px 26px;position:relative;overflow:hidden}
+.div-card .dstrip{position:absolute;left:0;top:0;bottom:0;width:4px}
+.div-card.bonds .dstrip{background:var(--cash)}.div-card.comm .dstrip{background:var(--brass)}
+.div-card .dk{font-family:var(--mono);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.div-card .damt{font-family:var(--mono);font-weight:600;font-size:26px;margin:8px 0 4px;letter-spacing:-.6px}
+.div-card.bonds .damt{color:var(--cash)}.div-card.comm .damt{color:var(--brass)}
+.div-card .dsub{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.5}
+.pick{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.pick .pt{font-weight:600;font-size:13.5px}
+.pick .pmeta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px;display:flex;gap:8px 14px;flex-wrap:wrap}
+.pick .pmeta .tk{color:var(--brass)}
+.pick.alt{background:transparent;border-style:dashed}
+.pick.alt .pt{font-weight:500;font-size:12.5px;color:var(--muted)}
+.pick.alt .pt b{color:var(--text)}
+.div-card .why{font-size:12.5px;color:var(--muted);line-height:1.55;margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+.div-card .why b{color:var(--text)}
+
+/* ===== SALVA 40 ===== */
+.prop-hero{display:grid;grid-template-columns:1.2fr 1fr;gap:0;overflow:hidden}
+.prop-hero .lft{padding:30px 32px;position:relative}
+.prop-hero .addr{font-family:var(--disp);font-weight:600;font-size:24px;margin:8px 0 2px;letter-spacing:.2px}
+.prop-hero .loc{color:var(--muted);font-size:13.5px}
+.prop-hero .price{font-family:var(--mono);font-weight:600;font-size:40px;letter-spacing:-1.5px;margin:20px 0 2px}
+.prop-hero .price .cur{color:var(--estate);font-size:.5em;vertical-align:top}
+.prop-hero .pmeta{color:var(--muted);font-size:13px}.prop-hero .pmeta b{color:var(--text)}
+.prop-hero .rgt{background:var(--surface-2);border-left:1px solid var(--line);padding:26px 28px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.spec{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);gap:12px}
+.spec:last-child{border-bottom:none}
+.spec .sk{font-size:12.5px;color:var(--muted)}
+.spec .sv{font-family:var(--mono);font-size:13px;text-align:right}
+
+.mort-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mort-panel{padding:24px 26px}
+.mort-panel h3{font-family:var(--disp);font-weight:600;font-size:15px;margin:0 0 18px;display:flex;align-items:center;gap:10px}
+.mbig{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:20px}
+.mbig .mb{flex:1;min-width:130px}
+.mbig .mk{font-family:var(--mono);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.mbig .mv{font-family:var(--mono);font-weight:600;font-size:24px;margin-top:6px;letter-spacing:-.5px}
+.mbig .mv.debt{color:var(--debt)}.mbig .mv.brass{color:var(--brass)}
+.mrow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.mrow:last-child{border-bottom:none}.mrow .mv{font-family:var(--mono)}.mrow .mk{color:var(--muted)}
+.paybar{height:12px;border-radius:6px;background:var(--ink);border:1px solid var(--line);overflow:hidden;margin:6px 0 8px;display:flex}
+.paybar .paid{background:var(--debt);height:100%}.paybar .left{background:rgba(201,169,106,.35);height:100%}
+.amort{padding:24px 26px}
+.amort h3{font-family:var(--disp);font-weight:600;font-size:14px;margin:0 0 4px}
+.amort .cap{color:var(--muted);font-size:12px;margin:0 0 12px}
+.amort svg{width:100%;height:auto;display:block}
+
+.costs{padding:8px 6px 10px}
+.costs table{width:100%;border-collapse:collapse}
+.costs th{font-family:var(--mono);font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 16px 10px;border-bottom:1px solid var(--line)}
+.costs th.r,.costs td.r{text-align:right}
+.costs td{padding:10px 16px;font-size:13.5px;border-bottom:1px solid rgba(255,255,255,.045)}
+.costs td.val{font-family:var(--mono)}
+.costs tr.tot td{font-weight:600;border-top:1px solid var(--line-strong);border-bottom:none;padding-top:12px}
+.costs .who{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.costs tr.tax td.lbl{color:var(--alert)}
+
+.own{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.own-card{padding:24px 26px}
+.own-card h3{font-family:var(--disp);font-weight:600;font-size:15px;margin:0 0 16px}
+.own-bar{height:34px;border-radius:8px;overflow:hidden;display:flex;border:1px solid var(--line);margin-bottom:14px}
+.own-bar span{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink)}
+.own-bar .simon{background:var(--estate)}.own-bar .lu{background:var(--recv);color:var(--text)}
+.own-list .mrow .mv{font-weight:500}
+.loan-badge{margin-top:14px;background:rgba(126,138,160,.1);border:1px solid rgba(126,138,160,.3);border-radius:10px;padding:14px 16px;font-size:13px}
+.loan-badge b{color:var(--recv)}
+.recon{margin-top:16px;background:rgba(216,146,92,.09);border:1px solid rgba(216,146,92,.28);border-radius:12px;padding:16px 18px;display:flex;gap:13px;align-items:flex-start}
+.recon .ic{font-family:var(--mono);color:var(--alert);font-weight:600;flex:none;margin-top:1px}
+.recon p{margin:0;font-size:13px;line-height:1.6}.recon p b{color:var(--alert)}
+
+.foot-note{margin-top:34px;color:var(--muted-2);font-size:11.5px;text-align:center;line-height:1.7;border-top:1px solid var(--line);padding-top:22px}
+
+/* header controls */
+.top-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.btn-primary{appearance:none;border:none;cursor:pointer;background:var(--brass);color:var(--ink);font-family:var(--body);font-weight:600;font-size:13px;padding:9px 15px;border-radius:9px;display:flex;align-items:center;gap:7px;transition:.15s}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-primary .plus{font-size:15px;line-height:1}
+.btn-ghost{appearance:none;cursor:pointer;background:var(--surface);border:1px solid var(--line-strong);color:var(--muted);font-family:var(--body);font-size:12.5px;padding:9px 13px;border-radius:9px;transition:.15s}
+.btn-ghost:hover{color:var(--text);border-color:var(--brass)}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(6,9,14,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay[hidden]{display:none}
+.modal{background:var(--surface);border:1px solid var(--line-strong);border-radius:18px;width:100%;max-width:460px;max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid var(--line)}
+.modal-head h3{font-family:var(--disp);font-weight:600;font-size:17px;margin:0}
+.modal-head button{appearance:none;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
+.modal-head button:hover{color:var(--text)}
+.modal-body{padding:20px 24px 24px}
+.modal-body label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:16px 0 7px}
+.modal-body label:first-child{margin-top:0}
+.fld,.modal-body select,.modal-body input[type=text]{width:100%;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--body);font-size:14px;padding:11px 13px}
+.modal-body input[type=text]{font-family:var(--mono)}
+.modal-body select{appearance:none;cursor:pointer}
+.dz-row{display:flex;gap:10px}.dz-row>div{flex:1}
+.dropzone{border:1.5px dashed var(--line-strong);border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;transition:.15s;background:var(--ink-2)}
+.dropzone:hover,.dropzone.drag{border-color:var(--brass);color:var(--text);background:var(--surface-2)}
+.dropzone .di{font-size:22px;display:block;margin-bottom:6px;opacity:.7}
+.thumb{margin-top:10px;max-height:120px;border-radius:8px;border:1px solid var(--line);display:block}
+.ocr-status{font-size:12.5px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:8px;min-height:18px}
+.spin{width:13px;height:13px;border:2px solid var(--line-strong);border-top-color:var(--brass);border-radius:50%;animation:sp .7s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.cands{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.cand{background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px;padding:7px 11px;font-family:var(--mono);font-size:12.5px;cursor:pointer;transition:.12s}
+.cand:hover{border-color:var(--brass);color:var(--brass)}
+.modal-actions{margin-top:22px;display:flex;gap:10px}
+.modal-actions .btn-primary{flex:1;justify-content:center;padding:12px}
+.hintline{font-size:11.5px;color:var(--muted-2);margin-top:12px;line-height:1.5}
+
+/* wealth tab */
+.wealth-chart{padding:24px 26px 18px}
+.wealth-chart svg{width:100%;height:auto;display:block;overflow:visible}
+.wc-empty{text-align:center;color:var(--muted);font-size:13px;padding:40px 10px}
+.movers{padding:20px 26px}
+.mover{display:grid;grid-template-columns:120px 1fr 110px;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.mover:last-child{border-bottom:none}
+.mover .mn{font-size:13px}
+.mover .mtrack{height:12px;background:var(--ink);border-radius:6px;position:relative;overflow:hidden}
+.mover .mfill{position:absolute;top:0;bottom:0;border-radius:6px}
+.mover .mfill.up{background:var(--grow)}.mover .mfill.down{background:var(--debt)}
+.mover .mval{font-family:var(--mono);font-size:12.5px;text-align:right}
+.mover .mval.up{color:var(--grow)}.mover .mval.down{color:var(--debt)}
+.mover .mval.flat{color:var(--muted)}
+.hist{padding:8px 6px 10px}
+.hist table{width:100%;border-collapse:collapse}
+.hist th{font-family:var(--mono);font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 16px 10px;border-bottom:1px solid var(--line)}
+.hist th.r,.hist td.r{text-align:right}
+.hist td{padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.045)}
+.hist tr:last-child td{border-bottom:none}
+.hist td.val{font-family:var(--mono);font-weight:500}
+.hist .delta{font-family:var(--mono);font-size:12px}
+.hist .delta.up{color:var(--grow)}.hist .delta.down{color:var(--debt)}
+.hist .src{font-size:10.5px;color:var(--muted-2);font-family:var(--mono)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--grow);color:var(--ink);font-weight:600;font-size:13px;padding:12px 20px;border-radius:10px;opacity:0;transition:.3s;z-index:200;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Salva sub-tabs */
+.subtabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--line)}
+.subtab{appearance:none;background:none;border:none;cursor:pointer;font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted);padding:11px 2px;margin-right:26px;position:relative;transition:.15s}
+.subtab:hover{color:var(--text)}
+.subtab.active{color:var(--text)}
+.subtab.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--brass);border-radius:2px}
+.subpanel{display:none}
+.subpanel.active{display:block}
+.section-head.with-action{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.btn-add{appearance:none;border:1px solid var(--brass);background:rgba(201,169,106,.12);color:var(--brass);font-family:var(--body);font-weight:600;font-size:12.5px;padding:7px 13px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn-add:hover{background:var(--brass);color:var(--ink)}
+.cost-row-del{appearance:none;background:none;border:none;color:var(--muted-2);cursor:pointer;font-size:13px;padding:2px 7px;border-radius:6px;transition:.12s;line-height:1}
+.cost-row-del:hover{color:var(--debt);background:rgba(197,107,90,.14)}
+.freq-badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--cash);border:1px solid rgba(110,136,176,.4);border-radius:5px;padding:2px 8px}
+.cost-empty{text-align:center;color:var(--muted);font-size:13px;padding:26px 14px;line-height:1.7}
+.when-tag{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+.when-tag.setup{color:var(--estate)}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.anim{opacity:0;animation:rise .55s cubic-bezier(.22,.61,.36,1) forwards}
+@media(prefers-reduced-motion:reduce){.anim{animation:none;opacity:1}}
+
+@media(max-width:940px){
+  .hero-grid,.prop-hero{grid-template-columns:1fr}
+  .prop-hero .rgt{border-left:none;border-top:1px solid var(--line)}
+  .kpis.k5,.kpis.k4,.kpis.k3{grid-template-columns:repeat(2,1fr)}
+  .split,.deploy,.pots,.dip-rules,.rules,.mort-grid,.own,.mini-split{grid-template-columns:1fr}
+  .pie-grid{grid-template-columns:1fr}.diversify-grid{grid-template-columns:1fr}.vwce-grid{grid-template-columns:1fr}
+  .tab .tl{display:none}
+}
+@media(max-width:560px){
+  .wrap{padding:24px 15px 60px}
+  .kpis.k5,.kpis.k4,.kpis.k3{grid-template-columns:1fr}
+  .tier{grid-template-columns:76px 1fr;grid-template-rows:auto auto}
+  .tier .act{grid-column:1/3;text-align:left;padding-top:4px}
+  .tab{font-size:13px;padding:11px 8px}
+}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brandmark">
+      <span class="dot" aria-hidden="true"></span>
+      <div><h1>Wealth Dashboard</h1><div class="sub">Simon · net worth, investments &amp; Salva 40</div></div>
+    </div>
+    <div class="top-actions">
+      <button class="btn-primary" id="updateBtn"><span class="plus">＋</span> Update</button>
+      <button class="btn-ghost" id="exportBtn" title="Download a JSON backup">Export</button>
+      <button class="btn-ghost" id="importBtn" title="Restore from a backup">Import</button>
+      <div class="datechip" id="dateChip">UPDATED · 1 JUL 2026</div>
+    </div>
+    <input type="file" id="importFile" accept="application/json" hidden>
+  </header>
+
+  <nav class="tabbar" role="tablist" aria-label="Dashboard sections">
+    <button class="tab active" role="tab" aria-selected="true" data-tab="net"><span class="ti">01</span> <span class="tl">Net worth</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="inv"><span class="ti">02</span> <span class="tl">Investments</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="salva"><span class="ti">03</span> <span class="tl">Salva 40</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="wealth"><span class="ti">04</span> <span class="tl">Wealth</span></button>
+  </nav>
+
+  <!-- ============ TAB 1 · NET WORTH ============ -->
+  <section class="panel active" id="tab-net" role="tabpanel">
+    <div class="hero anim">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Net worth</div>
+          <div class="netnum"><span id="netVal">211.286</span><span class="cur">€</span></div>
+          <div class="foot">Assets <b id="footAssets">346.757 €</b> &nbsp;−&nbsp; Debt <b id="footDebt">135.471 €</b></div>
+        </div>
+        <div class="beam-wrap">
+          <div class="beam-label"><span id="beamAssetsLbl">ASSETS · 346.757 €</span><span>COMPOSITION</span></div>
+          <div class="beam" id="beam" role="img" aria-label="Asset composition bar"></div>
+          <div class="beam-label" style="margin-top:11px"><span id="beamDebtLbl">DEBT · 135.471 €</span><span>against assets</span></div>
+          <div class="beam debt"><span id="beamDebt" style="width:39.07%;background:var(--debt)"></span></div>
+          <div class="beam-legend" id="beamLegend"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpis k5 anim" style="animation-delay:.05s">
+      <div class="kpi"><div class="k">Equity + savings + cash</div><div class="v" id="kpiFinAssets">155.011 €</div><div class="n">financial assets</div></div>
+      <div class="kpi"><div class="k">Invested equity</div><div class="v" id="kpiInvested">71.189 €</div><div class="n">VWCE + Degiro</div></div>
+      <div class="kpi pos"><div class="k">Property equity</div><div class="v" id="kpiPropEq">34.529 €</div><div class="n">170k − 135,5k mortgage</div></div>
+      <div class="kpi"><div class="k">Receivables</div><div class="v" id="kpiRecv">23.289 €</div><div class="n">Owed back to you</div></div>
+      <div class="kpi debt-kpi"><div class="k">Mortgage</div><div class="v" id="kpiMort">135.471 €</div><div class="n">Your 50% · Caixa</div></div>
+    </div>
+
+    <div class="section-head anim"><h2>Where it sits today</h2><span class="hint">Gross assets by category, and every account</span></div>
+    <div class="split">
+      <div class="card donut-card anim">
+        <div class="donut-flex">
+          <div class="donut"><svg width="200" height="200" viewBox="0 0 200 200" id="donut" aria-hidden="true"></svg>
+            <div class="center"><div class="cl">Gross assets</div><div class="cv" id="donutCenter">346.757 €</div></div></div>
+          <div class="alloc-legend" id="allocLegend"></div>
+        </div>
+      </div>
+      <div class="card ledger anim" style="animation-delay:.05s">
+        <table>
+          <thead><tr><th>Account</th><th>Type</th><th class="r">Value</th></tr></thead>
+          <tbody id="ledgerBody"></tbody>
+          <tfoot><tr><td>Net worth</td><td></td><td class="r" id="ledgerNet">211.286,24 €</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 2 · INVESTMENTS ============ -->
+  <section class="panel" id="tab-inv" role="tabpanel">
+    <div class="kpis k5 anim">
+      <div class="kpi brass-kpi"><div class="k">VWCE now</div><div class="v" id="kpiVwceNow">45.336 €</div><div class="n">FTSE All‑World (Acc)</div></div>
+      <div class="kpi"><div class="k">Degiro now</div><div class="v" id="kpiDegiro">27.396 €</div><div class="n">Stocks + EM trackers</div></div>
+      <div class="kpi pos"><div class="k">Total invested</div><div class="v" id="kpiTotalInv">72.732 €</div><div class="n">VWCE + Degiro, at market</div></div>
+      <div class="kpi"><div class="k">Left to deploy</div><div class="v">75.000 €</div><div class="n">Aug → Dec</div></div>
+      <div class="kpi"><div class="k">Target mix</div><div class="v">85 / 7 / 3 / 5</div><div class="n">Equity / bonds / commod. / cash</div></div>
+    </div>
+
+    <div class="section-head anim"><h2>Your total invested mix</h2><span class="hint">VWCE + Degiro combined · a look‑through of where every invested euro sits</span></div>
+    <div class="card anim" style="padding:24px 26px">
+      <p style="margin:0 0 20px;color:var(--muted);font-size:13.5px;line-height:1.65">Seen through all your funds and stocks at once (≈€72.129 of holdings), the Degiro side — two defence names plus Greece and Brazil trackers — pulls the blend well away from VWCE's near‑global weights: <b style="color:var(--text)">emerging markets jump from ~10% to ~28%</b>, and defence pushes <b style="color:var(--text)">industrials to your single biggest sector</b>. Concentration is the trade‑off for those outsized Greek and Brazilian gains.</p>
+      <div class="diversify-grid">
+        <div class="pie-card">
+          <h3>Developed vs emerging</h3><p class="cap">Look‑through, all holdings</p>
+          <div class="pie-wrap">
+            <div class="pie"><svg width="148" height="148" viewBox="0 0 150 150" id="pieTotalDev"></svg><div class="pc"><b>~28%</b><span>emerging</span></div></div>
+            <div class="pie-legend" id="legTotalDev"></div>
+          </div>
+        </div>
+        <div class="pie-card">
+          <h3>By sector</h3><p class="cap">Look‑through · approximate</p>
+          <div class="pie-wrap">
+            <div class="pie"><svg width="148" height="148" viewBox="0 0 150 150" id="pieTotalSector"></svg><div class="pc"><b>11</b><span>sectors</span></div></div>
+            <div class="pie-legend" id="legTotalSector"></div>
+          </div>
+        </div>
+      </div>
+      <p style="margin:16px 0 0;color:var(--muted-2);font-size:11px;line-height:1.5">Fund sleeves (VWCE, Greece, Brazil trackers) split by their published index weights, so sector figures are approximate. Base excludes €600,60 idle cash in Degiro.</p>
+    </div>
+
+    <div class="section-head anim"><h2>Inside your Degiro account</h2><span class="hint">4 positions · €26.795 securities + €601 cash · as of your latest screenshot</span></div>
+    <div class="card holdings anim">
+      <table>
+        <thead><tr><th>Holding</th><th>Type / market</th><th class="r">Value</th><th class="r">Unrealised</th></tr></thead>
+        <tbody id="degiroBody"></tbody>
+        <tfoot><tr><td>Account total</td><td></td><td class="r" style="font-family:var(--mono);font-weight:600">27.396 €</td><td class="r" style="font-family:var(--mono);color:var(--grow)">+4.346 €</td></tr></tfoot>
+      </table>
+    </div>
+
+    <div class="section-head anim"><h2>Why VWCE is the engine</h2><span class="hint">One ticker, ~3.760 companies, ~90% of the world's market cap</span></div>
+    <div class="card vwce-explain anim">
+      <div class="vwce-grid">
+        <ul class="why-list">
+          <li><b>The whole market in one line.</b> ~3.760 large & mid‑cap companies across ~49 countries, developed and emerging — roughly 90% of the world's investable value. You're not betting on a company, sector, or country; you own all of them.</li>
+          <li><b>Self‑cleansing, market‑cap weighted.</b> Winners grow their weight automatically, losers shrink and drop out. No manager to pick wrong, no rebalancing to do — the index maintains itself.</li>
+          <li><b>Very low cost.</b> 0,19% TER = about €19/year per €10.000. Costs are the one thing you control, and this is near the floor for global equity.</li>
+          <li><b>Accumulating = tax‑efficient in Spain.</b> Dividends are reinvested inside the fund, so there's no yearly dividend to declare — the taxable event is deferred until you sell, and compounding runs untouched.</li>
+          <li><b>Irish domicile.</b> 15% US dividend withholding via treaty (vs 30% otherwise) and UCITS investor protections.</li>
+          <li><b>The catch is behavioural.</b> It only delivers if you sit through a 30–50% drawdown without selling — which is exactly what the discipline rules below are for.</li>
+        </ul>
+        <div class="vwce-facts">
+          <div class="fr"><span class="fk">Ticker</span><span class="fv b">VWCE</span></div>
+          <div class="fr"><span class="fk">ISIN</span><span class="fv">IE00BK5BQT80</span></div>
+          <div class="fr"><span class="fk">Index</span><span class="fv">FTSE All‑World</span></div>
+          <div class="fr"><span class="fk">TER</span><span class="fv">0,19 % / yr</span></div>
+          <div class="fr"><span class="fk">Holdings</span><span class="fv">~3.760</span></div>
+          <div class="fr"><span class="fk">Domicile</span><span class="fv">Ireland</span></div>
+          <div class="fr"><span class="fk">Dividends</span><span class="fv">Accumulating</span></div>
+          <div class="fr"><span class="fk">Fund size</span><span class="fv">~€44 bn</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pie-grid" style="margin-top:16px">
+      <div class="card pie-card anim">
+        <h3>By sector</h3><p class="cap">ICB classification</p>
+        <div class="pie-wrap">
+          <div class="pie"><svg width="148" height="148" viewBox="0 0 150 150" id="pieSector"></svg><div class="pc"><b>11</b><span>sectors</span></div></div>
+          <div class="pie-legend" id="legSector"></div>
+        </div>
+      </div>
+      <div class="card pie-card anim" style="animation-delay:.05s">
+        <h3>By country</h3><p class="cap">Market‑cap weighted</p>
+        <div class="pie-wrap">
+          <div class="pie"><svg width="148" height="148" viewBox="0 0 150 150" id="pieCountry"></svg><div class="pc"><b>~49</b><span>countries</span></div></div>
+          <div class="pie-legend" id="legCountry"></div>
+        </div>
+      </div>
+      <div class="card pie-card anim" style="animation-delay:.1s">
+        <h3>Developed vs emerging</h3><p class="cap">FTSE classification</p>
+        <div class="pie-wrap">
+          <div class="pie"><svg width="148" height="148" viewBox="0 0 150 150" id="pieDev"></svg><div class="pc"><b>~90%</b><span>developed</span></div></div>
+          <div class="pie-legend" id="legDev"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card tophold-card anim" style="margin-top:16px">
+      <h3>Top holdings</h3><span class="sub">the top 10 are ~25% of the fund — the rest is spread across ~3.750 more</span>
+      <div class="tophold" id="topHold"></div>
+    </div>
+
+    <div class="section-head anim"><h2>Invested &amp; investable</h2><span class="hint">Held today, plus December's two new sleeves</span></div>
+    <div class="card holdings anim">
+      <table>
+        <thead><tr><th>Holding</th><th>Vehicle</th><th class="r">Value</th></tr></thead>
+        <tbody id="invBody"></tbody>
+        <tfoot><tr><td>Held now</td><td></td><td class="r" id="invHeldTotal" style="font-family:var(--mono);font-weight:600">150.958 €</td></tr></tfoot>
+      </table>
+    </div>
+
+    <div class="section-head anim"><h2>The 6‑month deployment</h2><span class="hint">VWCE June → November, then diversify in December</span></div>
+    <div class="deploy">
+      <div class="card ladder anim">
+        <p class="lead">June and July are done (<b>€30k</b> then <b>€15k</b> into VWCE). You carry <b>€15k/month</b> through November, then in <b>December you pivot</b> — €10k into world bonds and €5k into commodities instead of more equity. Each rung is one buy on a fixed date.</p>
+        <div class="rungs" id="rungs"></div>
+      </div>
+      <div class="card growth anim" style="animation-delay:.05s">
+        <h3>VWCE balance, month by month</h3>
+        <p class="cap">Contributions only — market movement not shown</p>
+        <div class="gbars" id="gbars"></div>
+        <div class="src-note"><b>Source:</b> the ongoing buys draw from Trade Republic savings (€75.987). <b>December</b> ends the equity build at ~€105k and adds the bond + commodity sleeves — see below.</div>
+      </div>
+    </div>
+
+    <div class="section-head anim"><h2>December: diversify</h2><span class="hint">€15.000 into two things VWCE doesn't hold</span></div>
+    <div class="diversify-grid">
+      <div class="card div-card bonds anim">
+        <span class="dstrip"></span>
+        <div class="dk">Sleeve 1 · World bonds</div>
+        <div class="damt">10.000 €</div>
+        <div class="dsub">Bonds zig when equities zag. A global investment‑grade bond sleeve softens the ride and gives you something to rebalance from in a crash.</div>
+        <div class="pick">
+          <div class="pt">Vanguard Global Aggregate Bond UCITS ETF — EUR Hedged (Acc)</div>
+          <div class="pmeta"><span class="tk">VAGF</span><span>IE00BG47KH54</span><span>TER 0,08%</span><span>Acc · Ireland</span></div>
+        </div>
+        <div class="pick alt"><div class="pt">Near‑identical alternative: <b>iShares Core Global Aggregate Bond EUR‑Hedged Acc</b> — AGGH · TER 0,10%</div></div>
+        <p class="why"><b>Why EUR‑hedged:</b> on a global bond fund, unhedged currency swings would dwarf the modest yield — hedging to euro removes that noise so the bonds actually behave like bonds. Accumulating keeps it tax‑simple in Spain, same as VWCE.</p>
+      </div>
+      <div class="card div-card comm anim" style="animation-delay:.05s">
+        <span class="dstrip"></span>
+        <div class="dk">Sleeve 2 · Commodities</div>
+        <div class="damt">5.000 €</div>
+        <div class="dsub">Low correlation to stocks and bonds, and a classic inflation hedge — the thing that rose in 2022 while everything else fell.</div>
+        <div class="pick">
+          <div class="pt">Invesco Bloomberg Commodity UCITS ETF (Acc)</div>
+          <div class="pmeta"><span class="tk">CMOD</span><span>IE00BD6FTQ80</span><span>TER 0,19%</span><span>Acc · broad basket</span></div>
+        </div>
+        <div class="pick alt"><div class="pt">Prefer pure gold/silver? <b>iShares Physical Gold ETC</b> — SGLN · TER 0,12% (physical, unhedged)</div></div>
+        <p class="why"><b>Broad vs precious:</b> CMOD spreads across energy, metals, agriculture <em>and</em> precious metals (incl. gold & silver) — the better all‑round diversifier. If you specifically want the gold/silver store‑of‑value angle, a physical gold ETC is the clean, cheap route. Splitting the €5k across both is also fine.</p>
+      </div>
+    </div>
+
+    <div class="section-head anim"><h2>Dip‑buy rules</h2><span class="hint">Pre‑decided, so a falling market becomes a shopping list</span></div>
+    <div class="card dip anim">
+      <div class="dip-phase">
+        <h3><span class="phasetag">Phase 1</span> During the deployment (through November)</h3>
+        <p class="pl">Your VWCE buys are already committed, so a dip just means front‑loading — more shares while cheaper, no new money.</p>
+        <div class="tiers">
+          <div class="tier t1"><div class="dd">−10%<small>vs recent high</small></div><div class="desc">VWCE 10%+ below its trailing high on your buy date.<small> Pull €5k forward from a later rung.</small></div><div class="act">Buy €20k</div></div>
+          <div class="tier t2"><div class="dd">−20%<small>vs recent high</small></div><div class="desc">Deep discount mid‑plan.<small> Double that month's rung.</small></div><div class="act">Buy €30k</div></div>
+        </div>
+      </div>
+      <div class="dip-phase">
+        <h3><span class="phasetag b">Phase 2</span> After deployment — spending a dip reserve</h3>
+        <p class="pl">Once you're building a cash reserve again, deploy it in tranches measured from VWCE's all‑time high (monthly close). Weighted to deeper drops.</p>
+        <div class="tiers">
+          <div class="tier t1"><div class="dd">−10%<small>correction</small></div><div class="desc">Ordinary pullback. Dip a toe in.</div><div class="act">15% of reserve</div></div>
+          <div class="tier t2"><div class="dd">−20%<small>bear market</small></div><div class="desc">Now it's on sale. Step up.</div><div class="act">25% of reserve</div></div>
+          <div class="tier t3"><div class="dd">−30%<small>deep bear</small></div><div class="desc">Rare territory. Back the truck up.</div><div class="act">30% of reserve</div></div>
+          <div class="tier t4"><div class="dd">−40%<small>crisis</small></div><div class="desc">Generational discount. Empty the tank.</div><div class="act">30% of reserve</div></div>
+        </div>
+        <ul class="dip-rules">
+          <li><b>One trigger per tier.</b> Fire −20% once; don't re‑buy every wobble.</li>
+          <li><b>Re‑arm only after recovery</b> above that tier's line.</li>
+          <li><b>Monthly closes, not intraday.</b> Ignore the afternoon red.</li>
+          <li><b>Never empty the reserve at −10%.</b> Keep powder for the deep ones.</li>
+          <li><b>Keep normal buying on top</b> — dip buys are extra.</li>
+          <li><b>No leverage, no new debt</b> to fund a dip.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-head anim"><h2>The discipline</h2><span class="hint">The rule that makes everything above work</span></div>
+    <div class="card nosell anim">
+      <div class="lock"><span class="ic">⊘</span><h2>No selling</h2></div>
+      <p class="tl">Not on a −30% drop, not on a scary headline, not to "lock in gains." The only exit is a real life need years out.</p>
+      <div class="rules">
+        <div class="r"><span class="no">01</span><p><b>A drawdown isn't a loss.</b><small>VWCE at −30% is a paper number. It only becomes a loss the moment you sell — so don't.</small></p></div>
+        <div class="r"><span class="no">02</span><p><b>Rebalance with new money only.</b><small>Steer future contributions. Never sell a winner to adjust.</small></p></div>
+        <div class="r"><span class="no">03</span><p><b>Mute the noise.</b><small>Kill price alerts. Review quarterly, decide annually. Daily checking is the enemy.</small></p></div>
+        <div class="r"><span class="no">04</span><p><b>Keep a buffer.</b><small>A liquid emergency fund means a shock never forces a sale at the bottom.</small></p></div>
+        <div class="r"><span class="no">05</span><p><b>The market moving isn't a reason to act.</b><small>Only your life changing changes the plan.</small></p></div>
+        <div class="r"><span class="no">06</span><p><b>Write down why you'd ever sell.</b><small>If it's not on that short list, the answer is no.</small></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3 · SALVA 40 ============ -->
+  <section class="panel" id="tab-salva" role="tabpanel">
+    <div class="subtabs" role="tablist">
+      <button class="subtab active" data-sub="property" role="tab">Property &amp; mortgage</button>
+      <button class="subtab" data-sub="costs" role="tab">Costs &amp; upkeep</button>
+    </div>
+    <div id="salva-sub-property" class="subpanel active">
+    <div class="card prop-hero anim">
+      <div class="lft">
+        <div class="eyebrow">Salva 40 · residential purchase</div>
+        <div class="addr">Carrer de Salvà 40</div>
+        <div class="loc">3º 1ª · 08004 Barcelona (Poble‑sec) · finca 4084</div>
+        <div class="price">340.000<span class="cur">€</span></div>
+        <div class="pmeta">Purchased <b>24 Apr 2026</b> · <b>€68.000</b> down (20%) + <b>€272.000</b> mortgage (80%)</div>
+      </div>
+      <div class="rgt">
+        <div class="spec"><span class="sk">Built surface</span><span class="sv">80 m² <span style="color:var(--muted-2)">(75 + 5 common)</span></span></div>
+        <div class="spec"><span class="sk">Year built</span><span class="sv">1877</span></div>
+        <div class="spec"><span class="sk">Use / class</span><span class="sv">Residencial · Urbano</span></div>
+        <div class="spec"><span class="sk">Community share</span><span class="sv">7,60 %</span></div>
+        <div class="spec"><span class="sk">Ref. catastral</span><span class="sv" style="font-size:11px">0206504DF3800E0009PL</span></div>
+        <div class="spec"><span class="sk">Registry</span><span class="sv" style="font-size:11.5px">Barcelona 18</span></div>
+      </div>
+    </div>
+
+    <div class="kpis k4 anim" style="animation-delay:.05s">
+      <div class="kpi"><div class="k">Monthly payment</div><div class="v">1.041,74 €</div><div class="n">Full mortgage</div></div>
+      <div class="kpi brass-kpi"><div class="k">Your share / month</div><div class="v">520,87 €</div><div class="n">50% · you &amp; Lu split</div></div>
+      <div class="kpi debt-kpi"><div class="k">Outstanding (full)</div><div class="v" id="kpiOut">270.942 €</div><div class="n" id="kpiOutSub">3 payments made</div></div>
+      <div class="kpi pos"><div class="k">Total taxes paid</div><div class="v">17.000 €</div><div class="n">ITP · 5% of price</div></div>
+    </div>
+
+    <div class="section-head anim"><h2>The mortgage</h2><span class="hint">CaixaBank · 30‑year term from April 2026</span></div>
+    <div class="mort-grid">
+      <div class="card mort-panel anim">
+        <h3>Balance &amp; terms</h3>
+        <div class="mbig">
+          <div class="mb"><div class="mk">Initial debt</div><div class="mv debt">272.000 €</div></div>
+          <div class="mb"><div class="mk">Outstanding now</div><div class="mv debt" id="outBig">270.942 €</div></div>
+        </div>
+        <div class="paybar"><span class="paid" id="payPaid" style="width:0.4%"></span><span class="left" id="payLeft" style="width:99.6%"></span></div>
+        <div class="mrow"><span class="mk">Total paid so far (3 payments)</span><span class="mv" id="totPaid">2.240,85 €</span></div>
+        <div class="mrow"><span class="mk" style="padding-left:10px">→ interest (cost of the loan)</span><span class="mv" id="intPaidRow" style="color:var(--muted)">1.183,01 €</span></div>
+        <div class="mrow"><span class="mk" style="padding-left:10px">→ principal (reduces the debt)</span><span class="mv" id="paidDown" style="color:var(--grow)">1.057,84 €</span></div>
+        <div class="mrow"><span class="mk">Interest rate</span><span class="mv">≈ 2,26 % / yr</span></div>
+        <div class="mrow"><span class="mk">Term</span><span class="mv">30 years (360 mo.)</span></div>
+        <div class="mrow"><span class="mk">Payoff date</span><span class="mv">Apr 2056</span></div>
+        <div class="mrow"><span class="mk">Total interest over life</span><span class="mv">≈ 103.026 €</span></div>
+        <div style="margin-top:16px;padding-top:6px;border-top:1px solid var(--line)"></div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:8px 0 4px">Payments to date</div>
+        <div id="payLog"></div>
+      </div>
+      <div class="card amort anim" style="animation-delay:.05s">
+        <h3>Payoff curve</h3>
+        <p class="cap">Full mortgage balance over 30 years · marker = today</p>
+        <svg id="amortSvg" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      </div>
+    </div>
+
+    <div class="section-head anim"><h2>What it cost to buy</h2><span class="hint">Everything paid on top of the price · €88.698 in cash</span></div>
+    <div class="card costs anim">
+      <table>
+        <thead><tr><th>Item</th><th>Paid by</th><th class="r">Amount</th></tr></thead>
+        <tbody id="costBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-head anim"><h2>Ownership &amp; your position</h2><span class="hint">How the deal splits, and how it lands on your balance sheet</span></div>
+    <div class="own">
+      <div class="card own-card anim">
+        <h3>Ownership · 50 / 50</h3>
+        <div class="own-bar"><span class="simon" style="width:50%">Simon 50%</span><span class="lu" style="width:50%">Luciana 50%</span></div>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.6">You each own half the flat and pay half the mortgage (<b style="color:var(--text)">€520,87</b> each). The <b style="color:var(--text)">€88.698</b> of own money covered the 20% deposit plus every tax and cost; the bank funded the other €272.000.</p>
+        <div class="own-list">
+          <div class="mrow"><span class="mk">Each half of the €88.698</span><span class="mv">44.349 €</span></div>
+          <div class="mrow"><span class="mk">Luciana's own money</span><span class="mv">22.175 €</span></div>
+          <div class="mrow"><span class="mk">… + borrowed from you</span><span class="mv">22.175 €</span></div>
+          <div class="mrow"><span class="mk">Cash you fronted (your half + her loan)</span><span class="mv">66.524 €</span></div>
+        </div>
+        <div class="loan-badge">You covered half of Luciana's share up front → <b>Luciana owes you 22.175 €</b>, held as a receivable on the net‑worth tab.</div>
+      </div>
+      <div class="card own-card anim" style="animation-delay:.05s">
+        <h3>On your balance sheet</h3>
+        <div class="own-list">
+          <div class="mrow"><span class="mk">Property value (your 50%)</span><span class="mv">170.000 €</span></div>
+          <div class="mrow"><span class="mk">Mortgage (your 50%)</span><span class="mv" id="bsMort" style="color:var(--debt)">− 135.471 €</span></div>
+          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Property equity</span><span class="mv" id="bsEq" style="color:var(--grow);font-weight:600">34.529 €</span></div>
+          <div class="mrow"><span class="mk">+ Receivable from Luciana</span><span class="mv">22.175 €</span></div>
+          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Your total stake in Salva 40</span><span class="mv" id="bsStake" style="font-weight:600">56.704 €</span></div>
+        </div>
+        <div class="recon" style="background:rgba(95,184,154,.08);border-color:rgba(95,184,154,.28)"><span class="ic" style="color:var(--grow)">✓</span><p><b style="color:var(--grow)">Confirmed 50/50.</b> Half the payment (€520,87) = half the loan = half the flat, so €170.000 / €135.000 / €35.000 is correct. The 75/25 is only who <em>fronted the cash</em> — squared off by Luciana's €22.175 debt to you.</p></div>
+      </div>
+    </div>
+
+    <p class="foot-note">
+      Sources: catastro, nota simple (Registro Barcelona 18), oferta de compra, purchase cost sheet · figures European format.<br>
+      Outstanding balance computed from a ~2,26% rate; refresh as payments post. A planning tool, not financial, legal, or tax advice.
+    </p>
+    </div><!-- /salva-sub-property -->
+
+    <div id="salva-sub-costs" class="subpanel">
+      <div class="kpis k4 anim">
+        <div class="kpi brass-kpi"><div class="k">One‑off costs</div><div class="v" id="costOneoffTotal">2.380 €</div><div class="n">furniture &amp; setup so far</div></div>
+        <div class="kpi"><div class="k">Recurring / month</div><div class="v" id="costRecurMonth">105 €</div><div class="n">community + insurance</div></div>
+        <div class="kpi"><div class="k">Recurring / year</div><div class="v" id="costRecurYear">1.255 €</div><div class="n" id="costRecurCount">2 recurring costs</div></div>
+        <div class="kpi pos"><div class="k">First‑year all‑in</div><div class="v" id="costFirstYear">3.635 €</div><div class="n">setup + 1 yr running</div></div>
+      </div>
+
+      <div class="section-head with-action anim"><h2>One‑off costs</h2><button class="btn-add" id="addCostBtn">＋ Add cost</button></div>
+      <div class="card holdings anim">
+        <table>
+          <thead><tr><th>When</th><th>Item</th><th>Where</th><th>Who</th><th class="r">Amount</th><th></th></tr></thead>
+          <tbody id="costBody2"></tbody>
+          <tfoot><tr><td colspan="4">Total one‑off</td><td class="r" id="costFootTotal" style="font-family:var(--mono);font-weight:600">2.380 €</td><td></td></tr></tfoot>
+        </table>
+      </div>
+
+      <div class="section-head with-action anim"><h2>Recurring costs</h2><button class="btn-add" id="addRecurBtn">＋ Add recurring</button></div>
+      <div class="card holdings anim">
+        <table>
+          <thead><tr><th>Cost</th><th>Who</th><th>Frequency</th><th class="r">Amount</th><th class="r">Per year</th><th></th></tr></thead>
+          <tbody id="recurBody"></tbody>
+          <tfoot><tr><td colspan="4">Annual total</td><td class="r" id="recurFootTotal" style="font-family:var(--mono);font-weight:600">0 €</td><td></td></tr></tfoot>
+        </table>
+      </div>
+
+      <p class="foot-note">
+        One‑off setup costs were read from your “Buy Furniture” sheet (total €2.379,87). Add repairs, upgrades and future purchases with ＋ Add cost; track running costs like community fees, IBI, home insurance or utilities under recurring.<br>
+        This is a spending log to see what the flat really costs over time — it doesn't change your net worth.
+      </p>
+    </div><!-- /salva-sub-costs -->
+  </section>
+
+  <!-- ============ TAB 4 · WEALTH ACCUMULATION ============ -->
+  <section class="panel" id="tab-wealth" role="tabpanel">
+    <div class="kpis k4 anim">
+      <div class="kpi brass-kpi"><div class="k">Net worth now</div><div class="v" id="wNow">—</div><div class="n">live</div></div>
+      <div class="kpi" id="wChgKpi"><div class="k">Since first snapshot</div><div class="v" id="wChg">—</div><div class="n" id="wChgSub">—</div></div>
+      <div class="kpi"><div class="k">Snapshots</div><div class="v" id="wCount">—</div><div class="n">recorded over time</div></div>
+      <div class="kpi"><div class="k">Last updated</div><div class="v" id="wLast" style="font-size:15px">—</div><div class="n" id="wLastSub">—</div></div>
+    </div>
+
+    <div class="section-head anim"><h2>Net worth over time</h2><span class="hint">Every screenshot you drop in adds a point</span></div>
+    <div class="card wealth-chart anim">
+      <svg id="wealthSvg" viewBox="0 0 900 300" aria-hidden="true"></svg>
+      <div class="wc-empty" id="wcEmpty" hidden>Only your starting snapshot so far — hit <b>＋ Update</b> to log a new figure and the line will start to build.</div>
+    </div>
+
+    <div class="section-head anim"><h2>What's driving it</h2><span class="hint">Change by slice since your first snapshot</span></div>
+    <div class="card movers anim"><div id="moversBody"></div></div>
+
+    <div class="section-head anim"><h2>Snapshot history</h2><span class="hint">Newest first · each one a moment you recorded</span></div>
+    <div class="card hist anim">
+      <table>
+        <thead><tr><th>When</th><th>What changed</th><th class="r">Net worth</th><th class="r">Δ</th></tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+    </div>
+
+    <p class="foot-note">
+      Your data lives in this browser (localStorage) and in the backups you export — nothing is sent anywhere. Screenshot reading happens on‑device.<br>
+      Use <b>Export</b> regularly and to move your history between devices. A planning tool, not financial advice.
+    </p>
+  </section>
+
+</div>
+
+<!-- ===== UPDATE MODAL ===== -->
+<div class="modal-overlay" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Update an account">
+    <div class="modal-head"><h3>Update an account</h3><button id="modalClose" aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <label for="mAccount">Which account?</label>
+      <select id="mAccount" class="fld"></select>
+      <div id="newAcctFields" hidden>
+        <label for="mNewName">New account name</label>
+        <input type="text" id="mNewName" class="fld" placeholder="e.g. N26 savings" style="font-family:var(--body)">
+        <label for="mNewCat">Category</label>
+        <select id="mNewCat" class="fld"></select>
+      </div>
+
+      <label>Screenshot of the balance (optional)</label>
+      <div class="dropzone" id="dropzone"><span class="di">🖼️</span>Drop a screenshot here, or tap to choose<input type="file" id="mFile" accept="image/*" hidden></div>
+      <img id="thumb" class="thumb" hidden alt="preview">
+      <div class="ocr-status" id="ocrStatus"></div>
+      <div class="cands" id="cands"></div>
+
+      <label for="mValue">New total (€)</label>
+      <input type="text" id="mValue" inputmode="decimal" placeholder="e.g. 342,78">
+
+      <div class="modal-actions"><button class="btn-primary" id="mCommit">Update &amp; take snapshot</button></div>
+      <p class="hintline">The screenshot is read on your device to suggest the number — always glance at it and correct if needed before saving. Each save recalculates your net worth and logs a point on the Wealth tab.</p>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="costModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Add a one-off cost">
+    <div class="modal-head"><h3>Add a one‑off cost</h3><button id="costModalClose" aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <label for="cItem">What is it?</label>
+      <input type="text" id="cItem" class="fld" style="font-family:var(--body)" placeholder="e.g. Sofa, fridge, repair">
+      <div class="dz-row">
+        <div><label for="cRoom">Room</label><input type="text" id="cRoom" class="fld" style="font-family:var(--body)" placeholder="e.g. Kitchen"></div>
+        <div><label for="cWhen">When (optional)</label><input type="text" id="cWhen" class="fld" style="font-family:var(--body)" placeholder="e.g. 2027"></div>
+      </div>
+      <div class="dz-row">
+        <div><label for="cBrand">Where / brand</label><input type="text" id="cBrand" class="fld" style="font-family:var(--body)" placeholder="e.g. Ikea"></div>
+        <div><label for="cCond">Condition</label><select id="cCond" class="fld"><option>New</option><option>Second hand</option></select></div>
+      </div>
+      <div class="dz-row">
+        <div><label for="cWho">Who paid</label><select id="cWho" class="fld"><option>Simon</option><option>Luciana</option><option>Both</option></select></div>
+        <div><label for="cAmount">Amount (€)</label><input type="text" id="cAmount" class="fld" inputmode="decimal" placeholder="e.g. 120"></div>
+      </div>
+      <div class="modal-actions"><button class="btn-primary" id="costCommit">Add cost</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="recurModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Add a recurring cost">
+    <div class="modal-head"><h3>Add a recurring cost</h3><button id="recurModalClose" aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <label for="rLabel">What is it?</label>
+      <input type="text" id="rLabel" class="fld" style="font-family:var(--body)" placeholder="e.g. Community fees, IBI, insurance">
+      <div class="dz-row">
+        <div><label for="rAmount">Amount (€)</label><input type="text" id="rAmount" class="fld" inputmode="decimal" placeholder="e.g. 45"></div>
+        <div><label for="rFreq">Frequency</label><select id="rFreq" class="fld"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="yearly">Yearly</option></select></div>
+      </div>
+      <label for="rWho">Who pays</label>
+      <select id="rWho" class="fld"><option>Simon</option><option>Luciana</option><option>Both</option></select>
+      <div class="modal-actions"><button class="btn-primary" id="recurCommit">Add recurring cost</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  /* ---------- helpers ---------- */
+  const eur=(n,dec=2)=>n.toLocaleString('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:dec,maximumFractionDigits:dec});
+  const eur0=n=>eur(n,0);
+  const grp=n=>Math.round(n).toLocaleString('es-ES');
+  const V=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NS='http://www.w3.org/2000/svg';
+  const $=id=>document.getElementById(id);
+  const set=(id,txt)=>{const el=$(id);if(el)el.textContent=txt;};
+
+  /* ---------- mortgage: single source of truth ---------- */
+  const M={init:272000,term:360,pay:1041.74,rate:0.0018872};
+  const payLog=[
+    {d:'7 May 2026',a:157.37,stub:true},
+    {d:'1 Jun 2026',a:1041.74},
+    {d:'1 Jul 2026',a:1041.74},
+  ];
+  let obFull=M.init,totalPaid=0,fullN=0,intPaid=0;
+  payLog.forEach(p=>{totalPaid+=p.a;if(p.stub){intPaid+=p.a;}else{const i=obFull*M.rate;intPaid+=i;obFull-=(p.a-i);fullN++;}});
+  const simonMort=obFull/2, propValue=170000;
+
+  /* ---------- categories ---------- */
+  const catMeta={'Equity':V('--brass'),'Real estate':V('--estate'),'Savings':V('--grow'),'Receivables':V('--recv'),'Cash':V('--cash')};
+  const order=['Equity','Real estate','Savings','Receivables','Cash'];
+
+  /* ---------- seed accounts ---------- */
+  const seed=[
+    {id:'portefeuille',name:'Portefeuille',cat:'Cash',value:2600.00},
+    {id:'argenta',name:'Argenta zichtrek',cat:'Cash',value:88.95},
+    {id:'revolut_cash',name:'Revolut cash',cat:'Cash',value:311.21},
+    {id:'edenred',name:'EdenRed',cat:'Cash',value:342.78},
+    {id:'caixa_cash',name:'Caixa',cat:'Cash',value:711.00},
+    {id:'revolut_sav',name:'Revolut saving',cat:'Savings',value:2238.01},
+    {id:'trade_republic',name:'Trade Republic',cat:'Savings',value:75987.39},
+    {id:'vwce',name:'VWCE',cat:'Equity',value:45336.41},
+    {id:'degiro',name:'Degiro',cat:'Equity',value:27395.70},
+    {id:'salva',name:'Salva 40 (your 50%)',cat:'Real estate',value:170000.00,locked:true},
+    {id:'splitwise',name:'Splitwise',cat:'Receivables',value:1114.11},
+    {id:'lu_debt',name:'House debt · Lu',cat:'Receivables',value:22175.00},
+    {id:'mortgage',name:'Caixa mortgage (your 50%)',cat:'Mortgage',value:simonMort,liability:true,locked:true},
+  ];
+
+  /* ---------- totals ---------- */
+  function totalsOf(accts){const cats={};order.forEach(c=>cats[c]=0);let liab=0;
+    accts.forEach(a=>{if(a.liability)liab+=a.value;else cats[a.cat]=(cats[a.cat]||0)+a.value;});
+    const gross=order.reduce((s,c)=>s+(cats[c]||0),0);return {cats,gross,liab,net:gross-liab};}
+  function clone(o){return JSON.parse(JSON.stringify(o));}
+
+  /* ---------- state + persistence ---------- */
+  const LS='wealthDash_v1';
+  let state=null;
+  try{const raw=localStorage.getItem(LS);if(raw)state=JSON.parse(raw);}catch(e){state=null;}
+  if(!state||!state.accounts||!state.history){
+    const t=totalsOf(seed);
+    state={accounts:clone(seed),history:[{ts:Date.parse('2026-07-01T12:00:00'),net:t.net,gross:t.gross,cats:clone(t.cats),liab:t.liab,note:'Starting snapshot'}]};
+  }
+  /* property costs (from the "Buy Furniture" sheet) */
+  const seedCosts=[
+    {item:'Clothes hanger',room:'Living room',brand:'Sklum',amount:118.88,cond:'New',who:'Luciana'},
+    {item:'Living room table',room:'Living room',brand:'Sklum',amount:570,cond:'New',who:'Luciana'},
+    {item:'Microwave',room:'Kitchen',brand:'Mediamarket',amount:70,cond:'New',who:'Luciana'},
+    {item:'Airfryer',room:'Kitchen',brand:'Ninja',amount:75,cond:'New',who:'Luciana'},
+    {item:'Espejo Baño',room:'Toilet guest',brand:'Tikamoon',amount:79,cond:'New',who:'Luciana'},
+    {item:'Small stuff',room:'Everywhere',brand:'Ikea',amount:206.69,cond:'New',who:'Luciana'},
+    {item:'Chairs',room:'Living room',brand:'Wallapop',amount:200,cond:'Second hand',who:'Simon'},
+    {item:'Espejo Baño 2',room:'Toilet room',brand:'Zara Home',amount:70,cond:'New',who:'Luciana'},
+    {item:'Small stuff',room:'Everywhere',brand:'Shein',amount:31,cond:'New',who:'Luciana'},
+    {item:'Mattress couch',room:'Guest room',brand:'Espuma al medio',amount:123.38,cond:'New',who:'Luciana'},
+    {item:'Foldable bed',room:'Guest room',brand:'Amazon',amount:85,cond:'New',who:'Luciana'},
+    {item:'Tabourets',room:'Living room',brand:'Amazon',amount:124,cond:'New',who:'Luciana'},
+    {item:'Bedside tables',room:'Bedroom',brand:'Zara Home',amount:200,cond:'New',who:'Simon'},
+    {item:'Perchero',room:'Living room',brand:'Sklum',amount:130,cond:'New',who:'Simon'},
+    {item:'Small kitchen stuff',room:'Kitchen',brand:'Sklum',amount:83,cond:'New',who:'Simon'},
+    {item:'Small stuff',room:'Everywhere',brand:'Diagonal',amount:78,cond:'New',who:'Simon'},
+    {item:'Cushions & plant pot',room:'Everywhere',brand:'H&M Home',amount:135.92,cond:'New',who:'Simon'},
+  ].map((c,i)=>Object.assign({id:'cost_seed_'+i,when:'setup'},c));
+  if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);
+  if(!state.recurringCosts)state.recurringCosts=[];
+  const seedRecurring=[
+    {id:'recur_seed_comunidad',label:'Community fees (Feliu)',amount:70,freq:'monthly',who:'Both',note:'Comunidad · Salva 40 · Dpto 3‑1'},
+    {id:'recur_seed_hogar',label:'Home insurance (Adeslas)',amount:415.05,freq:'yearly',who:'Both',note:'Hogar Complet · Segurcaixa Adeslas · Apr–Apr'},
+    {id:'recur_seed_simwifi',label:'2 SIM cards + wifi',amount:22.5,freq:'monthly',who:'Luciana',note:'Mobile + home internet'},
+  ];
+  if(!state.seededRecurIds)state.seededRecurIds=state.recurSeeded?['recur_seed_comunidad','recur_seed_hogar']:[];
+  {let added=false;seedRecurring.forEach(s=>{if(state.seededRecurIds.indexOf(s.id)===-1){if(!state.recurringCosts.some(r=>r.id===s.id))state.recurringCosts.push(s);state.seededRecurIds.push(s.id);added=true;}});if(added){state.recurSeeded=true;persist();}}
+  function syncMort(){const m=state.accounts.find(a=>a.id==='mortgage');if(m)m.value=simonMort;}
+  function persist(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
+  function snapEntry(note){const t=totalsOf(state.accounts);return {ts:Date.now(),net:t.net,gross:t.gross,cats:clone(t.cats),liab:t.liab,note};}
+  function sameDay(a,b){return new Date(a).toDateString()===new Date(b).toDateString();}
+  function recordSnapshot(note){const entry=snapEntry(note);const h=state.history,last=h[h.length-1];
+    if(last&&sameDay(last.ts,entry.ts)){entry.note=note;h[h.length-1]=entry;}else{h.push(entry);}}
+  function dedupeHistory(){const h=state.history;if(!h||h.length<2)return;
+    const out=[];for(const e of h){const last=out[out.length-1];
+      if(last&&sameDay(last.ts,e.ts))out[out.length-1]=e;else out.push(e);}
+    if(out.length!==h.length){state.history=out;persist();}}
+
+  /* ---------- tabs ---------- */
+  const tabs=[...document.querySelectorAll('.tab')];
+  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),wealth:$('tab-wealth')};
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false');});
+    t.classList.add('active');t.setAttribute('aria-selected','true');
+    Object.values(panels).forEach(p=>p&&p.classList.remove('active'));
+    const p=panels[t.dataset.tab];if(p)p.classList.add('active');
+    window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
+  }));
+
+  /* ---------- date helpers ---------- */
+  function fmtDate(ts){return new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+  function fmtDateTime(ts){const d=new Date(ts);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
+
+  /* ============ DYNAMIC RENDER ============ */
+  function renderDynamic(){
+    syncMort();
+    const t=totalsOf(state.accounts);
+    set('netVal',grp(t.net));
+    set('footAssets',eur0(t.gross));
+    set('footDebt',eur0(t.liab));
+    set('beamAssetsLbl','ASSETS · '+eur0(t.gross));
+    set('beamDebtLbl','DEBT · '+eur0(t.liab));
+    const bd=$('beamDebt');if(bd)bd.style.width=(t.gross?t.liab/t.gross*100:0).toFixed(2)+'%';
+    set('donutCenter',eur0(t.gross));
+    set('kpiFinAssets',eur0((t.cats['Equity']||0)+(t.cats['Savings']||0)+(t.cats['Cash']||0)));
+    set('kpiInvested',eur0(t.cats['Equity']||0));
+    set('kpiPropEq',eur0((t.cats['Real estate']||0)-simonMort));
+    set('kpiRecv',eur0(t.cats['Receivables']||0));
+    set('kpiMort',eur0(t.liab));
+    set('ledgerNet',eur(t.net));
+    const vwce=state.accounts.find(a=>a.id==='vwce');if(vwce)set('kpiVwceNow',eur0(vwce.value));
+    const dg=state.accounts.find(a=>a.id==='degiro');if(dg)set('kpiDegiro',eur0(dg.value));
+    set('kpiTotalInv',eur0(t.cats['Equity']||0));
+    set('kpiInvAfter',eur0((t.cats['Equity']||0)+75000));
+    const heldTot=['vwce','degiro','trade_republic','revolut_sav'].reduce((s,id)=>{const a=state.accounts.find(x=>x.id===id);return s+(a?a.value:0);},0);
+    set('invHeldTotal',eur0(heldTot));
+    set('bsMort','− '+eur0(simonMort));
+    set('bsEq',eur0(propValue-simonMort));
+    set('bsStake',eur0(propValue-simonMort+22175));
+
+    const beam=$('beam'),bl=$('beamLegend');
+    if(beam){beam.innerHTML='';bl.innerHTML='';
+      order.forEach(c=>{const w=t.gross?t.cats[c]/t.gross*100:0;
+        const s=document.createElement('span');s.style.width=w+'%';s.style.background=catMeta[c];s.title=c+' '+eur0(t.cats[c]);beam.appendChild(s);
+        const d=document.createElement('div');d.className='lg';d.innerHTML='<i style="background:'+catMeta[c]+'"></i>'+c+' <b>'+eur0(t.cats[c])+'</b>';bl.appendChild(d);});}
+
+    const donut=$('donut');
+    if(donut){donut.innerHTML='';const R=78,C=2*Math.PI*R;
+      const tr=document.createElementNS(NS,'circle');tr.setAttribute('cx',100);tr.setAttribute('cy',100);tr.setAttribute('r',R);tr.setAttribute('fill','none');tr.setAttribute('stroke','rgba(255,255,255,.05)');tr.setAttribute('stroke-width',22);donut.appendChild(tr);
+      let off=0;order.forEach(c=>{const len=t.gross?t.cats[c]/t.gross*C:0;const el=document.createElementNS(NS,'circle');
+        el.setAttribute('cx',100);el.setAttribute('cy',100);el.setAttribute('r',R);el.setAttribute('fill','none');el.setAttribute('stroke',catMeta[c]);el.setAttribute('stroke-width',22);el.setAttribute('stroke-dashoffset',off);el.setAttribute('stroke-dasharray',len+' '+(C-len));donut.appendChild(el);off-=len;});}
+
+    const al=$('allocLegend');
+    if(al){al.innerHTML='';order.forEach(c=>{const row=document.createElement('div');row.className='alloc-row';
+      row.innerHTML='<i style="background:'+catMeta[c]+'"></i><span class="nm">'+c+'</span><span class="vl">'+eur0(t.cats[c])+'</span><span class="pc">'+(t.gross?(t.cats[c]/t.gross*100).toFixed(1):'0')+'%</span>';al.appendChild(row);});}
+
+    const lb=$('ledgerBody');
+    if(lb){lb.innerHTML='';state.accounts.forEach(a=>{const trr=document.createElement('tr');if(a.liability)trr.className='liab';
+      const col=a.liability?V('--debt'):(catMeta[a.cat]||V('--muted'));
+      trr.innerHTML='<td class="acct">'+a.name+'</td><td><span class="tag"><i style="background:'+col+'"></i>'+a.cat+'</span></td><td class="r val">'+(a.liability?'−':'')+eur(a.value)+'</td>';lb.appendChild(trr);});}
+
+    const ib=$('invBody');
+    if(ib){ib.innerHTML='';
+      [['vwce','Trade Republic · FTSE All‑World ETF (Acc)'],['degiro','Stocks &amp; emerging markets'],['trade_republic','Savings · deployment fuel'],['revolut_sav','Savings']].forEach(h=>{
+        const a=state.accounts.find(x=>x.id===h[0]);if(!a)return;const trr=document.createElement('tr');
+        trr.innerHTML='<td><div style="font-weight:500">'+a.name+'</div><div class="sub">'+h[1]+'</div></td><td></td><td class="r val">'+eur(a.value)+'</td>';ib.appendChild(trr);});
+      [['World bonds','Planned · VAGF (EUR‑hedged, Acc)',10000],['Commodities','Planned · CMOD broad basket',5000]].forEach(p=>{const trr=document.createElement('tr');trr.setAttribute('style','opacity:.6');
+        trr.innerHTML='<td><div style="font-weight:500">'+p[0]+' <span style="font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--brass);border:1px solid rgba(201,169,106,.4);border-radius:4px;padding:1px 5px;margin-left:6px">DEC</span></div><div class="sub">'+p[1]+'</div></td><td></td><td class="r val">'+eur(p[2])+'</td>';ib.appendChild(trr);});}
+
+    const last=state.history[state.history.length-1];
+    const dc=$('dateChip');if(dc)dc.textContent='UPDATED · '+fmtDate(last.ts).toUpperCase();
+    renderWealth(t);
+    renderCosts();
+  }
+
+  /* ============ WEALTH TAB ============ */
+  function renderWealth(t){
+    const h=state.history,first=h[0],lastNet=t.net;
+    set('wNow',eur0(lastNet));
+    const chg=lastNet-first.net,chgP=first.net?chg/first.net*100:0;
+    const cv=$('wChg');if(cv){cv.textContent=(chg>=0?'+':'−')+eur0(Math.abs(chg));cv.style.color=chg>=0?V('--grow'):V('--debt');}
+    set('wChgSub',(chg>=0?'+':'−')+Math.abs(chgP).toFixed(1)+'% since '+fmtDate(first.ts));
+    set('wCount',h.length);
+    set('wLast',fmtDate(h[h.length-1].ts));
+    set('wLastSub',h.length>1?'latest of '+h.length:'starting point');
+
+    const svg=$('wealthSvg'),empty=$('wcEmpty');
+    const pts=h.map(s=>({ts:s.ts,net:s.net}));
+    if(svg){svg.innerHTML='';
+      if(pts.length<2){if(empty)empty.hidden=false;svg.style.display='none';}
+      else{if(empty)empty.hidden=true;svg.style.display='block';
+        const W=900,H=300,pad={l:64,r:18,t:18,b:34};
+        const xs=pts.map(p=>p.ts),ys=pts.map(p=>p.net);
+        const minT=Math.min.apply(null,xs),maxT=Math.max.apply(null,xs);
+        let minY=Math.min.apply(null,ys),maxY=Math.max.apply(null,ys);
+        const padY=(maxY-minY)*0.15||Math.abs(maxY)*0.05||1000;minY-=padY;maxY+=padY;
+        const X=ts=>pad.l+(maxT===minT?0.5:(ts-minT)/(maxT-minT))*(W-pad.l-pad.r);
+        const Y=v=>pad.t+(1-(v-minY)/(maxY-minY))*(H-pad.t-pad.b);
+        let g='';for(let i=0;i<=3;i++){const gy=pad.t+i/3*(H-pad.t-pad.b);const gv=maxY-(i/3)*(maxY-minY);
+          g+='<line x1="'+pad.l+'" y1="'+gy+'" x2="'+(W-pad.r)+'" y2="'+gy+'" stroke="rgba(255,255,255,.06)"/>'+
+             '<text x="'+(pad.l-8)+'" y="'+(gy+4)+'" text-anchor="end" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="11">'+Math.round(gv/1000)+'k</text>';}
+        let d='M'+X(pts[0].ts)+' '+Y(pts[0].net);pts.forEach(p=>d+=' L'+X(p.ts)+' '+Y(p.net));
+        const area=d+' L'+X(pts[pts.length-1].ts)+' '+Y(minY)+' L'+X(pts[0].ts)+' '+Y(minY)+' Z';
+        let dots='';pts.forEach(p=>dots+='<circle cx="'+X(p.ts)+'" cy="'+Y(p.net)+'" r="4" fill="'+V('--brass')+'"/>');
+        const xl='<text x="'+X(pts[0].ts)+'" y="'+(H-10)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="11">'+fmtDate(pts[0].ts)+'</text>'+
+                 '<text x="'+(W-pad.r)+'" y="'+(H-10)+'" text-anchor="end" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="11">'+fmtDate(pts[pts.length-1].ts)+'</text>';
+        svg.innerHTML='<defs><linearGradient id="wg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--brass')+'" stop-opacity=".28"/><stop offset="1" stop-color="'+V('--brass')+'" stop-opacity="0"/></linearGradient></defs>'+
+          g+'<path d="'+area+'" fill="url(#wg)"/><path d="'+d+'" fill="none" stroke="'+V('--brass')+'" stroke-width="2.5"/>'+dots+xl;}}
+
+    const mb=$('moversBody');
+    if(mb){mb.innerHTML='';
+      const rows=[];order.forEach(c=>rows.push({n:c,delta:(t.cats[c]||0)-(first.cats[c]||0)}));
+      rows.push({n:'Mortgage paydown',delta:(first.liab||0)-(t.liab||0)});
+      const maxAbs=Math.max(1,...rows.map(r=>Math.abs(r.delta)));
+      rows.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+      rows.forEach(r=>{const up=r.delta>=0,w=Math.abs(r.delta)/maxAbs*100,dir=up?'up':'down';
+        const fillStyle='width:'+(w/2)+'%;'+(up?'left:50%':'right:50%');
+        const row=document.createElement('div');row.className='mover';
+        row.innerHTML='<div class="mn">'+r.n+'</div>'+
+          '<div class="mtrack"><div class="mfill '+dir+'" style="'+fillStyle+'"></div><div style="position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.18)"></div></div>'+
+          '<div class="mval '+(r.delta===0?'flat':dir)+'">'+(r.delta===0?'—':(up?'+':'−')+eur0(Math.abs(r.delta)))+'</div>';
+        mb.appendChild(row);});
+      if(h.length<2){const note=document.createElement('div');note.style.cssText='color:var(--muted-2);font-size:12px;padding:12px 0 2px';note.textContent='Movers fill in once you log a second snapshot.';mb.appendChild(note);}}
+
+    const hb=$('histBody');
+    if(hb){hb.innerHTML='';
+      for(let i=h.length-1;i>=0;i--){const s=h[i],prev=h[i-1];const delta=prev?s.net-prev.net:0,up=delta>=0;
+        const trr=document.createElement('tr');
+        trr.innerHTML='<td>'+fmtDateTime(s.ts)+(i===0?' <span class="src">start</span>':'')+'</td>'+
+          '<td class="src">'+(s.note||'—')+'</td>'+
+          '<td class="r val">'+eur0(s.net)+'</td>'+
+          '<td class="r delta '+(prev?(up?'up':'down'):'')+'">'+(prev?(up?'+':'−')+eur0(Math.abs(delta)):'—')+'</td>';
+        hb.appendChild(trr);}}
+  }
+
+  /* ---------- commit / add ---------- */
+  function commit(accId,newValue){
+    const a=state.accounts.find(x=>x.id===accId);if(!a)return;
+    a.value=newValue;
+    recordSnapshot(a.name+' → '+eur0(newValue));
+    persist();renderDynamic();toast('Updated '+a.name+' · snapshot saved');
+  }
+
+  /* ---------- toast ---------- */
+  let toTimer;function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(toTimer);toTimer=setTimeout(()=>el.classList.remove('show'),2600);}
+
+  /* ============ STATIC RENDER (once) ============ */
+  function initStatic(){
+    const sched=[{mo:'Jun',amt:30000,done:true},{mo:'Jul',amt:15000,done:true},{mo:'Aug',amt:15000},{mo:'Sep',amt:15000},{mo:'Oct',amt:15000},{mo:'Nov',amt:15000},{mo:'Dec',amt:15000,div:true}];
+    const rungs=$('rungs');let cum=0;
+    if(rungs)sched.forEach(s=>{cum+=s.amt;const d=document.createElement('div');d.className='rung'+(s.done?' now':'');
+      const barTxt=s.div?'bonds + comm':('+'+(s.amt/1000)+'k');
+      const barStyle=s.div?'width:50%;background:linear-gradient(90deg,var(--cash),var(--brass))':'width:'+(s.amt/30000*100)+'%';
+      d.innerHTML='<div class="mo">'+s.mo+'<small>'+(s.done?'✓ done':'2026')+'</small></div><div class="bar" style="'+barStyle+'">'+barTxt+'</div><div class="tot">'+eur0(cum)+'<small>'+(s.div?'incl. €15k div':'deployed')+'</small></div>';rungs.appendChild(d);});
+
+    const gb=$('gbars');
+    if(gb){const series=[{l:'Now',v:45336.41,now:true}];let b2=45336.41;['Aug','Sep','Oct','Nov'].forEach(l=>{b2+=15000;series.push({l,v:b2});});
+      const maxV=series[series.length-1].v;
+      series.forEach(s=>{const col=document.createElement('div');col.className='gcol'+(s.now?' now':'');const hh=Math.max(4,s.v/maxV*150);
+        col.innerHTML='<div class="gv">'+Math.round(s.v/1000)+'k</div><div class="gb" style="height:'+hh+'px"></div><div class="gl">'+s.l+'</div>';gb.appendChild(col);});}
+
+    function pie(svgId,legId,data){const svg=$(svgId);if(!svg)return;svg.innerHTML='';const r=60,cc=2*Math.PI*r,w=26;
+      const tr=document.createElementNS(NS,'circle');tr.setAttribute('cx',75);tr.setAttribute('cy',75);tr.setAttribute('r',r);tr.setAttribute('fill','none');tr.setAttribute('stroke','rgba(255,255,255,.05)');tr.setAttribute('stroke-width',w);svg.appendChild(tr);
+      const tot=data.reduce((s,d)=>s+d.v,0);let o=0;
+      data.forEach(d=>{const len=d.v/tot*cc;const el=document.createElementNS(NS,'circle');el.setAttribute('cx',75);el.setAttribute('cy',75);el.setAttribute('r',r);el.setAttribute('fill','none');el.setAttribute('stroke',d.col);el.setAttribute('stroke-width',w);el.setAttribute('stroke-dashoffset',o);el.setAttribute('stroke-dasharray',len+' '+(cc-len));svg.appendChild(el);o-=len;});
+      const leg=$(legId);if(leg){leg.innerHTML='';data.forEach(d=>{const row=document.createElement('div');row.className='ple';row.innerHTML='<i style="background:'+d.col+'"></i><span class="pn">'+d.n+'</span><span class="pp">'+d.v.toString().replace('.',',')+'%</span>';leg.appendChild(row);});}}
+    const pal=['#C9A96A','#6E88B0','#5FB89A','#9C82BC','#D8925C','#7E8AA0','#C56B5A','#8FB0C9','#B0906E','#7FA88F','#A88FB0'];
+    pie('pieSector','legSector',[['Technology',32.5],['Financials',15.3],['Industrials',10.5],['Consumer cyclical',9.2],['Communication',8.4],['Healthcare',7.7],['Consumer defensive',4.6],['Basic materials',3.8],['Energy',3.8],['Utilities',2.4],['Real estate',1.8]].map((x,i)=>({n:x[0],v:x[1],col:pal[i]})));
+    pie('pieCountry','legCountry',[['United States',62],['Japan',6],['United Kingdom',4],['China',3],['Canada',3],['France',2.5],['Switzerland',2.3],['Germany',2],['Rest of world',15.2]].map((x,i)=>({n:x[0],v:x[1],col:pal[i]})));
+    pie('pieDev','legDev',[{n:'Developed markets',v:89.5,col:V('--brass')},{n:'Emerging markets',v:10.5,col:V('--grow')}]);
+    const top=[['NVIDIA','4,7%'],['Apple','4,3%'],['Microsoft','3,2%'],['Alphabet','3,8%'],['Amazon','2,5%'],['Broadcom','2,0%'],['TSMC','1,7%'],['Meta','1,3%'],['Tesla','1,2%']];
+    const th=$('topHold');if(th){th.innerHTML='';top.forEach(x=>{const c=document.createElement('div');c.className='chip';c.innerHTML='<span class="cn">'+x[0]+'</span><span class="cv">'+x[1]+'</span>';th.appendChild(c);});}
+
+    /* combined VWCE + Degiro look-through */
+    pie('pieTotalDev','legTotalDev',[{n:'Developed markets',v:71.7,col:V('--brass')},{n:'Emerging markets',v:28.3,col:V('--grow')}]);
+    pie('pieTotalSector','legTotalSector',[['Industrials',23.9],['Technology',20.4],['Financials',17.9],['Consumer cyclical',7.8],['Communication',6.9],['Healthcare',5.1],['Basic materials',4.6],['Energy',4.4],['Consumer defensive',4.0],['Utilities',3.5],['Real estate',1.5]].map((x,i)=>({n:x[0],v:x[1],col:pal[i]})));
+
+    /* Degiro holdings detail */
+    const degiro=[
+      ['BAE Systems PLC','Stock · London · defence',5559.90,928.98,'+20,06%'],
+      ['Leonardo SpA','Stock · Milan · defence',5569.50,1066.50,'+23,68%'],
+      ['Amundi MSCI Greece UCITS ETF','ETF · Greece · emerging',9451.20,4441.80,'+88,66%'],
+      ['iShares MSCI Brazil UCITS ETF','ETF · Brazil · emerging',6212.25,345.13,'+5,88%'],
+    ];
+    const dgb=$('degiroBody');
+    if(dgb){dgb.innerHTML='';
+      degiro.forEach(d=>{const tr=document.createElement('tr');
+        tr.innerHTML='<td><div style="font-weight:500">'+d[0]+'</div></td><td style="color:var(--muted);font-size:12px">'+d[1]+'</td><td class="r val">'+eur(d[2])+'</td><td class="r val" style="color:var(--grow)">+'+eur(d[3])+' <span style="color:var(--muted-2);font-size:10.5px">'+d[4]+'</span></td>';
+        dgb.appendChild(tr);});
+      const trc=document.createElement('tr');trc.setAttribute('style','opacity:.65');
+      trc.innerHTML='<td><div style="font-weight:500">Free cash</div></td><td style="color:var(--muted);font-size:12px">EUR · uninvested</td><td class="r val">'+eur(600.60)+'</td><td class="r val" style="color:var(--muted-2)">—</td>';
+      dgb.appendChild(trc);}
+
+    const ob=obFull,paidDown=M.init-ob,paidPct=paidDown/M.init*100;
+    set('kpiOut',eur0(ob));set('kpiOutSub',payLog.length+' payments · '+eur0(totalPaid)+' paid');set('outBig',eur0(ob));
+    set('paidDown',eur(paidDown));set('totPaid',eur(totalPaid));set('intPaidRow',eur(intPaid));
+    const pp=$('payPaid'),pl=$('payLeft');if(pp){pp.style.width=Math.max(0.4,paidPct)+'%';pl.style.width=(100-Math.max(0.4,paidPct))+'%';}
+    const plog=$('payLog');if(plog){plog.innerHTML='';payLog.forEach(p=>{const r=document.createElement('div');r.className='mrow';r.innerHTML='<span class="mk">'+p.d+(p.stub?' · first stub':'')+'</span><span class="mv">'+eur(p.a)+'</span>';plog.appendChild(r);});const r2=document.createElement('div');r2.className='mrow';r2.innerHTML='<span class="mk" style="color:var(--text)">Ongoing · every month</span><span class="mv" style="color:var(--brass)">'+eur(M.pay)+'</span>';plog.appendChild(r2);}
+
+    const svg=$('amortSvg');
+    if(svg){const W=480,H=240,pad={l:8,r:8,t:12,b:26},yrs=30;const ptsA=[];let cb=M.init;ptsA.push(cb);for(let y=1;y<=yrs;y++){for(let m=0;m<12;m++){cb-=(M.pay-cb*M.rate);}ptsA.push(Math.max(0,cb));}
+      const maxB=M.init,x=i=>pad.l+i/yrs*(W-pad.l-pad.r),yy=v=>pad.t+(1-v/maxB)*(H-pad.t-pad.b);
+      let dP='M'+x(0)+' '+yy(ptsA[0]);for(let i=1;i<ptsA.length;i++)dP+=' L'+x(i)+' '+yy(ptsA[i]);
+      const area=dP+' L'+x(yrs)+' '+yy(0)+' L'+x(0)+' '+yy(0)+' Z';const nowX=x(fullN/12),nowY=yy(ob);
+      svg.innerHTML='<defs><linearGradient id="ag" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--estate')+'" stop-opacity="0.32"/><stop offset="1" stop-color="'+V('--estate')+'" stop-opacity="0"/></linearGradient></defs><path d="'+area+'" fill="url(#ag)"/><path d="'+dP+'" fill="none" stroke="'+V('--estate')+'" stroke-width="2"/><line x1="'+nowX+'" y1="'+pad.t+'" x2="'+nowX+'" y2="'+(H-pad.b)+'" stroke="'+V('--brass')+'" stroke-width="1" stroke-dasharray="3 3"/><circle cx="'+nowX+'" cy="'+nowY+'" r="4" fill="'+V('--brass')+'"/><text x="'+(nowX+6)+'" y="'+(pad.t+12)+'" fill="'+V('--brass')+'" font-family="'+V('--mono')+'" font-size="10">now</text><text x="'+x(0)+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10">2026</text><text x="'+x(15)+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="middle">2041</text><text x="'+x(30)+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="end">2056</text><text x="'+x(0)+'" y="'+(pad.t+4)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10">272k</text>';}
+
+    const costs=[{i:'Down payment (20%)',w:'',v:68000},{i:'ITP transfer tax',w:'Buyer',v:17000,tax:true},{i:'Notaría',w:'Buyer',v:1500},{i:'Registro (registry inscription)',w:'Buyer',v:900},{i:'Gestión',w:'Buyer',v:288},{i:'Lawyer (Clara)',w:'Lu',v:605},{i:'Appraisal',w:'Lu',v:405}];
+    const cb2=$('costBody');if(cb2){cb2.innerHTML='';costs.forEach(c=>{const trr=document.createElement('tr');if(c.tax)trr.className='tax';trr.innerHTML='<td class="lbl">'+c.i+'</td><td class="who">'+(c.w||'')+'</td><td class="r val">'+eur0(c.v)+'</td>';cb2.appendChild(trr);});const tt=document.createElement('tr');tt.className='tot';tt.innerHTML='<td>Total cash at purchase</td><td class="who">of which taxes 17.000 €</td><td class="r val">88.698 €</td>';cb2.appendChild(tt);}
+  }
+
+  /* ============ UPDATE MODAL + OCR ============ */
+  const modal=$('modal'),mAccount=$('mAccount'),mValue=$('mValue'),mFile=$('mFile'),dropzone=$('dropzone'),thumb=$('thumb'),ocrStatus=$('ocrStatus'),cands=$('cands'),newFields=$('newAcctFields'),mNewName=$('mNewName'),mNewCat=$('mNewCat');
+  function fillAccountSelect(){mAccount.innerHTML='';
+    state.accounts.filter(a=>!a.locked).forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' — '+eur0(a.value);mAccount.appendChild(o);});
+    const o=document.createElement('option');o.value='__new';o.textContent='＋ New account…';mAccount.appendChild(o);
+    if(mNewCat&&!mNewCat.childElementCount)order.forEach(c=>{const oo=document.createElement('option');oo.value=c;oo.textContent=c;mNewCat.appendChild(oo);});}
+  function syncSelectValue(){const isNew=mAccount.value==='__new';newFields.hidden=!isNew;
+    if(!isNew){const a=state.accounts.find(x=>x.id===mAccount.value);if(a)mValue.placeholder='current: '+eur0(a.value);}}
+  function openModal(){fillAccountSelect();mValue.value='';cands.innerHTML='';ocrStatus.textContent='';thumb.hidden=true;newFields.hidden=true;modal.hidden=false;syncSelectValue();}
+  function closeModal(){modal.hidden=true;}
+  $('updateBtn').addEventListener('click',openModal);
+  $('modalClose').addEventListener('click',closeModal);
+  modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+  mAccount.addEventListener('change',syncSelectValue);
+  dropzone.addEventListener('click',()=>mFile.click());
+  dropzone.addEventListener('dragover',e=>{e.preventDefault();dropzone.classList.add('drag');});
+  dropzone.addEventListener('dragleave',()=>dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop',e=>{e.preventDefault();dropzone.classList.remove('drag');if(e.dataTransfer.files[0])handleImage(e.dataTransfer.files[0]);});
+  mFile.addEventListener('change',()=>{if(mFile.files[0])handleImage(mFile.files[0]);});
+
+  function normNum(raw){raw=(raw||'').replace(/[^\d.,]/g,'');if(!raw)return null;
+    const hasC=raw.includes(','),hasD=raw.includes('.');
+    if(hasC&&hasD){if(raw.lastIndexOf(',')>raw.lastIndexOf('.'))raw=raw.replace(/\./g,'').replace(',','.');else raw=raw.replace(/,/g,'');}
+    else if(hasC){const dec=raw.split(',').pop();raw=(dec.length===2)?raw.replace(/\./g,'').replace(',','.'):raw.replace(/,/g,'');}
+    else if(hasD){const dec=raw.split('.').pop();if(dec.length===3)raw=raw.replace(/\./g,'');}
+    const n=parseFloat(raw);return isNaN(n)?null:n;}
+  function parseNumbers(text){const out=[];const re=/(\d[\d.,\s]{1,15}\d|\d)/g;let m;
+    while((m=re.exec(text))){const val=normNum(m[0].replace(/\s/g,''));if(val!=null&&val>0&&val<100000000)out.push(Math.round(val*100)/100);}
+    return [...new Set(out)].sort((a,b)=>b-a).slice(0,6);}
+
+  let tessLoading;
+  function loadTesseract(){if(window.Tesseract)return Promise.resolve();if(tessLoading)return tessLoading;
+    tessLoading=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    return tessLoading;}
+  async function handleImage(file){
+    try{thumb.src=URL.createObjectURL(file);thumb.hidden=false;}catch(e){}
+    cands.innerHTML='';ocrStatus.innerHTML='<span class="spin"></span> Reading the screenshot on your device…';
+    try{await loadTesseract();
+      const res=await Tesseract.recognize(file,'eng');
+      const nums=parseNumbers((res&&res.data&&res.data.text)||'');
+      if(nums.length){ocrStatus.textContent='Tap the right amount, or type it below:';
+        nums.forEach(n=>{const b=document.createElement('button');b.type='button';b.className='cand';b.textContent=eur(n);b.addEventListener('click',()=>{mValue.value=n.toString().replace('.',',');});cands.appendChild(b);});
+        mValue.value=nums[0].toString().replace('.',',');
+      }else{ocrStatus.textContent='Couldn’t read a number confidently — please type it below.';}
+    }catch(err){ocrStatus.textContent='On‑device reading unavailable here — just type the amount below.';}
+  }
+
+  $('mCommit').addEventListener('click',()=>{
+    const val=normNum(mValue.value);
+    if(val==null||val<0){toast('Enter a valid amount');return;}
+    if(mAccount.value==='__new'){
+      const nm=(mNewName.value||'').trim();if(!nm){toast('Name the new account');return;}
+      state.accounts.push({id:'acc_'+Date.now(),name:nm,cat:mNewCat.value,value:val});
+      recordSnapshot(nm+' added → '+eur0(val));persist();renderDynamic();
+      toast('Account added · snapshot saved');closeModal();return;}
+    commit(mAccount.value,val);closeModal();
+  });
+
+  /* ---------- export / import ---------- */
+  $('exportBtn').addEventListener('click',()=>{
+    const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wealth-dashboard-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();
+    toast('Backup downloaded');});
+  $('importBtn').addEventListener('click',()=>$('importFile').click());
+  $('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
+
+  /* ============ COSTS & UPKEEP ============ */
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function annualise(c){const a=+c.amount||0;return c.freq==='monthly'?a*12:c.freq==='quarterly'?a*4:a;}
+  function freqLabel(f){return f==='monthly'?'Monthly':f==='quarterly'?'Quarterly':'Yearly';}
+  function delCost(id){state.propertyCosts=state.propertyCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Cost removed');}
+  function delRecur(id){state.recurringCosts=state.recurringCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Recurring cost removed');}
+  function renderCosts(){
+    const one=state.propertyCosts||[],rec=state.recurringCosts||[];
+    const total=one.reduce((s,c)=>s+(+c.amount||0),0);
+    const annual=rec.reduce((s,c)=>s+annualise(c),0);
+    set('costOneoffTotal',eur0(total));set('costFootTotal',eur0(total));
+    set('costRecurMonth',rec.length?eur0(annual/12):'0 €');
+    set('costRecurYear',eur0(annual));
+    set('costRecurCount',rec.length?(rec.length+' recurring cost'+(rec.length>1?'s':'')):'none yet');
+    set('costFirstYear',eur0(total+annual));
+    set('recurFootTotal',eur0(annual));
+    const cb=$('costBody2');
+    if(cb){cb.innerHTML='';
+      one.forEach(c=>{const tr=document.createElement('tr');
+        const when=c.when==='setup'?'<span class="when-tag setup">Setup</span>':(c.when?'<span class="when-tag">'+esc(c.when)+'</span>':'<span class="when-tag">—</span>');
+        tr.innerHTML='<td>'+when+'</td>'+
+          '<td><div style="font-weight:500">'+esc(c.item)+'</div><div class="sub">'+esc(c.room||'')+(c.cond?' · '+esc(c.cond):'')+'</div></td>'+
+          '<td style="color:var(--muted);font-size:12.5px">'+esc(c.brand||'')+'</td>'+
+          '<td>'+esc(c.who||'')+'</td>'+
+          '<td class="r val">'+eur(+c.amount||0)+'</td>'+
+          '<td class="r"><button class="cost-row-del" data-del-cost="'+c.id+'" title="Remove">✕</button></td>';
+        cb.appendChild(tr);});
+      if(!one.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="6"><div class="cost-empty">No one‑off costs yet — use ＋ Add cost.</div></td>';cb.appendChild(tr);}
+      cb.querySelectorAll('[data-del-cost]').forEach(b=>b.addEventListener('click',()=>delCost(b.getAttribute('data-del-cost'))));
+    }
+    const rb=$('recurBody');
+    if(rb){rb.innerHTML='';
+      rec.forEach(c=>{const tr=document.createElement('tr');
+        tr.innerHTML='<td><div style="font-weight:500">'+esc(c.label)+'</div></td>'+
+          '<td>'+esc(c.who||'')+'</td>'+
+          '<td><span class="freq-badge">'+freqLabel(c.freq)+'</span></td>'+
+          '<td class="r val">'+eur(+c.amount||0)+'</td>'+
+          '<td class="r val">'+eur0(annualise(c))+'</td>'+
+          '<td class="r"><button class="cost-row-del" data-del-recur="'+c.id+'" title="Remove">✕</button></td>';
+        rb.appendChild(tr);});
+      if(!rec.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="6"><div class="cost-empty">No recurring costs yet — add community fees, IBI, home insurance, utilities…<br>Use ＋ Add recurring above.</div></td>';rb.appendChild(tr);}
+      rb.querySelectorAll('[data-del-recur]').forEach(b=>b.addEventListener('click',()=>delRecur(b.getAttribute('data-del-recur'))));
+    }
+  }
+
+  /* Salva sub-tabs */
+  const subtabs=[...document.querySelectorAll('.subtab')];
+  const subpanels={property:$('salva-sub-property'),costs:$('salva-sub-costs')};
+  subtabs.forEach(st=>st.addEventListener('click',()=>{
+    subtabs.forEach(x=>x.classList.remove('active'));st.classList.add('active');
+    Object.values(subpanels).forEach(p=>p&&p.classList.remove('active'));
+    const p=subpanels[st.dataset.sub];if(p)p.classList.add('active');
+  }));
+
+  /* cost modals */
+  const costModal=$('costModal'),recurModal=$('recurModal');
+  function openCost(){['cItem','cRoom','cWhen','cBrand','cAmount'].forEach(id=>{if($(id))$(id).value='';});costModal.hidden=false;}
+  function openRecur(){['rLabel','rAmount'].forEach(id=>{if($(id))$(id).value='';});recurModal.hidden=false;}
+  $('addCostBtn').addEventListener('click',openCost);
+  $('costModalClose').addEventListener('click',()=>costModal.hidden=true);
+  costModal.addEventListener('click',e=>{if(e.target===costModal)costModal.hidden=true;});
+  $('costCommit').addEventListener('click',()=>{
+    const item=($('cItem').value||'').trim(),amt=normNum($('cAmount').value);
+    if(!item){toast('What did you buy?');return;}
+    if(amt==null||amt<0){toast('Enter an amount');return;}
+    state.propertyCosts.push({id:'cost_'+Date.now(),when:($('cWhen').value||'').trim(),item,room:($('cRoom').value||'').trim(),brand:($('cBrand').value||'').trim(),who:$('cWho').value,cond:$('cCond').value,amount:amt});
+    persist();renderCosts();toast('Cost added');costModal.hidden=true;
+  });
+  $('addRecurBtn').addEventListener('click',openRecur);
+  $('recurModalClose').addEventListener('click',()=>recurModal.hidden=true);
+  recurModal.addEventListener('click',e=>{if(e.target===recurModal)recurModal.hidden=true;});
+  $('recurCommit').addEventListener('click',()=>{
+    const label=($('rLabel').value||'').trim(),amt=normNum($('rAmount').value);
+    if(!label){toast('Name the cost');return;}
+    if(amt==null||amt<0){toast('Enter an amount');return;}
+    state.recurringCosts.push({id:'recur_'+Date.now(),label,amount:amt,freq:$('rFreq').value,who:$('rWho').value});
+    persist();renderCosts();toast('Recurring cost added');recurModal.hidden=true;
+  });
+
+  /* ---------- go ---------- */
+  dedupeHistory();
+  initStatic();
+  renderDynamic();
+})();
+</script>
+</body>
+</html>
