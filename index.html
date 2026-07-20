@@ -1289,14 +1289,20 @@ body.locked .gate{display:flex}
         const padY=(maxY-minY)*0.15||Math.abs(maxY)*0.05||1000;minY-=padY;maxY+=padY;
         const X=ts=>pad.l+(maxT===minT?0.5:(ts-minT)/(maxT-minT))*(W-pad.l-pad.r);
         const Y=v=>pad.t+(1-(v-minY)/(maxY-minY))*(H-pad.t-pad.b);
+        const step=(maxY-minY)/3,yDec=step>=1000?0:(step>=100?1:2);
+        const kFmt=v=>(v/1000).toFixed(yDec).replace('.',',')+'k';
         let g='';for(let i=0;i<=3;i++){const gy=pad.t+i/3*(H-pad.t-pad.b);const gv=maxY-(i/3)*(maxY-minY);
           g+='<line x1="'+pad.l+'" y1="'+gy+'" x2="'+(W-pad.r)+'" y2="'+gy+'" stroke="rgba(255,255,255,.06)"/>'+
-             '<text x="'+(pad.l-8)+'" y="'+(gy+4)+'" text-anchor="end" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="11">'+Math.round(gv/1000)+'k</text>';}
+             '<text x="'+(pad.l-8)+'" y="'+(gy+4)+'" text-anchor="end" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="11">'+kFmt(gv)+'</text>';}
         let d='M'+X(pts[0].ts)+' '+Y(pts[0].net);pts.forEach(p=>d+=' L'+X(p.ts)+' '+Y(p.net));
         const area=d+' L'+X(pts[pts.length-1].ts)+' '+Y(minY)+' L'+X(pts[0].ts)+' '+Y(minY)+' Z';
         let dots='';pts.forEach(p=>dots+='<circle cx="'+X(p.ts)+'" cy="'+Y(p.net)+'" r="4" fill="'+V('--brass')+'"/>');
-        const xl='<text x="'+X(pts[0].ts)+'" y="'+(H-10)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="11">'+fmtDate(pts[0].ts)+'</text>'+
-                 '<text x="'+(W-pad.r)+'" y="'+(H-10)+'" text-anchor="end" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="11">'+fmtDate(pts[pts.length-1].ts)+'</text>';
+        let xl='',prevLbl='';
+        const nTicks=maxT===minT?1:4;
+        for(let i=0;i<nTicks;i++){const f=nTicks===1?0.5:i/(nTicks-1);const tt=minT+f*(maxT-minT);const lbl=fmtDate(tt);
+          if(lbl===prevLbl)continue;prevLbl=lbl;
+          const anchor=f===0?'start':(f===1?'end':'middle');const tx=f===0?pad.l:(f===1?W-pad.r:X(tt));
+          xl+='<text x="'+tx+'" y="'+(H-10)+'" text-anchor="'+anchor+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="11">'+lbl+'</text>';}
         svg.innerHTML='<defs><linearGradient id="wg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--brass')+'" stop-opacity=".28"/><stop offset="1" stop-color="'+V('--brass')+'" stop-opacity="0"/></linearGradient></defs>'+
           g+'<path d="'+area+'" fill="url(#wg)"/><path d="'+d+'" fill="none" stroke="'+V('--brass')+'" stroke-width="2.5"/>'+dots+xl;}}
 
@@ -1555,7 +1561,7 @@ body.locked .gate{display:flex}
     function legend(){
       lgEl.innerHTML='';
       SERIES.forEach(sr=>{const b=document.createElement('button');b.type='button';b.className='lg';
-        b.style.cssText='appearance:none;background:none;border:none;cursor:pointer;padding:0;font:inherit;opacity:'+(on[sr.k]?'1':'.35');
+        b.style.cssText='appearance:none;background:none;border:none;cursor:pointer;padding:0;font-family:var(--body);font-size:12px;opacity:'+(on[sr.k]?'1':'.35');
         b.title=on[sr.k]?'Click to hide':'Click to show';
         b.innerHTML='<i style="background:'+V(sr.c)+'"></i>'+sr.n+' <b>'+fmtK(sr.d[N])+'</b>';
         b.addEventListener('click',()=>{on[sr.k]=!on[sr.k];draw();legend();});lgEl.appendChild(b);});
