@@ -826,26 +826,26 @@ body.locked .gate{display:flex}
       <div class="mort-grid">
         <div class="card mort-panel anim">
           <h3>Price per m² since 2012</h3>
-          <svg id="mktSvg" viewBox="0 0 480 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
-          <div class="beam-legend" style="margin-top:10px">
-            <div class="lg"><i style="background:var(--brass)"></i>el Poble Sec <b>4.357</b></div>
-            <div class="lg"><i style="background:var(--cash)"></i>Barcelona <b>4.548</b></div>
-            <div class="lg"><i style="background:var(--estate)"></i>Sants‑Montjuïc <b>4.229</b></div>
-            <div class="lg"><i style="background:var(--text)"></i>your buy <b>4.250</b></div>
+          <div id="mktWrap" style="position:relative">
+            <svg id="mktSvg" viewBox="0 0 480 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style="touch-action:none"></svg>
+            <div id="mktTip" style="position:absolute;display:none;pointer-events:none;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:8px;padding:8px 11px;font-family:var(--mono);font-size:11px;line-height:1.7;white-space:nowrap;z-index:5;box-shadow:0 10px 28px rgba(0,0,0,.45)"></div>
           </div>
-          <p class="cap" style="margin:12px 0 0;color:var(--muted);font-size:12px">Poble Sec fell hardest into the 2014 trough (1.754 €/m²) and has climbed <b style="color:var(--text)">+148%</b> since — the classic re‑rating of a once‑cheap central barrio.</p>
+          <div class="beam-legend" id="mktLegend" style="margin-top:10px"></div>
+          <p class="cap" style="margin:12px 0 0;color:var(--muted);font-size:12px">Hover for the values of any year · click a name to hide or show its line. Poble Sec fell hardest into the 2014 trough (1.754 €/m²) and has climbed <b style="color:var(--text)">+148%</b> since — the classic re‑rating of a once‑cheap central barrio.</p>
         </div>
         <div class="card mort-panel anim" style="animation-delay:.05s">
           <h3>How the areas compare</h3>
           <div class="mrow"><span class="mk" style="color:var(--brass);font-weight:600">el Poble Sec — your barrio</span><span class="mv" style="color:var(--brass)">4.357 €/m²</span></div>
           <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +8,6% · 5 yr +33,1% · 10 yr +68,4%</span><span class="mv" style="color:var(--muted)">CAGR 5,4%</span></div>
-          <div class="mrow"><span class="mk">Sants‑Montjuïc (district)</span><span class="mv">4.229 €/m²</span></div>
-          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +9,4% · 5 yr +35,9% · 10 yr +79,7%</span><span class="mv" style="color:var(--muted)">CAGR 6,0%</span></div>
+          <div class="mrow"><span class="mk">el Clot</span><span class="mv">4.787 €/m²</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +17,0% · 5 yr +51,3% · 10 yr +95,9%</span><span class="mv" style="color:var(--muted)">CAGR 7,0%</span></div>
+          <div class="mrow"><span class="mk">el Poblenou</span><span class="mv">5.829 €/m²</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +7,0% · 5 yr +47,9% · 10 yr +99,3%</span><span class="mv" style="color:var(--muted)">CAGR 7,1%</span></div>
+          <div class="mrow"><span class="mk">la Dreta de l'Eixample</span><span class="mv">6.709 €/m²</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +7,8% · 5 yr +40,2% · 10 yr +58,6%</span><span class="mv" style="color:var(--muted)">CAGR 4,7%</span></div>
           <div class="mrow"><span class="mk">Barcelona (whole city)</span><span class="mv">4.548 €/m²</span></div>
           <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +6,9% · 5 yr +36,7% · 10 yr +67,6%</span><span class="mv" style="color:var(--muted)">CAGR 5,3%</span></div>
-          <div class="mrow"><span class="mk">Eixample (prime reference)</span><span class="mv">5.402 €/m²</span></div>
-          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +1,5% · 5 yr +33,9% · 10 yr +59,8%</span><span class="mv" style="color:var(--muted)">CAGR 4,8%</span></div>
-          <div class="loan-badge" style="margin-top:16px">Poble Sec still trades <b>4% below</b> the city average and <b>19% below</b> Eixample next door — while matching the city's 10‑year growth. Catch‑up room left.</div>
+          <div class="loan-badge" style="margin-top:16px">Poble Sec is still the cheap door: <b>4% below</b> the city average, <b>9% below</b> el Clot, <b>25% below</b> el Poblenou and <b>35% below</b> la Dreta de l'Eixample — while matching the city's 10‑year growth.</div>
         </div>
       </div>
 
@@ -908,6 +908,35 @@ body.locked .gate{display:flex}
       </div>
       <p class="foot-note" style="margin-top:10px">The growth leaders are mostly cheap peripheral barrios catching up from a very low base (and la Marina del Prat Vermell is new‑build with few sales, so its average jumps around). Poble Sec is mid‑table on recent growth because it already re‑rated hard — <b style="color:var(--text)">+104% between its 2014 low and 2019</b> — and now sits at a far higher absolute price than any of the 5‑year leaders bar Diagonal Mar.</p>
 
+      <div class="section-head anim"><h2>Your building's vintage</h2><span class="hint">Salvà 40 was built in 1877 · what era does to price</span></div>
+      <div class="own">
+        <div class="card own-card anim">
+          <h3>Buildings like yours · pre‑1900</h3>
+          <div class="own-list">
+            <div class="mrow"><span class="mk">Your finca</span><span class="mv">built 1877</span></div>
+            <div class="mrow"><span class="mk">Poble Sec pre‑1900 average · 2026</span><span class="mv">4.248 €/m²</span></div>
+            <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">You paid</span><span class="mv" style="font-weight:600">4.250 €/m²</span></div>
+            <div class="mrow"><span class="mk">Barcelona pre‑1900 average</span><span class="mv">4.474 €/m²</span></div>
+            <div class="mrow"><span class="mk">Poble Sec pre‑1900 · 10‑yr growth</span><span class="mv" style="color:var(--grow)">+56,1%</span></div>
+            <div class="mrow"><span class="mk">Pre‑1900 vs all ages in the barrio</span><span class="mv">− 2,5%</span></div>
+          </div>
+          <div class="loan-badge">You paid <b>spot on the going rate</b> for a pre‑1900 finca in Poble Sec — and century‑old buildings here trade only ≈ 2,5% under the all‑ages barrio average, so the 1877 vintage is no drag on value.</div>
+        </div>
+        <div class="card own-card anim" style="animation-delay:.05s">
+          <h3>Poble Sec 2026 · €/m² by construction era</h3>
+          <div class="own-list">
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="width:104px;font-size:12px;color:var(--muted)">2000–2020</span><div style="flex:1;height:9px;background:var(--ink);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:100%;background:var(--cash)"></span></div><span class="num" style="font-size:12px;width:52px;text-align:right">5.682</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="width:104px;font-size:12px;color:var(--muted)">1980–1999</span><div style="flex:1;height:9px;background:var(--ink);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:73%;background:var(--muted-2)"></span></div><span class="num" style="font-size:12px;width:52px;text-align:right">4.157</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="width:104px;font-size:12px;color:var(--muted)">1960–1979</span><div style="flex:1;height:9px;background:var(--ink);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:76%;background:var(--muted-2)"></span></div><span class="num" style="font-size:12px;width:52px;text-align:right">4.340</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="width:104px;font-size:12px;color:var(--muted)">1940–1959</span><div style="flex:1;height:9px;background:var(--ink);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:71%;background:var(--muted-2)"></span></div><span class="num" style="font-size:12px;width:52px;text-align:right">4.060</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="width:104px;font-size:12px;color:var(--muted)">1920–1939</span><div style="flex:1;height:9px;background:var(--ink);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:78%;background:var(--muted-2)"></span></div><span class="num" style="font-size:12px;width:52px;text-align:right">4.446</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="width:104px;font-size:12px;color:var(--muted)">1900–1919</span><div style="flex:1;height:9px;background:var(--ink);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:77%;background:var(--muted-2)"></span></div><span class="num" style="font-size:12px;width:52px;text-align:right">4.361</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="width:104px;font-size:12px;color:var(--brass);font-weight:600">before 1900 ★</span><div style="flex:1;height:9px;background:var(--ink);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:75%;background:var(--brass)"></span></div><span class="num" style="font-size:12px;width:52px;text-align:right;color:var(--brass);font-weight:600">4.248</span></div>
+          </div>
+          <p style="font-size:12.5px;color:var(--muted);margin:12px 0 0;line-height:1.6">Age hardly discounts in Poble Sec — everything from 1877 fincas to 1990s blocks trades within ±5% of the barrio average. Only scarce post‑2000 stock commands a premium (city‑wide new‑build average: 6.157 €/m²; none registered in Poble Sec).</p>
+        </div>
+      </div>
+
       <div class="section-head anim"><h2>What this says about Salvà 40</h2><span class="hint">Market yardstick, not an appraisal</span></div>
       <div class="own">
         <div class="card own-card anim">
@@ -916,12 +945,13 @@ body.locked .gate{display:flex}
             <div class="mrow"><span class="mk">Paid · Apr 2026</span><span class="mv">340.000 €</span></div>
             <div class="mrow"><span class="mk">Your price on 80 m² built</span><span class="mv">4.250 €/m²</span></div>
             <div class="mrow"><span class="mk">Poble Sec average 2026</span><span class="mv">4.357 €/m²</span></div>
+            <div class="mrow"><span class="mk">Pre‑1900 fincas like yours</span><span class="mv">4.248 €/m²</span></div>
             <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Implied value at area average</span><span class="mv" style="font-weight:600">≈ 348.600 €</span></div>
             <div class="mrow"><span class="mk">vs price paid</span><span class="mv" style="color:var(--grow)">+8.600 € (+2,5%)</span></div>
             <div class="mrow"><span class="mk">Your 50% at implied value</span><span class="mv">≈ 174.300 €</span></div>
             <div class="mrow"><span class="mk">Break‑even incl. all buying costs (360.698 €)</span><span class="mv">4.509 €/m²</span></div>
           </div>
-          <div class="loan-badge">You bought <b>≈ 2,5% under</b> the 2026 barrio average. Covering the full 20.698 € of taxes &amp; fees needs the barrio at 4.509 €/m² — about <b>one more year</b> of growth at the recent +8,6%/yr pace.</div>
+          <div class="loan-badge">You bought <b>≈ 2,5% under</b> the 2026 barrio average and <b>spot on</b> the pre‑1900 going rate. Covering the full 20.698 € of taxes &amp; fees needs the barrio at 4.509 €/m² — about <b>one more year</b> of growth at the recent +8,6%/yr pace.</div>
         </div>
         <div class="card own-card anim" style="animation-delay:.05s">
           <h3>If Poble Sec keeps compounding</h3>
@@ -938,7 +968,7 @@ body.locked .gate{display:flex}
       </div>
 
       <p class="foot-note">
-        Source: Ajuntament de Barcelona, Portal de Dades — “Preu mitjà per superfície (€/m²) dels habitatges transmesos per compravenda”, registered sale transactions, CC BY 4.0, retrieved 20 Jul 2026. The 2026 figure is year‑to‑date. Small outer barrios trade thinly, so their averages are volatile.<br>
+        Source: Ajuntament de Barcelona, Portal de Dades — “Preu mitjà per superfície (€/m²) dels habitatges transmesos per compravenda”, plus the companion breakdowns by construction year and by property type. Registered sale transactions, CC BY 4.0, retrieved 20 Jul 2026; the 2026 figures are year‑to‑date. Small outer barrios trade thinly, so their averages are volatile; whole‑building (vertical) sales in Poble Sec are too sporadic to price, so all figures shown are for flats.<br>
         Neighbourhood averages mix all sizes, states and streets — the balance‑sheet still carries the flat at the 340.000 € purchase price until you have a real appraisal.
       </p>
     </div><!-- /salva-sub-market -->
@@ -1492,25 +1522,61 @@ body.locked .gate{display:flex}
     const p=subpanels[st.dataset.sub];if(p)p.classList.add('active');
   }));
 
-  /* market chart — Poble Sec vs Barcelona vs Sants-Montjuïc, €/m² 2012–2026 */
+  /* market chart — interactive €/m² 2012–2026: hover tooltip + toggleable series */
   (function(){
-    const svg=$('mktSvg');if(!svg)return;
-    const PS =[2116,1805,1754,2160,2588,3272,3502,3580,3331,3274,3496,3664,3912,4013,4357];
-    const BCN=[2466,2248,2304,2606,2714,3145,3382,3306,3296,3328,3597,3622,3875,4254,4548];
-    const SM =[1965,1739,1843,2186,2354,2815,3137,3153,3092,3112,3220,3305,3446,3867,4229];
-    const W=480,H=260,pad={l:42,r:14,t:14,b:26},y0=1500,y1=5100,N=PS.length-1;
+    const svg=$('mktSvg'),tip=$('mktTip'),wrap=$('mktWrap'),lgEl=$('mktLegend');if(!svg)return;
+    const YRS=Array.from({length:15},(_,i)=>2012+i);
+    const SERIES=[
+      {k:'ps',   n:'el Poble Sec',          c:'--brass', w:2.4, d:[2116,1805,1754,2160,2588,3272,3502,3580,3331,3274,3496,3664,3912,4013,4357]},
+      {k:'bcn',  n:'Barcelona',             c:'--cash',  w:1.6, d:[2466,2248,2304,2606,2714,3145,3382,3306,3296,3328,3597,3622,3875,4254,4548]},
+      {k:'clot', n:'el Clot',               c:'--grow',  w:1.6, d:[2223,1869,1985,2145,2443,2955,2964,3168,3235,3163,3619,3395,3641,4092,4787]},
+      {k:'pn',   n:'el Poblenou',           c:'--alert', w:1.6, d:[2649,2493,2551,2718,2924,3620,3767,3755,3863,3940,4390,4052,4642,5448,5829]},
+      {k:'dreta',n:"la Dreta de l'Eixample",c:'--estate',w:1.6, d:[3345,3411,3326,3623,4229,4738,5138,4994,5253,4785,5507,5523,5888,6224,6709]},
+    ];
+    const on={ps:true,bcn:true,clot:true,pn:true,dreta:true};
+    const W=480,H=260,pad={l:42,r:14,t:14,b:26},y0=1500,y1=7000,N=14;
     const X=i=>pad.l+i/N*(W-pad.l-pad.r),Y=v=>pad.t+(1-(v-y0)/(y1-y0))*(H-pad.t-pad.b);
     const path=a=>a.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
-    let s='<defs><linearGradient id="mg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--brass')+'" stop-opacity="0.22"/><stop offset="1" stop-color="'+V('--brass')+'" stop-opacity="0"/></linearGradient></defs>';
-    [2000,3000,4000,5000].forEach(v=>{s+='<line x1="'+pad.l+'" y1="'+Y(v)+'" x2="'+(W-pad.r)+'" y2="'+Y(v)+'" stroke="'+V('--line-strong')+'" stroke-width="1"/><text x="'+(pad.l-6)+'" y="'+(Y(v)+3)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="9" text-anchor="end">'+(v/1000)+'k</text>';});
-    s+='<path d="'+path(PS)+' L'+X(N)+' '+Y(y0)+' L'+X(0)+' '+Y(y0)+' Z" fill="url(#mg)"/>';
-    s+='<path d="'+path(SM)+'" fill="none" stroke="'+V('--estate')+'" stroke-width="1.6" opacity="0.9"/>';
-    s+='<path d="'+path(BCN)+'" fill="none" stroke="'+V('--cash')+'" stroke-width="1.6" opacity="0.9"/>';
-    s+='<path d="'+path(PS)+'" fill="none" stroke="'+V('--brass')+'" stroke-width="2.4"/>';
-    s+='<circle cx="'+X(N)+'" cy="'+Y(4250)+'" r="4.5" fill="'+V('--ink')+'" stroke="'+V('--text')+'" stroke-width="2"/>';
-    s+='<text x="'+(X(N)-9)+'" y="'+(Y(4250)+14)+'" fill="'+V('--text')+'" font-family="'+V('--mono')+'" font-size="9.5" text-anchor="end">you · 4.250</text>';
-    [[0,'2012','start'],[7,'2019','middle'],[14,'2026','end']].forEach(t=>{s+='<text x="'+X(t[0])+'" y="'+(H-8)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="'+t[2]+'">'+t[1]+'</text>';});
-    svg.innerHTML=s;
+    const fmtK=n=>Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+    let hoverI=null;
+    function draw(){
+      let s='<defs><linearGradient id="mg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--brass')+'" stop-opacity="0.20"/><stop offset="1" stop-color="'+V('--brass')+'" stop-opacity="0"/></linearGradient></defs>';
+      [2000,3000,4000,5000,6000,7000].forEach(v=>{s+='<line x1="'+pad.l+'" y1="'+Y(v)+'" x2="'+(W-pad.r)+'" y2="'+Y(v)+'" stroke="'+V('--line-strong')+'" stroke-width="1"/><text x="'+(pad.l-6)+'" y="'+(Y(v)+3)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="9" text-anchor="end">'+(v/1000)+'k</text>';});
+      if(on.ps)s+='<path d="'+path(SERIES[0].d)+' L'+X(N)+' '+Y(y0)+' L'+X(0)+' '+Y(y0)+' Z" fill="url(#mg)"/>';
+      SERIES.slice(1).reverse().forEach(sr=>{if(on[sr.k])s+='<path d="'+path(sr.d)+'" fill="none" stroke="'+V(sr.c)+'" stroke-width="'+sr.w+'" opacity="0.9"/>';});
+      if(on.ps)s+='<path d="'+path(SERIES[0].d)+'" fill="none" stroke="'+V('--brass')+'" stroke-width="2.4"/>';
+      if(hoverI!=null){s+='<line x1="'+X(hoverI)+'" y1="'+pad.t+'" x2="'+X(hoverI)+'" y2="'+(H-pad.b)+'" stroke="'+V('--muted-2')+'" stroke-width="1" stroke-dasharray="3 3"/>';
+        SERIES.forEach(sr=>{if(on[sr.k])s+='<circle cx="'+X(hoverI)+'" cy="'+Y(sr.d[hoverI])+'" r="3.4" fill="'+V(sr.c)+'" stroke="'+V('--ink')+'" stroke-width="1.5"/>';});}
+      if(on.ps){s+='<circle cx="'+X(N)+'" cy="'+Y(4250)+'" r="4.5" fill="'+V('--ink')+'" stroke="'+V('--text')+'" stroke-width="2"/>';
+        s+='<text x="'+(X(N)-9)+'" y="'+(Y(4250)+14)+'" fill="'+V('--text')+'" font-family="'+V('--mono')+'" font-size="9.5" text-anchor="end">you · 4.250</text>';}
+      [[0,'2012','start'],[7,'2019','middle'],[14,'2026','end']].forEach(t=>{s+='<text x="'+X(t[0])+'" y="'+(H-8)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="'+t[2]+'">'+t[1]+'</text>';});
+      svg.innerHTML=s;
+    }
+    function legend(){
+      lgEl.innerHTML='';
+      SERIES.forEach(sr=>{const b=document.createElement('button');b.type='button';b.className='lg';
+        b.style.cssText='appearance:none;background:none;border:none;cursor:pointer;padding:0;font:inherit;opacity:'+(on[sr.k]?'1':'.35');
+        b.title=on[sr.k]?'Click to hide':'Click to show';
+        b.innerHTML='<i style="background:'+V(sr.c)+'"></i>'+sr.n+' <b>'+fmtK(sr.d[N])+'</b>';
+        b.addEventListener('click',()=>{on[sr.k]=!on[sr.k];draw();legend();});lgEl.appendChild(b);});
+      const d=document.createElement('div');d.className='lg';
+      d.innerHTML='<i style="background:var(--text)"></i>your buy <b>4.250</b>';lgEl.appendChild(d);
+    }
+    svg.addEventListener('pointermove',e=>{
+      const r=svg.getBoundingClientRect();if(!r.width)return;
+      const vx=(e.clientX-r.left)*(W/r.width);
+      let i=Math.round((vx-pad.l)/((W-pad.l-pad.r)/N));i=Math.max(0,Math.min(N,i));
+      if(i!==hoverI){hoverI=i;draw();}
+      const act=SERIES.filter(sr=>on[sr.k]).sort((a,b)=>b.d[i]-a.d[i]);
+      tip.innerHTML='<b>'+YRS[i]+'</b><br>'+act.map(sr=>'<span style="color:'+V(sr.c)+'">●</span> '+sr.n+' <b>'+fmtK(sr.d[i])+' €</b>').join('<br>');
+      tip.style.display='block';
+      const wr=wrap.getBoundingClientRect();
+      let tx=e.clientX-wr.left+16;if(tx+tip.offsetWidth+4>wr.width)tx=e.clientX-wr.left-tip.offsetWidth-16;
+      let ty=e.clientY-wr.top+12;if(ty+tip.offsetHeight>wr.height)ty=wr.height-tip.offsetHeight;
+      tip.style.left=Math.max(0,tx)+'px';tip.style.top=Math.max(0,ty)+'px';
+    });
+    svg.addEventListener('pointerleave',()=>{hoverI=null;tip.style.display='none';draw();});
+    draw();legend();
   })();
 
   /* cost modals */
