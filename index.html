@@ -255,6 +255,7 @@ body{margin:0;background:
 .spec .sv{font-family:var(--mono);font-size:13px;text-align:right}
 
 .mort-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tri-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .mort-panel{padding:24px 26px}
 .mort-panel h3{font-family:var(--disp);font-weight:600;font-size:15px;margin:0 0 18px;display:flex;align-items:center;gap:10px}
 .mbig{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:20px}
@@ -401,7 +402,7 @@ body.locked .gate{display:flex}
   .hero-grid,.prop-hero{grid-template-columns:1fr}
   .prop-hero .rgt{border-left:none;border-top:1px solid var(--line)}
   .kpis.k5,.kpis.k4,.kpis.k3{grid-template-columns:repeat(2,1fr)}
-  .split,.deploy,.pots,.dip-rules,.rules,.mort-grid,.own,.mini-split{grid-template-columns:1fr}
+  .split,.deploy,.pots,.dip-rules,.rules,.mort-grid,.tri-grid,.own,.mini-split{grid-template-columns:1fr}
   .pie-grid{grid-template-columns:1fr}.diversify-grid{grid-template-columns:1fr}.vwce-grid{grid-template-columns:1fr}
   .tab .tl{display:none}
 }
@@ -849,8 +850,26 @@ body.locked .gate{display:flex}
       </div>
 
       <div class="section-head anim"><h2>Top 10 neighbourhoods by price growth</h2><span class="hint">All 69 Barcelona barrios with data · where Poble Sec ranks</span></div>
-      <div class="mort-grid">
+      <div class="tri-grid">
         <div class="card hist anim">
+          <table>
+            <thead><tr><th>#</th><th>Last year · 2025 → 2026</th><th class="r">€/m² now</th><th class="r">Δ 1 yr</th></tr></thead>
+            <tbody>
+              <tr><td class="src">1</td><td>les Roquetes</td><td class="val r">3.215</td><td class="r"><span class="delta up">+30,5%</span></td></tr>
+              <tr><td class="src">2</td><td>la Vall d'Hebron</td><td class="val r">4.856</td><td class="r"><span class="delta up">+25,6%</span></td></tr>
+              <tr><td class="src">3</td><td>Baró de Viver</td><td class="val r">2.250</td><td class="r"><span class="delta up">+24,9%</span></td></tr>
+              <tr><td class="src">4</td><td>Verdun</td><td class="val r">3.408</td><td class="r"><span class="delta up">+24,6%</span></td></tr>
+              <tr><td class="src">5</td><td>el Besòs i el Maresme</td><td class="val r">3.423</td><td class="r"><span class="delta up">+20,6%</span></td></tr>
+              <tr><td class="src">6</td><td>la Sagrera</td><td class="val r">4.315</td><td class="r"><span class="delta up">+17,8%</span></td></tr>
+              <tr><td class="src">7</td><td>Porta</td><td class="val r">3.920</td><td class="r"><span class="delta up">+17,7%</span></td></tr>
+              <tr><td class="src">8</td><td>Hostafrancs</td><td class="val r">4.740</td><td class="r"><span class="delta up">+17,3%</span></td></tr>
+              <tr><td class="src">9</td><td>el Clot</td><td class="val r">4.787</td><td class="r"><span class="delta up">+17,0%</span></td></tr>
+              <tr><td class="src">10</td><td>la Marina de Port</td><td class="val r">3.400</td><td class="r"><span class="delta up">+15,8%</span></td></tr>
+              <tr style="color:var(--brass)"><td class="src" style="color:var(--brass)">33</td><td style="font-weight:600">el Poble Sec</td><td class="val r">4.357</td><td class="r"><span class="delta up">+8,6%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card hist anim" style="animation-delay:.05s">
           <table>
             <thead><tr><th>#</th><th>Last 5 years · 2021 → 2026</th><th class="r">€/m² now</th><th class="r">Δ 5 yr</th></tr></thead>
             <tbody>
@@ -868,7 +887,7 @@ body.locked .gate{display:flex}
             </tbody>
           </table>
         </div>
-        <div class="card hist anim" style="animation-delay:.05s">
+        <div class="card hist anim" style="animation-delay:.1s">
           <table>
             <thead><tr><th>#</th><th>Last 10 years · 2016 → 2026</th><th class="r">€/m² now</th><th class="r">Δ 10 yr</th></tr></thead>
             <tbody>
