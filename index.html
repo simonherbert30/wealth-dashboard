@@ -685,6 +685,7 @@ body.locked .gate{display:flex}
     <div class="subtabs" role="tablist">
       <button class="subtab active" data-sub="property" role="tab">Property &amp; mortgage</button>
       <button class="subtab" data-sub="costs" role="tab">Costs &amp; upkeep</button>
+      <button class="subtab" data-sub="market" role="tab">Market &amp; value</button>
     </div>
     <div id="salva-sub-property" class="subpanel active">
     <div class="card prop-hero anim">
@@ -811,6 +812,117 @@ body.locked .gate{display:flex}
         This is a spending log to see what the flat really costs over time — it doesn't change your net worth.
       </p>
     </div><!-- /salva-sub-costs -->
+
+    <div id="salva-sub-market" class="subpanel">
+      <div class="kpis k4 anim">
+        <div class="kpi brass-kpi"><div class="k">Poble Sec · €/m²</div><div class="v">4.357 €</div><div class="n">2026 avg sale price · +8,6% vs 2025</div></div>
+        <div class="kpi pos"><div class="k">Implied value · 80 m²</div><div class="v">≈ 348.600 €</div><div class="n">paid 340.000 € → +2,5% on paper</div></div>
+        <div class="kpi"><div class="k">Poble Sec · 5 years</div><div class="v">+33,1%</div><div class="n">Barcelona average +36,7%</div></div>
+        <div class="kpi"><div class="k">Poble Sec · 10 years</div><div class="v">+68,4%</div><div class="n">Barcelona average +67,6%</div></div>
+      </div>
+
+      <div class="section-head anim"><h2>Poble Sec vs the city</h2><span class="hint">Average €/m² of homes sold · registered transactions 2012–2026</span></div>
+      <div class="mort-grid">
+        <div class="card mort-panel anim">
+          <h3>Price per m² since 2012</h3>
+          <svg id="mktSvg" viewBox="0 0 480 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+          <div class="beam-legend" style="margin-top:10px">
+            <div class="lg"><i style="background:var(--brass)"></i>el Poble Sec <b>4.357</b></div>
+            <div class="lg"><i style="background:var(--cash)"></i>Barcelona <b>4.548</b></div>
+            <div class="lg"><i style="background:var(--estate)"></i>Sants‑Montjuïc <b>4.229</b></div>
+            <div class="lg"><i style="background:var(--text)"></i>your buy <b>4.250</b></div>
+          </div>
+          <p class="cap" style="margin:12px 0 0;color:var(--muted);font-size:12px">Poble Sec fell hardest into the 2014 trough (1.754 €/m²) and has climbed <b style="color:var(--text)">+148%</b> since — the classic re‑rating of a once‑cheap central barrio.</p>
+        </div>
+        <div class="card mort-panel anim" style="animation-delay:.05s">
+          <h3>How the areas compare</h3>
+          <div class="mrow"><span class="mk" style="color:var(--brass);font-weight:600">el Poble Sec — your barrio</span><span class="mv" style="color:var(--brass)">4.357 €/m²</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +8,6% · 5 yr +33,1% · 10 yr +68,4%</span><span class="mv" style="color:var(--muted)">CAGR 5,4%</span></div>
+          <div class="mrow"><span class="mk">Sants‑Montjuïc (district)</span><span class="mv">4.229 €/m²</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +9,4% · 5 yr +35,9% · 10 yr +79,7%</span><span class="mv" style="color:var(--muted)">CAGR 6,0%</span></div>
+          <div class="mrow"><span class="mk">Barcelona (whole city)</span><span class="mv">4.548 €/m²</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +6,9% · 5 yr +36,7% · 10 yr +67,6%</span><span class="mv" style="color:var(--muted)">CAGR 5,3%</span></div>
+          <div class="mrow"><span class="mk">Eixample (prime reference)</span><span class="mv">5.402 €/m²</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ 1 yr +1,5% · 5 yr +33,9% · 10 yr +59,8%</span><span class="mv" style="color:var(--muted)">CAGR 4,8%</span></div>
+          <div class="loan-badge" style="margin-top:16px">Poble Sec still trades <b>4% below</b> the city average and <b>19% below</b> Eixample next door — while matching the city's 10‑year growth. Catch‑up room left.</div>
+        </div>
+      </div>
+
+      <div class="section-head anim"><h2>Top 10 neighbourhoods by price growth</h2><span class="hint">All 69 Barcelona barrios with data · where Poble Sec ranks</span></div>
+      <div class="mort-grid">
+        <div class="card hist anim">
+          <table>
+            <thead><tr><th>#</th><th>Last 5 years · 2021 → 2026</th><th class="r">€/m² now</th><th class="r">Δ 5 yr</th></tr></thead>
+            <tbody>
+              <tr><td class="src">1</td><td>la Marina del Prat Vermell</td><td class="val r">3.084</td><td class="r"><span class="delta up">+185,2%</span></td></tr>
+              <tr><td class="src">2</td><td>les Roquetes</td><td class="val r">3.215</td><td class="r"><span class="delta up">+74,2%</span></td></tr>
+              <tr><td class="src">3</td><td>Verdun</td><td class="val r">3.408</td><td class="r"><span class="delta up">+65,4%</span></td></tr>
+              <tr><td class="src">4</td><td>Baró de Viver</td><td class="val r">2.250</td><td class="r"><span class="delta up">+59,3%</span></td></tr>
+              <tr><td class="src">5</td><td>Diagonal Mar i el Front Marítim</td><td class="val r">6.074</td><td class="r"><span class="delta up">+56,4%</span></td></tr>
+              <tr><td class="src">6</td><td>Provençals del Poblenou</td><td class="val r">4.408</td><td class="r"><span class="delta up">+53,9%</span></td></tr>
+              <tr><td class="src">7</td><td>el Turó de la Peira</td><td class="val r">3.187</td><td class="r"><span class="delta up">+51,9%</span></td></tr>
+              <tr><td class="src">8</td><td>el Clot</td><td class="val r">4.787</td><td class="r"><span class="delta up">+51,3%</span></td></tr>
+              <tr><td class="src">9</td><td>la Prosperitat</td><td class="val r">3.451</td><td class="r"><span class="delta up">+50,3%</span></td></tr>
+              <tr><td class="src">10</td><td>la Sagrera</td><td class="val r">4.315</td><td class="r"><span class="delta up">+48,9%</span></td></tr>
+              <tr style="color:var(--brass)"><td class="src" style="color:var(--brass)">53</td><td style="font-weight:600">el Poble Sec</td><td class="val r">4.357</td><td class="r"><span class="delta up">+33,1%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card hist anim" style="animation-delay:.05s">
+          <table>
+            <thead><tr><th>#</th><th>Last 10 years · 2016 → 2026</th><th class="r">€/m² now</th><th class="r">Δ 10 yr</th></tr></thead>
+            <tbody>
+              <tr><td class="src">1</td><td>Baró de Viver</td><td class="val r">2.250</td><td class="r"><span class="delta up">+240,5%</span></td></tr>
+              <tr><td class="src">2</td><td>la Marina del Prat Vermell</td><td class="val r">3.084</td><td class="r"><span class="delta up">+180,3%</span></td></tr>
+              <tr><td class="src">3</td><td>Ciutat Meridiana</td><td class="val r">2.340</td><td class="r"><span class="delta up">+151,7%</span></td></tr>
+              <tr><td class="src">4</td><td>les Roquetes</td><td class="val r">3.215</td><td class="r"><span class="delta up">+151,5%</span></td></tr>
+              <tr><td class="src">5</td><td>Navas</td><td class="val r">4.446</td><td class="r"><span class="delta up">+150,2%</span></td></tr>
+              <tr><td class="src">6</td><td>la Vall d'Hebron</td><td class="val r">4.856</td><td class="r"><span class="delta up">+122,2%</span></td></tr>
+              <tr><td class="src">7</td><td>el Besòs i el Maresme</td><td class="val r">3.423</td><td class="r"><span class="delta up">+120,2%</span></td></tr>
+              <tr><td class="src">8</td><td>Verdun</td><td class="val r">3.408</td><td class="r"><span class="delta up">+119,6%</span></td></tr>
+              <tr><td class="src">9</td><td>el Turó de la Peira</td><td class="val r">3.187</td><td class="r"><span class="delta up">+113,3%</span></td></tr>
+              <tr><td class="src">10</td><td>Hostafrancs</td><td class="val r">4.740</td><td class="r"><span class="delta up">+112,6%</span></td></tr>
+              <tr style="color:var(--brass)"><td class="src" style="color:var(--brass)">49</td><td style="font-weight:600">el Poble Sec</td><td class="val r">4.357</td><td class="r"><span class="delta up">+68,4%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="foot-note" style="margin-top:10px">The growth leaders are mostly cheap peripheral barrios catching up from a very low base (and la Marina del Prat Vermell is new‑build with few sales, so its average jumps around). Poble Sec is mid‑table on recent growth because it already re‑rated hard — <b style="color:var(--text)">+104% between its 2014 low and 2019</b> — and now sits at a far higher absolute price than any of the 5‑year leaders bar Diagonal Mar.</p>
+
+      <div class="section-head anim"><h2>What this says about Salvà 40</h2><span class="hint">Market yardstick, not an appraisal</span></div>
+      <div class="own">
+        <div class="card own-card anim">
+          <h3>Where you stand today</h3>
+          <div class="own-list">
+            <div class="mrow"><span class="mk">Paid · Apr 2026</span><span class="mv">340.000 €</span></div>
+            <div class="mrow"><span class="mk">Your price on 80 m² built</span><span class="mv">4.250 €/m²</span></div>
+            <div class="mrow"><span class="mk">Poble Sec average 2026</span><span class="mv">4.357 €/m²</span></div>
+            <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Implied value at area average</span><span class="mv" style="font-weight:600">≈ 348.600 €</span></div>
+            <div class="mrow"><span class="mk">vs price paid</span><span class="mv" style="color:var(--grow)">+8.600 € (+2,5%)</span></div>
+            <div class="mrow"><span class="mk">Your 50% at implied value</span><span class="mv">≈ 174.300 €</span></div>
+            <div class="mrow"><span class="mk">Break‑even incl. all buying costs (360.698 €)</span><span class="mv">4.509 €/m²</span></div>
+          </div>
+          <div class="loan-badge">You bought <b>≈ 2,5% under</b> the 2026 barrio average. Covering the full 20.698 € of taxes &amp; fees needs the barrio at 4.509 €/m² — about <b>one more year</b> of growth at the recent +8,6%/yr pace.</div>
+        </div>
+        <div class="card own-card anim" style="animation-delay:.05s">
+          <h3>If Poble Sec keeps compounding</h3>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.6">Extrapolating the barrio's own 10‑year pace (<b style="color:var(--text)">≈ 5,4%/yr</b>) from the implied 348.600 €, while the mortgage amortises on schedule:</p>
+          <div class="own-list">
+            <div class="mrow"><span class="mk">2031 · flat value</span><span class="mv">≈ 452.000 €</span></div>
+            <div class="mrow"><span class="mk" style="padding-left:10px">→ mortgage left ≈ 238.000 €</span><span class="mv" style="color:var(--grow)">equity ≈ 214.000 €</span></div>
+            <div class="mrow"><span class="mk">2036 · flat value</span><span class="mv">≈ 587.000 €</span></div>
+            <div class="mrow"><span class="mk" style="padding-left:10px">→ mortgage left ≈ 201.000 €</span><span class="mv" style="color:var(--grow)">equity ≈ 386.000 €</span></div>
+            <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Your 50% of equity in 2036</span><span class="mv" style="color:var(--grow);font-weight:600">≈ 193.000 €</span></div>
+          </div>
+          <div class="recon" style="background:rgba(216,146,92,.08);border-color:rgba(216,146,92,.3);margin-top:14px"><span class="ic" style="color:var(--alert)">!</span><p>A straight‑line extrapolation of past growth — prices can stall or fall (Poble Sec dropped 17% from 2012 to 2014). Useful as a compounding illustration, not a forecast.</p></div>
+        </div>
+      </div>
+
+      <p class="foot-note">
+        Source: Ajuntament de Barcelona, Portal de Dades — “Preu mitjà per superfície (€/m²) dels habitatges transmesos per compravenda”, registered sale transactions, CC BY 4.0, retrieved 20 Jul 2026. The 2026 figure is year‑to‑date. Small outer barrios trade thinly, so their averages are volatile.<br>
+        Neighbourhood averages mix all sizes, states and streets — the balance‑sheet still carries the flat at the 340.000 € purchase price until you have a real appraisal.
+      </p>
+    </div><!-- /salva-sub-market -->
   </section>
 
   <!-- ============ TAB 4 · WEALTH ACCUMULATION ============ -->
@@ -1354,12 +1466,33 @@ body.locked .gate{display:flex}
 
   /* Salva sub-tabs */
   const subtabs=[...document.querySelectorAll('.subtab')];
-  const subpanels={property:$('salva-sub-property'),costs:$('salva-sub-costs')};
+  const subpanels={property:$('salva-sub-property'),costs:$('salva-sub-costs'),market:$('salva-sub-market')};
   subtabs.forEach(st=>st.addEventListener('click',()=>{
     subtabs.forEach(x=>x.classList.remove('active'));st.classList.add('active');
     Object.values(subpanels).forEach(p=>p&&p.classList.remove('active'));
     const p=subpanels[st.dataset.sub];if(p)p.classList.add('active');
   }));
+
+  /* market chart — Poble Sec vs Barcelona vs Sants-Montjuïc, €/m² 2012–2026 */
+  (function(){
+    const svg=$('mktSvg');if(!svg)return;
+    const PS =[2116,1805,1754,2160,2588,3272,3502,3580,3331,3274,3496,3664,3912,4013,4357];
+    const BCN=[2466,2248,2304,2606,2714,3145,3382,3306,3296,3328,3597,3622,3875,4254,4548];
+    const SM =[1965,1739,1843,2186,2354,2815,3137,3153,3092,3112,3220,3305,3446,3867,4229];
+    const W=480,H=260,pad={l:42,r:14,t:14,b:26},y0=1500,y1=5100,N=PS.length-1;
+    const X=i=>pad.l+i/N*(W-pad.l-pad.r),Y=v=>pad.t+(1-(v-y0)/(y1-y0))*(H-pad.t-pad.b);
+    const path=a=>a.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+    let s='<defs><linearGradient id="mg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--brass')+'" stop-opacity="0.22"/><stop offset="1" stop-color="'+V('--brass')+'" stop-opacity="0"/></linearGradient></defs>';
+    [2000,3000,4000,5000].forEach(v=>{s+='<line x1="'+pad.l+'" y1="'+Y(v)+'" x2="'+(W-pad.r)+'" y2="'+Y(v)+'" stroke="'+V('--line-strong')+'" stroke-width="1"/><text x="'+(pad.l-6)+'" y="'+(Y(v)+3)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="9" text-anchor="end">'+(v/1000)+'k</text>';});
+    s+='<path d="'+path(PS)+' L'+X(N)+' '+Y(y0)+' L'+X(0)+' '+Y(y0)+' Z" fill="url(#mg)"/>';
+    s+='<path d="'+path(SM)+'" fill="none" stroke="'+V('--estate')+'" stroke-width="1.6" opacity="0.9"/>';
+    s+='<path d="'+path(BCN)+'" fill="none" stroke="'+V('--cash')+'" stroke-width="1.6" opacity="0.9"/>';
+    s+='<path d="'+path(PS)+'" fill="none" stroke="'+V('--brass')+'" stroke-width="2.4"/>';
+    s+='<circle cx="'+X(N)+'" cy="'+Y(4250)+'" r="4.5" fill="'+V('--ink')+'" stroke="'+V('--text')+'" stroke-width="2"/>';
+    s+='<text x="'+(X(N)-9)+'" y="'+(Y(4250)+14)+'" fill="'+V('--text')+'" font-family="'+V('--mono')+'" font-size="9.5" text-anchor="end">you · 4.250</text>';
+    [[0,'2012','start'],[7,'2019','middle'],[14,'2026','end']].forEach(t=>{s+='<text x="'+X(t[0])+'" y="'+(H-8)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="'+t[2]+'">'+t[1]+'</text>';});
+    svg.innerHTML=s;
+  })();
 
   /* cost modals */
   const costModal=$('costModal'),recurModal=$('recurModal');
