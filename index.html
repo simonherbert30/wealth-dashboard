@@ -1096,7 +1096,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.</p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 23 Jul 2026 · c</span></p>
   </div>
 </div>
 
@@ -1574,7 +1574,7 @@ body.locked .gate{display:flex}
       let htm='<b>'+fmtDate(p.ts)+'</b><br>Net worth <b>'+eur0(p.net)+'</b>';
       if(prev)htm+='<br>'+sgn(p.net-prev.net)+' vs previous';
       if(bi>0&&first.net)htm+='<br>'+sgn(p.net-first.net)+' since start ('+((p.net-first.net)>=0?'+':'−')+Math.abs((p.net-first.net)/first.net*100).toFixed(1).replace('.',',')+'%)';
-      if(p.note)htm+='<br><span style="color:'+V('--muted')+'">'+esc(p.note)+'</span>';
+      if(p.note)htm+='<span style="color:'+V('--muted')+';display:block;white-space:normal;max-width:240px;margin-top:3px">'+esc(p.note)+'</span>';
       tip.innerHTML=htm;tip.style.display='block';
       const wr=wrap.getBoundingClientRect();
       let tx=e.clientX-wr.left+16;if(tx+tip.offsetWidth+4>wr.width)tx=e.clientX-wr.left-tip.offsetWidth-16;
