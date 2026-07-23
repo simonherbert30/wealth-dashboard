@@ -394,8 +394,8 @@ body.locked .gate{display:flex}
 .gate-err{color:var(--debt);font-size:12.5px;min-height:18px;margin-top:10px}
 .gate-note{color:var(--muted-2);font-size:11px;line-height:1.6;margin:14px 0 0}
 
-@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.anim{opacity:0;animation:rise .55s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes rise{from{transform:translateY(14px)}to{transform:none}}
+.anim{animation:rise .55s cubic-bezier(.22,.61,.36,1) both}
 @media(prefers-reduced-motion:reduce){.anim{animation:none;opacity:1}}
 
 @media(max-width:940px){
