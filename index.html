@@ -1193,7 +1193,15 @@ body.locked .gate{display:flex}
   function snapEntry(note){const t=totalsOf(state.accounts);return {ts:Date.now(),net:t.net,gross:t.gross,cats:clone(t.cats),liab:t.liab,note};}
   function sameDay(a,b){return new Date(a).toDateString()===new Date(b).toDateString();}
   function recordSnapshot(note){const entry=snapEntry(note);const h=state.history,last=h[h.length-1];
-    if(last&&sameDay(last.ts,entry.ts)){entry.note=note;h[h.length-1]=entry;}else{h.push(entry);}}
+    if(last&&sameDay(last.ts,entry.ts)){
+      /* merge same-day notes so every change of the day stays listed; a re-update of the same account replaces its earlier line */
+      const parts=(last.note?String(last.note).split(' · '):[]).filter(Boolean);
+      const key=note.split(' → ')[0];
+      const idx=parts.findIndex(p=>p.split(' → ')[0]===key);
+      if(idx>=0)parts[idx]=note;else parts.push(note);
+      entry.note=parts.join(' · ');
+      h[h.length-1]=entry;
+    }else{h.push(entry);}}
   function dedupeHistory(){const h=state.history;if(!h||h.length<2)return;
     const out=[];for(const e of h){const last=out[out.length-1];
       if(last&&sameDay(last.ts,e.ts))out[out.length-1]=e;else out.push(e);}
