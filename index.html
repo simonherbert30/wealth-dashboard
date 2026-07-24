@@ -448,7 +448,8 @@ body.locked .gate{display:flex}
     <button class="tab active" role="tab" aria-selected="true" data-tab="net"><span class="ti">01</span> <span class="tl">Net worth</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="inv"><span class="ti">02</span> <span class="tl">Investments</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="salva"><span class="ti">03</span> <span class="tl">Salva 40</span></button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="wealth"><span class="ti">04</span> <span class="tl">Wealth</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="gifts"><span class="ti">04</span> <span class="tl">Gifts</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="wealth"><span class="ti">05</span> <span class="tl">Wealth</span></button>
   </nav>
 
   <!-- ============ TAB 1 · NET WORTH ============ -->
@@ -981,7 +982,130 @@ body.locked .gate{display:flex}
     </div><!-- /salva-sub-market -->
   </section>
 
-  <!-- ============ TAB 4 · WEALTH ACCUMULATION ============ -->
+  <!-- ============ TAB 4 · GIFTS & INHERITANCE ============ -->
+  <section class="panel" id="tab-gifts" role="tabpanel">
+    <div class="kpis k4 anim">
+      <div class="kpi brass-kpi"><div class="k">Family gifts received</div><div class="v">163.000 €</div><div class="n">146.000 € dad · 17.000 € grandmother</div></div>
+      <div class="kpi debt-kpi"><div class="k">Declared to Hacienda</div><div class="v">0 €</div><div class="n">no deed, no escritura — bank records only</div></div>
+      <div class="kpi"><div class="k">Taxable base (advisor)</div><div class="v">160.000 €</div><div class="n">3.000 € cash excluded · Bufete G. de Castro</div></div>
+      <div class="kpi"><div class="k">Exposure range</div><div class="v">8.140 – 22.032 €</div><div class="n">best formalised case → caught case · + interest</div></div>
+    </div>
+
+    <div class="section-head anim"><h2>The gifts, donor by donor</h2><span class="hint">From Family_Gifts_Overview.pdf · resident in Catalonia at every date</span></div>
+    <div class="mort-grid">
+      <div class="card hist anim">
+        <table>
+          <thead><tr><th>From dad</th><th class="r">Amount</th><th>Account</th></tr></thead>
+          <tbody>
+            <tr><td>25 Apr 2023</td><td class="val r">1.000 €</td><td class="src">N26 (DE)</td></tr>
+            <tr><td>13 Jul 2023</td><td class="val r">4.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>28 Mar 2024</td><td class="val r">20.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>26 Apr 2024</td><td class="val r">20.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>29 May 2024</td><td class="val r">25.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>17 Jun 2024</td><td class="val r">20.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>25 Jul 2024</td><td class="val r">20.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>16 Aug 2024</td><td class="val r">20.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>25 Sep 2024</td><td class="val r">15.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>14 Oct 2025</td><td class="val r">1.000 €</td><td class="src">Revolut</td></tr>
+            <tr style="color:var(--brass)"><td style="font-weight:600">Total</td><td class="val r" style="font-weight:600">146.000 €</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card hist anim" style="animation-delay:.05s">
+        <table>
+          <thead><tr><th>From grandmother (Lucette V.)</th><th class="r">Amount</th><th>Account</th></tr></thead>
+          <tbody>
+            <tr><td>20 Jul 2023</td><td class="val r">500 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>15 Jan 2024</td><td class="val r">500 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>23 Jan 2024 · via dad</td><td class="val r">1.500 €</td><td class="src">N26 (DE)</td></tr>
+            <tr><td>13 Feb 2024</td><td class="val r">1.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>22 Feb 2024</td><td class="val r">1.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>23 Feb 2024 · via dad</td><td class="val r">1.500 €</td><td class="src">Sabadell (ES)</td></tr>
+            <tr><td>≈ 4 Mar 2024 · cash, deposited</td><td class="val r">3.000 €</td><td class="src">Sabadell (ES)</td></tr>
+            <tr><td>9 Apr 2024</td><td class="val r">4.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr><td>Date unknown · via dad</td><td class="val r">4.000 €</td><td class="src">Argenta (BE)</td></tr>
+            <tr style="color:var(--brass)"><td style="font-weight:600">Total</td><td class="val r" style="font-weight:600">17.000 €</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="foot-note" style="margin-top:10px">The 113.500 € moved from Argenta to Trade Republic (Aug 2024 – Sep 2025) are transfers between your own accounts — movements of the money above, not additional gifts. Of the grandmother's 17.000 €, only 7.000 € left her own account; 7.000 € was transferred by your dad on her behalf and 3.000 € was cash. No gift deed, private agreement or written reference exists for any of it — the bank records are the only evidence.</p>
+
+    <div class="section-head anim"><h2>Your two options</h2><span class="hint">Advisor's simulation · Bufete Guerrero de Castro · 24 Jul 2026 · Catalonia rates</span></div>
+    <div class="own">
+      <div class="card own-card anim">
+        <h3 style="color:var(--grow)">Option 1 · Declare before any letter</h3>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.6">Voluntary late filing (regularización extemporánea, art. 27 LGT) — as long as no requerimiento has arrived, there is <b style="color:var(--text)">no sanction at all</b>, only a surcharge.</p>
+        <div class="own-list">
+          <div class="mrow"><span class="mk">ISD at general rate (base 160.000 €)</span><span class="mv">16.200 €</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ 50k @ 7% · 100k @ 11% · 10k @ 17%</span><span class="mv" style="color:var(--muted)"></span></div>
+          <div class="mrow"><span class="mk">Recargo (max 15%, most gifts &gt;12 mo late)</span><span class="mv">2.430 €</span></div>
+          <div class="mrow"><span class="mk">Sanction</span><span class="mv" style="color:var(--grow)">0 €</span></div>
+          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Total (general rate)</span><span class="mv" style="font-weight:600">≈ 18.630 € + interest</span></div>
+          <div class="mrow"><span class="mk">Advisor scenario B — reduced 5%/7% rate if gifts are first formalised in escritura pública</span><span class="mv" style="color:var(--grow);font-weight:600">8.140 € (+ recargo ≈ 9.360 €)</span></div>
+        </div>
+        <div class="loan-badge">Cheapest realistic outcome: notarise the donations, file voluntarily, pay ≈ <b>9.400 €</b> all-in. Without escritura: ≈ <b>18.630 €</b> + 4,0625%/yr default interest.</div>
+      </div>
+      <div class="card own-card anim" style="animation-delay:.05s">
+        <h3 style="color:var(--debt)">Option 2 · Wait — and the letter arrives first</h3>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.6">If Hacienda/ATC sends a requerimiento before you file, the same tax comes <b style="color:var(--text)">plus a sanction</b>, and the reduced-rate route is off the table.</p>
+        <div class="own-list">
+          <div class="mrow"><span class="mk">ISD at general rate</span><span class="mv">16.200 €</span></div>
+          <div class="mrow"><span class="mk">Sanction · 50% base 8.100 €, with conformity + prompt‑payment reductions</span><span class="mv" style="color:var(--debt)">3.402 €</span></div>
+          <div class="mrow"><span class="mk">Surcharge / interest component</span><span class="mv">2.430 €</span></div>
+          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Advisor's total</span><span class="mv" style="color:var(--debt);font-weight:600">≈ 22.032 € + interest</span></div>
+          <div class="mrow"><span class="mk">If reductions are lost (appeal / no prompt payment)</span><span class="mv">up to ≈ 26.730 €</span></div>
+        </div>
+        <div class="recon" style="background:rgba(197,107,90,.08);border-color:rgba(197,107,90,.3);margin-top:14px"><span class="ic" style="color:var(--debt)">!</span><p>Worse tail risk: if the money can't be proven to be a donation, Hacienda can instead tax it as an <b>unjustified capital gain</b> in IRPF (art. 39 LIRPF) at marginal rates up to ≈ 47% plus 50–150% sanctions — far above the ISD numbers here.</p></div>
+      </div>
+    </div>
+
+    <div class="section-head anim"><h2>How visible is this to Hacienda?</h2><span class="hint">Detection-risk factors · an informed guess, not a statistic</span></div>
+    <div class="card mort-panel anim">
+      <div class="own-list">
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="flex:1;font-size:13px">Modelo 720 filed → AEAT already sees the Argenta/N26 balances, including the +140k jump in 2024</span><div style="width:120px;height:9px;background:var(--ink);border-radius:4px;overflow:hidden;flex:none"><span style="display:block;height:100%;width:90%;background:var(--debt)"></span></div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="flex:1;font-size:13px">CRS / DAC2: Belgian &amp; German banks auto-report accounts of Spanish residents every year</span><div style="width:120px;height:9px;background:var(--ink);border-radius:4px;overflow:hidden;flex:none"><span style="display:block;height:100%;width:85%;background:var(--debt)"></span></div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="flex:1;font-size:13px">113.500 € repatriated to Trade Republic ES (2024–25) + 3.000 € cash deposit — reported domestically</span><div style="width:120px;height:9px;background:var(--ink);border-radius:4px;overflow:hidden;flex:none"><span style="display:block;height:100%;width:75%;background:var(--alert)"></span></div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="flex:1;font-size:13px">Savings grew ≈ 163k beyond declared income — the classic automated cross-check trigger</span><div style="width:120px;height:9px;background:var(--ink);border-radius:4px;overflow:hidden;flex:none"><span style="display:block;height:100%;width:70%;background:var(--alert)"></span></div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="flex:1;font-size:13px;color:var(--muted)">Mitigating: many small SEPA transfers, no single ≥ 100k movement, IRPF &amp; 720 otherwise compliant</span><div style="width:120px;height:9px;background:var(--ink);border-radius:4px;overflow:hidden;flex:none"><span style="display:block;height:100%;width:30%;background:var(--grow)"></span></div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0"><span style="flex:1;font-size:13px;color:var(--muted)">Mitigating: donation checks are not fully automated today — most requerimientos still follow an IRPF/720 review</span><div style="width:120px;height:9px;background:var(--ink);border-radius:4px;overflow:hidden;flex:none"><span style="display:block;height:100%;width:35%;background:var(--grow)"></span></div></div>
+      </div>
+      <div class="loan-badge" style="margin-top:14px">Rough estimate: the data trail is <b>fully visible</b> to AEAT/ATC (720 + CRS + Spanish broker), so discovery is a question of whether an automated cross-check or manual review picks the file up before prescription. Over the ≈ 2,3 years until the bulk prescribes, a requerimiento is plausibly a <b>15–35% cumulative risk</b> — material, not remote. This is an informed guess from the visibility factors above, not a statistic.</div>
+    </div>
+
+    <div class="section-head anim"><h2>The 4-year clock — when each gift becomes untouchable</h2><span class="hint">Live countdown · recalculates every time you open this page</span></div>
+    <div class="kpis k4 anim">
+      <div class="kpi"><div class="k">Safe today</div><div class="v" id="gSafeNow">—</div><div class="n" id="gSafeNowSub">of 163.000 € prescribed</div></div>
+      <div class="kpi"><div class="k">First gift safe</div><div class="v" id="gFirst">—</div><div class="n" id="gFirstSub">—</div></div>
+      <div class="kpi brass-kpi"><div class="k">Bulk of the money safe</div><div class="v" id="gBulk">—</div><div class="n" id="gBulkSub">all 2024 gifts prescribed</div></div>
+      <div class="kpi"><div class="k">Everything safe</div><div class="v" id="gAll">—</div><div class="n" id="gAllSub">except cash &amp; undated</div></div>
+    </div>
+    <div class="card mort-panel anim">
+      <h3>Prescription progress per gift</h3>
+      <p class="cap" style="color:var(--muted);font-size:12px;margin:0 0 14px">Each bar runs from the gift date to its ≈ prescription date (transfer + 30 business days + 4 years, STS 30‑11‑2020). Dates are approximate to a few days — leave margin before relying on one.</p>
+      <div id="giftBars"></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--line)">
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:7px"><span>TOTAL PRESCRIBED</span><span id="gTotLbl">—</span></div>
+        <div style="height:14px;background:var(--ink);border:1px solid var(--line);border-radius:6px;overflow:hidden"><span id="gTotBar" style="display:block;height:100%;width:0%;background:var(--grow)"></span></div>
+      </div>
+    </div>
+
+    <div class="card own-card anim" style="margin-top:16px">
+      <h3>Is the 4-year rule real? — fact-checked</h3>
+      <div class="own-list" style="font-size:13px;line-height:1.7;color:var(--muted)">
+        <p style="margin:0 0 10px"><b style="color:var(--grow)">Yes, with conditions.</b> Arts. 66–67 LGT: the administration's right to assess the tax prescribes <b style="color:var(--text)">4 years</b> after the voluntary filing window closes. For donations evidenced <em>only</em> by bank transfers, the Tribunal Supremo (<b style="color:var(--text)">STS 30 Nov 2020, rec. 4467/2018</b>) fixed the start at 30 business days after the transfer date on the statement — expressly rejecting Hacienda's position that such gifts could effectively never prescribe.</p>
+        <p style="margin:0 0 10px"><b style="color:var(--alert)">Exceptions that don't tick:</b> the <b style="color:var(--text)">3.000 € cash</b> gift and the <b style="color:var(--text)">4.000 € with unknown date</b> have no dated transfer of their own, so under art. 48.2 RISD / art. 1227 CC their clock only starts if and when they surface — treat them as never prescribing on their own.</p>
+        <p style="margin:0"><b style="color:var(--alert)">Two more caveats:</b> any requerimiento received before a date below <b style="color:var(--text)">interrupts and resets</b> that gift's clock (art. 68 LGT). And ISD prescription is not total immunity: the IRPF "unjustified gain" angle (art. 39 LIRPF) lives on its own 4-year clock from each IRPF filing deadline — for money that surfaced in 2024, roughly until <b style="color:var(--text)">30 Jun 2029</b> — though proving the funds arrived as (ISD-prescribed) gifts is the defence.</p>
+      </div>
+    </div>
+
+    <p class="foot-note">
+      Sources: Family_Gifts_Overview.pdf · Tax simulation, Bufete Guerrero de Castro, 24 Jul 2026 · Ley 58/2003 (LGT) arts. 27, 66–68, 191 · STS 30‑11‑2020 (rec. 4467/2018) · art. 48.2 RISD · art. 39 LIRPF. Catalonia ISD rates.<br>
+      This page organises your documents and public legal rules for planning; it is not tax or legal advice — decisions on declaring should go through your advisor.
+    </p>
+  </section>
+
+  <!-- ============ TAB 5 · WEALTH ACCUMULATION ============ -->
   <section class="panel" id="tab-wealth" role="tabpanel">
     <div class="kpis k4 anim">
       <div class="kpi brass-kpi"><div class="k">Net worth now</div><div class="v" id="wNow">—</div><div class="n">live</div></div>
@@ -1096,7 +1220,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 23 Jul 2026 · c</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · gifts</span></p>
   </div>
 </div>
 
@@ -1209,7 +1333,7 @@ body.locked .gate{display:flex}
 
   /* ---------- tabs ---------- */
   const tabs=[...document.querySelectorAll('.tab')];
-  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),wealth:$('tab-wealth')};
+  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),gifts:$('tab-gifts'),wealth:$('tab-wealth')};
   tabs.forEach(t=>t.addEventListener('click',()=>{
     tabs.forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false');});
     t.classList.add('active');t.setAttribute('aria-selected','true');
@@ -1587,6 +1711,65 @@ body.locked .gate{display:flex}
     if(wtab)wtab.addEventListener('click',()=>setTimeout(drawWealthChart,30));
   })();
 
+  /* gifts — live 4-year prescription countdown (STS 30-11-2020: transfer + 30 business days + 4 years) */
+  (function(){
+    const host=$('giftBars');if(!host)return;
+    const GIFTS=[
+      {d:'2023-04-25',a:1000,who:'dad'},{d:'2023-07-13',a:4000,who:'dad'},
+      {d:'2024-03-28',a:20000,who:'dad'},{d:'2024-04-26',a:20000,who:'dad'},
+      {d:'2024-05-29',a:25000,who:'dad'},{d:'2024-06-17',a:20000,who:'dad'},
+      {d:'2024-07-25',a:20000,who:'dad'},{d:'2024-08-16',a:20000,who:'dad'},
+      {d:'2024-09-25',a:15000,who:'dad'},{d:'2025-10-14',a:1000,who:'dad'},
+      {d:'2023-07-20',a:500,who:'gm'},{d:'2024-01-15',a:500,who:'gm'},
+      {d:'2024-01-23',a:1500,who:'gm'},{d:'2024-02-13',a:1000,who:'gm'},
+      {d:'2024-02-22',a:1000,who:'gm'},{d:'2024-02-23',a:1500,who:'gm'},
+      {d:'2024-04-09',a:4000,who:'gm'},
+      {d:null,a:3000,who:'gm',note:'cash · no own date'},{d:null,a:4000,who:'gm',note:'date unknown'}
+    ];
+    const DAY=86400000;
+    function addBusinessDays(dt,n){let d=new Date(dt),added=0;while(added<n){d=new Date(d.getTime()+DAY);const wd=d.getDay();if(wd!==0&&wd!==6)added++;}return d;}
+    function prescDate(iso){const start=addBusinessDays(new Date(iso+'T00:00:00'),30);const p=new Date(start);p.setFullYear(p.getFullYear()+4);return p;}
+    const now=new Date();
+    const total=GIFTS.reduce((s,g)=>s+g.a,0);
+    let prescribed=0,firstSafe=null,everythingSafe=null,bulkSafe=null;
+    const rows=GIFTS.map(g=>{
+      if(!g.d)return {...g,presc:null,done:false,pct:0};
+      const gd=new Date(g.d+'T00:00:00'),pd=prescDate(g.d);
+      const done=now>=pd;if(done)prescribed+=g.a;
+      const pct=Math.max(0,Math.min(100,(now-gd)/(pd-gd)*100));
+      return {...g,gd,presc:pd,done,pct};
+    });
+    const dated=rows.filter(r=>r.presc);
+    dated.sort((a,b)=>a.presc-b.presc);
+    const pending=dated.filter(r=>!r.done);
+    firstSafe=pending[0]?pending[0].presc:null;
+    everythingSafe=dated[dated.length-1].presc;
+    const y2024=dated.filter(r=>r.gd.getFullYear()===2024);
+    bulkSafe=y2024.length?y2024[y2024.length-1].presc:null;
+    const fmtD=d=>d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
+    const untilTxt=d=>{if(!d)return 'n/a';if(now>=d)return 'already safe';const days=Math.ceil((d-now)/DAY);const mo=Math.floor(days/30.44);return mo>=1?('in ~'+mo+' month'+(mo>1?'s':'')):('in ~'+days+' days');};
+    set('gSafeNow',Math.round(prescribed/total*100)+'%');
+    set('gSafeNowSub',eur0(prescribed)+' of '+eur0(total)+' prescribed');
+    set('gFirst',untilTxt(firstSafe).replace('in ~','').replace('already safe','done'));
+    set('gFirstSub',firstSafe?('next: '+fmtD(firstSafe)):'all dated gifts safe');
+    set('gBulk',untilTxt(bulkSafe));set('gBulkSub','2024 gifts safe by '+fmtD(bulkSafe));
+    set('gAll',untilTxt(everythingSafe));set('gAllSub','last dated gift: '+fmtD(everythingSafe));
+    set('gTotLbl',eur0(prescribed)+' / '+eur0(total)+' · '+Math.round(prescribed/total*100)+'%');
+    const tb=$('gTotBar');if(tb)tb.style.width=(prescribed/total*100).toFixed(1)+'%';
+    // per-gift bars, grouped chronological
+    const order=[...rows].sort((a,b)=>{if(!a.presc)return 1;if(!b.presc)return -1;return a.presc-b.presc;});
+    host.innerHTML='';
+    order.forEach(r=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;padding:5px 0';
+      const lbl=(r.who==='dad'?'Dad':'GM')+' · '+eur0(r.a)+' · '+(r.d?fmtD(r.gd):(r.note||'undated'));
+      const status=!r.presc?'<span style="color:var(--alert)">no clock</span>':(r.done?'<span style="color:var(--grow)">safe</span>':untilTxt(r.presc));
+      row.innerHTML='<span style="width:210px;font-size:12px;color:var(--muted);flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+lbl+'</span>'+
+        '<div style="flex:1;height:9px;background:var(--ink);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:'+(r.presc?r.pct.toFixed(1):0)+'%;background:'+(r.done?'var(--grow)':(r.presc?'var(--brass)':'var(--debt)'))+'"></span></div>'+
+        '<span style="width:96px;text-align:right;font-family:var(--mono);font-size:11px;flex:none">'+status+'</span>';
+      host.appendChild(row);
+    });
+  })();
+
   /* market chart — interactive €/m² 2012–2026: hover tooltip + toggleable series */
   (function(){
     const svg=$('mktSvg'),tip=$('mktTip'),wrap=$('mktWrap'),lgEl=$('mktLegend');if(!svg)return;
@@ -1644,7 +1827,6 @@ body.locked .gate{display:flex}
     draw();legend();
   })();
 
-  /* info tooltips — keep the bubble inside the viewport */
   function fixTipBox(t){const b=t.querySelector('.itip-box');if(!b)return;
     b.style.marginLeft='0px';const r=b.getBoundingClientRect();if(!r.width)return;
     let sh=0;if(r.left<8)sh=8-r.left;else if(r.right>innerWidth-8)sh=(innerWidth-8)-r.right;
