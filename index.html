@@ -1285,7 +1285,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · gifts-decision</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · gifts-decision2</span></p>
   </div>
 </div>
 
@@ -1835,7 +1835,7 @@ body.locked .gate{display:flex}
     });
   })();
 
-  /* gifts — cumulative "safe euros" over time chart */
+  /* gifts — cumulative "safe euros" over time chart (responsive px-true) */
   (function(){
     const svg=$('safeChart'),tip=$('safeTip'),wrap=$('safeWrap');if(!svg)return;
     const G=[
@@ -1854,10 +1854,9 @@ body.locked .gate{display:flex}
     const now=new Date();
     const t0=new Date('2026-07-01T00:00:00').getTime();
     const t1=new Date('2030-06-01T00:00:00').getTime();
-    const W=480,H=240,pad={l:44,r:14,t:16,b:26};
+    let W=480,H=240;const pad={l:46,r:16,t:18,b:28};
     const X=t=>pad.l+(t-t0)/(t1-t0)*(W-pad.l-pad.r);
     const Y=v=>pad.t+(1-v/170000)*(H-pad.t-pad.b);
-    // build cumulative step points
     let cum=0;const pts=[{t:t0,v:0}];
     steps.forEach(s=>{pts.push({t:s.t.getTime(),v:cum});cum+=s.a;pts.push({t:s.t.getTime(),v:cum});});
     pts.push({t:t1,v:cum});
@@ -1865,19 +1864,20 @@ body.locked .gate{display:flex}
     function path(){let d='M'+X(pts[0].t).toFixed(1)+' '+Y(pts[0].v).toFixed(1);for(let i=1;i<pts.length;i++)d+=' L'+X(pts[i].t).toFixed(1)+' '+Y(pts[i].v).toFixed(1);return d;}
     let hoverT=null;
     function draw(){
+      const cw=(wrap?wrap.clientWidth:0)||480;
+      W=Math.max(300,Math.round(cw));
+      H=Math.round(Math.min(300,Math.max(190,W*0.34)));
+      svg.setAttribute('viewBox','0 0 '+W+' '+H);
       let s='<defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--grow')+'" stop-opacity="0.28"/><stop offset="1" stop-color="'+V('--grow')+'" stop-opacity="0"/></linearGradient></defs>';
-      [0,50000,100000,150000].forEach(v=>{s+='<line x1="'+pad.l+'" y1="'+Y(v)+'" x2="'+(W-pad.r)+'" y2="'+Y(v)+'" stroke="'+V('--line-strong')+'" stroke-width="1"/><text x="'+(pad.l-6)+'" y="'+(Y(v)+3)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="9" text-anchor="end">'+(v/1000)+'k</text>';});
-      // ceiling line at 156k
-      s+='<line x1="'+pad.l+'" y1="'+Y(CEIL)+'" x2="'+(W-pad.r)+'" y2="'+Y(CEIL)+'" stroke="'+V('--muted-2')+'" stroke-width="1" stroke-dasharray="4 3"/><text x="'+(W-pad.r)+'" y="'+(Y(CEIL)-4)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="8.5" text-anchor="end">156k ceiling</text>';
+      [0,50000,100000,150000].forEach(v=>{s+='<line x1="'+pad.l+'" y1="'+Y(v)+'" x2="'+(W-pad.r)+'" y2="'+Y(v)+'" stroke="'+V('--line-strong')+'" stroke-width="1"/><text x="'+(pad.l-6)+'" y="'+(Y(v)+3)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="end">'+(v/1000)+'k</text>';});
+      s+='<line x1="'+pad.l+'" y1="'+Y(CEIL)+'" x2="'+(W-pad.r)+'" y2="'+Y(CEIL)+'" stroke="'+V('--muted-2')+'" stroke-width="1" stroke-dasharray="4 3"/><text x="'+(W-pad.r)+'" y="'+(Y(CEIL)-4)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="end">156k ceiling</text>';
       s+='<path d="'+path()+' L'+X(t1)+' '+Y(0)+' L'+X(t0)+' '+Y(0)+' Z" fill="url(#sg)"/>';
       s+='<path d="'+path()+'" fill="none" stroke="'+V('--grow')+'" stroke-width="2.4"/>';
-      // now marker
       const nx=X(now.getTime());
-      s+='<line x1="'+nx+'" y1="'+pad.t+'" x2="'+nx+'" y2="'+(H-pad.b)+'" stroke="'+V('--brass')+'" stroke-width="1" stroke-dasharray="3 3"/><circle cx="'+nx+'" cy="'+Y(safeNow)+'" r="4" fill="'+V('--brass')+'"/><text x="'+(nx+5)+'" y="'+(pad.t+10)+'" fill="'+V('--brass')+'" font-family="'+V('--mono')+'" font-size="9">today</text>';
+      s+='<line x1="'+nx+'" y1="'+pad.t+'" x2="'+nx+'" y2="'+(H-pad.b)+'" stroke="'+V('--brass')+'" stroke-width="1" stroke-dasharray="3 3"/><circle cx="'+nx+'" cy="'+Y(safeNow)+'" r="4" fill="'+V('--brass')+'"/><text x="'+(nx+5)+'" y="'+(pad.t+11)+'" fill="'+V('--brass')+'" font-family="'+V('--mono')+'" font-size="10">today</text>';
       if(hoverT!=null){const hx=X(hoverT);let cv=0;steps.forEach(st=>{if(hoverT>=st.t.getTime())cv+=st.a;});
         s+='<line x1="'+hx+'" y1="'+pad.t+'" x2="'+hx+'" y2="'+(H-pad.b)+'" stroke="'+V('--muted-2')+'" stroke-width="1"/><circle cx="'+hx+'" cy="'+Y(cv)+'" r="3.5" fill="'+V('--grow')+'" stroke="'+V('--ink')+'" stroke-width="1.5"/>';}
-      // year ticks
-      [2027,2028,2029,2030].forEach(y=>{const tx=X(new Date(y+'-01-01T00:00:00').getTime());s+='<text x="'+tx+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="9.5" text-anchor="middle">'+y+'</text>';});
+      [2027,2028,2029,2030].forEach(y=>{const tx=X(new Date(y+'-01-01T00:00:00').getTime());s+='<text x="'+tx+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="11" text-anchor="middle">'+y+'</text>';});
       svg.innerHTML=s;
     }
     svg.addEventListener('pointermove',e=>{
@@ -1894,6 +1894,9 @@ body.locked .gate{display:flex}
       tip.style.left=Math.max(0,tx)+'px';tip.style.top='8px';
     });
     svg.addEventListener('pointerleave',()=>{hoverT=null;tip.style.display='none';draw();});
+    let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(draw,150);});
+    const gtab=document.querySelector('[data-tab="gifts"]');
+    if(gtab)gtab.addEventListener('click',()=>setTimeout(draw,30));
     draw();
   })();
 
