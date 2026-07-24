@@ -1063,15 +1063,15 @@ body.locked .gate{display:flex}
     <div class="section-head anim"><h2>Risks the simulation doesn't capture</h2><span class="hint">Adversarial pass · things that make it worse, not better</span></div>
     <div class="own">
       <div class="card own-card anim">
-        <h3 style="color:var(--debt)">🇧🇪 Belgian inheritance-tax trap</h3>
-        <p style="font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.6">The Spanish analysis ignores Belgium entirely. An <b style="color:var(--text)">unregistered bank gift</b> (manuele/bankgift) is retaxed as inheritance if the donor dies within the suspect period while Belgian‑resident.</p>
+        <h3 style="color:var(--debt)">🇧🇪 Belgian inheritance — now triggered</h3>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.6"><b style="color:var(--debt)">Your grandmother has passed away.</b> Her gifts were <b style="color:var(--text)">unregistered bank gifts</b> made in 2023–2024 — inside Belgium's 3‑year suspect period at her death — so if she was Belgian‑resident they now fall back into her estate for Belgian inheritance tax.</p>
         <div class="own-list">
-          <div class="mrow"><span class="mk">Suspect period · Flanders (gifts from 2025)</span><span class="mv">5 years</span></div>
-          <div class="mrow"><span class="mk">Older gifts / Brussels</span><span class="mv">3 yr / 3–5 yr</span></div>
-          <div class="mrow"><span class="mk">Direct‑line inheritance rate (higher bands)</span><span class="mv" style="color:var(--debt)">up to 27–30%</span></div>
-          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Most exposed</span><span class="mv" style="font-weight:600">grandmother's gifts</span></div>
+          <div class="mrow"><span class="mk">Grandmother's gifts in the suspect window</span><span class="mv" style="color:var(--debt)">≈ 17.000 €</span></div>
+          <div class="mrow"><span class="mk">Belgian direct‑line rate on this band (≤ 50k)</span><span class="mv">3%</span></div>
+          <div class="mrow"><span class="mk">Rough Belgian inheritance tax on the gifts</span><span class="mv">≈ 300 – 510 €</span></div>
+          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Still open: dad's gifts (146k)</span><span class="mv" style="font-weight:600">3→5 yr window</span></div>
         </div>
-        <div class="loan-badge">If your dad (146k, Argenta) or grandmother (17k) is Belgian‑resident and dies inside the window, Belgium taxes those gifts as inheritance — potentially far above the Spanish ISD. Registering the gifts in Belgium (3% direct line) closes it. The <b>elderly grandmother</b> is the acute case.</div>
+        <div class="loan-badge">The money is small, but the <b>obligation is real</b>: her gifts likely must be reported in her Belgian estate, and Spanish ISD may also <b>accumulate</b> them with anything you inherit from her (art. 30 LISD). Get a <b>Belgian</b> advisor onto the estate. Dad's 146k stays exposed only if he dies within his 3–5 yr windows.</div>
       </div>
       <div class="card own-card anim" style="animation-delay:.05s">
         <h3 style="color:var(--debt)">The other Spanish landmines</h3>
@@ -1107,6 +1107,34 @@ body.locked .gate{display:flex}
         <p style="font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.6">Reading it: full <em>inspection</em> off foreign-account data hits only ≈ 600 people a year nationwide, and averages ≈ 417k per case — an order of magnitude above your 163k, so a dedicated inspection is statistically unlikely. The realistic route is a lighter <em>gestión</em> requerimiento (comprobación limitada) once AEAT passes the 720/CRS mismatch to ATC — higher volume, lower threshold (family transfers are flagged from ≈ 6.000 €), but not automated for donations yet.</p>
       </div>
       <div class="loan-badge" style="margin-top:14px">Grounded estimate: the trail is <b>fully visible</b>, but converting visibility into an actual ISD requerimiento is rarer than it feels — the one hard base rate (≈ 600 foreign-account inspections/yr, avg ≈ 417k) sits well above your profile. Weighing that against full visibility and rising data-sharing, a dedicated ISD requerimiento before the bulk prescribes is roughly a <b>5–15% cumulative risk</b> (revised down from an earlier 15–35% guess once the base rates were checked). <b>Fatter tail:</b> the IRPF "unjustified gain" cross-check (art. 39 LIRPF) on the 163k savings jump is the more likely trigger, and it runs to ≈ 2029.</div>
+    </div>
+
+    <div class="section-head anim"><h2>Declare now vs wait — the expected-cost math</h2><span class="hint">Two options only · 15% assumed chance of being caught before prescription</span></div>
+    <div class="kpis k3 anim">
+      <div class="kpi"><div class="k">Option 1 · declare now</div><div class="v">≈ 18.630 €</div><div class="n">certain · general rate 16.200 € + recargo 2.430 €</div></div>
+      <div class="kpi brass-kpi"><div class="k">Option 2 · wait · expected cost</div><div class="v">≈ 3.305 €</div><div class="n">15% × 22.032 € (caught) + 85% × 0 € (prescribes)</div></div>
+      <div class="kpi"><div class="k">Break-even catch chance</div><div class="v">≈ 85%</div><div class="n">above this, declaring now wins on EV</div></div>
+    </div>
+    <div class="card mort-panel anim">
+      <h3>Euros that become “safe” (prescribed) over time</h3>
+      <p class="cap" style="color:var(--muted);font-size:12px;margin:0 0 8px">Each gift is untouchable 4 years + 30 business days after its transfer. Bars/curve fill as money crosses that line. The 3.000 € cash and 4.000 € undated never get a clean start, so ≈ 7.000 € stays permanently at risk (dashed ceiling gap).</p>
+      <div id="safeWrap" style="position:relative">
+        <svg id="safeChart" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style="touch-action:pan-y"></svg>
+        <div id="safeTip" style="position:absolute;display:none;pointer-events:none;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:8px;padding:8px 11px;font-family:var(--mono);font-size:11px;line-height:1.7;white-space:nowrap;z-index:5;box-shadow:0 10px 28px rgba(0,0,0,.45)"></div>
+      </div>
+      <div class="beam-legend" style="margin-top:10px">
+        <div class="lg"><i style="background:var(--grow)"></i>cumulative safe €</div>
+        <div class="lg"><i style="background:var(--brass)"></i>today</div>
+        <div class="lg"><i style="background:var(--muted-2)"></i>≈ 156k ceiling · 7k never prescribes</div>
+      </div>
+    </div>
+    <div class="card own-card anim" style="margin-top:16px">
+      <h3>So which is “best”?</h3>
+      <div class="own-list" style="font-size:13px;line-height:1.7;color:var(--muted)">
+        <p style="margin:0 0 10px">On <b style="color:var(--text)">pure expected value at a 15% catch chance</b>, waiting is far cheaper: ≈ <b style="color:var(--grow)">3.305 €</b> expected vs a certain <b style="color:var(--text)">18.630 €</b> to declare now. Declaring only wins on EV if the catch chance climbs above ≈ <b style="color:var(--text)">85%</b>.</p>
+        <p style="margin:0 0 10px"><b style="color:var(--alert)">But EV isn't the whole picture</b>, and these push the other way: the 15% is itself uncertain and <em>rising</em> (ATC express reviews, 720/CRS sharing); if caught, the downside can exceed 22k via the <b>IRPF art. 39</b> route (up to ≈ 47% + 50–150% sanction); interest accrues the whole time you wait; and “wait” means <b>staying non-declared</b>, which is the non-compliant path with its own legal and personal weight.</p>
+        <p style="margin:0"><b style="color:var(--text)">Read it as:</b> if you're risk-neutral and trust the 15%, the math favours waiting out the ≈ 3,3 years to full prescription. If you're risk-averse or think detection is likelier than 15%, the ≈ 18.630 € certainty buys peace and closes the IRPF tail. This is decision math on your figures, <b>not advice</b> — the call belongs with you and your advisor.</p>
+      </div>
     </div>
 
     <div class="section-head anim"><h2>The 4-year clock — when each gift becomes untouchable</h2><span class="hint">Live countdown · recalculates every time you open this page</span></div>
@@ -1257,7 +1285,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · gifts-risk2</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · gifts-decision</span></p>
   </div>
 </div>
 
@@ -1805,6 +1833,68 @@ body.locked .gate{display:flex}
         '<span style="width:96px;text-align:right;font-family:var(--mono);font-size:11px;flex:none">'+status+'</span>';
       host.appendChild(row);
     });
+  })();
+
+  /* gifts — cumulative "safe euros" over time chart */
+  (function(){
+    const svg=$('safeChart'),tip=$('safeTip'),wrap=$('safeWrap');if(!svg)return;
+    const G=[
+      {d:'2023-04-25',a:1000},{d:'2023-07-13',a:4000},{d:'2024-03-28',a:20000},
+      {d:'2024-04-26',a:20000},{d:'2024-05-29',a:25000},{d:'2024-06-17',a:20000},
+      {d:'2024-07-25',a:20000},{d:'2024-08-16',a:20000},{d:'2024-09-25',a:15000},
+      {d:'2025-10-14',a:1000},{d:'2023-07-20',a:500},{d:'2024-01-15',a:500},
+      {d:'2024-01-23',a:1500},{d:'2024-02-13',a:1000},{d:'2024-02-22',a:1000},
+      {d:'2024-02-23',a:1500},{d:'2024-04-09',a:4000}
+    ]; // dated gifts only (156.000 €); 7.000 € cash+undated never prescribes
+    const DAY=86400000;
+    function addBiz(dt,n){let d=new Date(dt),k=0;while(k<n){d=new Date(d.getTime()+DAY);const w=d.getDay();if(w!==0&&w!==6)k++;}return d;}
+    function presc(iso){const s=addBiz(new Date(iso+'T00:00:00'),30);const p=new Date(s);p.setFullYear(p.getFullYear()+4);return p;}
+    const steps=G.map(g=>({t:presc(g.d),a:g.a})).sort((x,y)=>x.t-y.t);
+    const CEIL=156000,TOTAL=163000;
+    const now=new Date();
+    const t0=new Date('2026-07-01T00:00:00').getTime();
+    const t1=new Date('2030-06-01T00:00:00').getTime();
+    const W=480,H=240,pad={l:44,r:14,t:16,b:26};
+    const X=t=>pad.l+(t-t0)/(t1-t0)*(W-pad.l-pad.r);
+    const Y=v=>pad.t+(1-v/170000)*(H-pad.t-pad.b);
+    // build cumulative step points
+    let cum=0;const pts=[{t:t0,v:0}];
+    steps.forEach(s=>{pts.push({t:s.t.getTime(),v:cum});cum+=s.a;pts.push({t:s.t.getTime(),v:cum});});
+    pts.push({t:t1,v:cum});
+    const safeNow=(()=>{let c=0;steps.forEach(s=>{if(now>=s.t)c+=s.a;});return c;})();
+    function path(){let d='M'+X(pts[0].t).toFixed(1)+' '+Y(pts[0].v).toFixed(1);for(let i=1;i<pts.length;i++)d+=' L'+X(pts[i].t).toFixed(1)+' '+Y(pts[i].v).toFixed(1);return d;}
+    let hoverT=null;
+    function draw(){
+      let s='<defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--grow')+'" stop-opacity="0.28"/><stop offset="1" stop-color="'+V('--grow')+'" stop-opacity="0"/></linearGradient></defs>';
+      [0,50000,100000,150000].forEach(v=>{s+='<line x1="'+pad.l+'" y1="'+Y(v)+'" x2="'+(W-pad.r)+'" y2="'+Y(v)+'" stroke="'+V('--line-strong')+'" stroke-width="1"/><text x="'+(pad.l-6)+'" y="'+(Y(v)+3)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="9" text-anchor="end">'+(v/1000)+'k</text>';});
+      // ceiling line at 156k
+      s+='<line x1="'+pad.l+'" y1="'+Y(CEIL)+'" x2="'+(W-pad.r)+'" y2="'+Y(CEIL)+'" stroke="'+V('--muted-2')+'" stroke-width="1" stroke-dasharray="4 3"/><text x="'+(W-pad.r)+'" y="'+(Y(CEIL)-4)+'" fill="'+V('--muted-2')+'" font-family="'+V('--mono')+'" font-size="8.5" text-anchor="end">156k ceiling</text>';
+      s+='<path d="'+path()+' L'+X(t1)+' '+Y(0)+' L'+X(t0)+' '+Y(0)+' Z" fill="url(#sg)"/>';
+      s+='<path d="'+path()+'" fill="none" stroke="'+V('--grow')+'" stroke-width="2.4"/>';
+      // now marker
+      const nx=X(now.getTime());
+      s+='<line x1="'+nx+'" y1="'+pad.t+'" x2="'+nx+'" y2="'+(H-pad.b)+'" stroke="'+V('--brass')+'" stroke-width="1" stroke-dasharray="3 3"/><circle cx="'+nx+'" cy="'+Y(safeNow)+'" r="4" fill="'+V('--brass')+'"/><text x="'+(nx+5)+'" y="'+(pad.t+10)+'" fill="'+V('--brass')+'" font-family="'+V('--mono')+'" font-size="9">today</text>';
+      if(hoverT!=null){const hx=X(hoverT);let cv=0;steps.forEach(st=>{if(hoverT>=st.t.getTime())cv+=st.a;});
+        s+='<line x1="'+hx+'" y1="'+pad.t+'" x2="'+hx+'" y2="'+(H-pad.b)+'" stroke="'+V('--muted-2')+'" stroke-width="1"/><circle cx="'+hx+'" cy="'+Y(cv)+'" r="3.5" fill="'+V('--grow')+'" stroke="'+V('--ink')+'" stroke-width="1.5"/>';}
+      // year ticks
+      [2027,2028,2029,2030].forEach(y=>{const tx=X(new Date(y+'-01-01T00:00:00').getTime());s+='<text x="'+tx+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="9.5" text-anchor="middle">'+y+'</text>';});
+      svg.innerHTML=s;
+    }
+    svg.addEventListener('pointermove',e=>{
+      const r=svg.getBoundingClientRect();if(!r.width)return;
+      const vx=(e.clientX-r.left)*(W/r.width);
+      const frac=Math.max(0,Math.min(1,(vx-pad.l)/(W-pad.l-pad.r)));
+      hoverT=t0+frac*(t1-t0);draw();
+      let cv=0;steps.forEach(st=>{if(hoverT>=st.t.getTime())cv+=st.a;});
+      const dt=new Date(hoverT);
+      tip.innerHTML='<b>'+dt.toLocaleDateString('en-GB',{month:'short',year:'numeric'})+'</b><br><span style="color:'+V('--grow')+'">safe: '+eur0(cv)+'</span><br><span style="color:'+V('--muted')+'">still at risk: '+eur0(TOTAL-cv)+'</span>';
+      tip.style.display='block';
+      const wr=wrap.getBoundingClientRect();
+      let tx=e.clientX-wr.left+16;if(tx+tip.offsetWidth+4>wr.width)tx=e.clientX-wr.left-tip.offsetWidth-16;
+      tip.style.left=Math.max(0,tx)+'px';tip.style.top='8px';
+    });
+    svg.addEventListener('pointerleave',()=>{hoverT=null;tip.style.display='none';draw();});
+    draw();
   })();
 
   /* market chart — interactive €/m² 2012–2026: hover tooltip + toggleable series */
