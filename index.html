@@ -532,12 +532,12 @@ body.locked .gate{display:flex}
       <p style="margin:16px 0 0;color:var(--muted-2);font-size:11px;line-height:1.5">Fund sleeves (VWCE, Greece, Brazil trackers) split by their published index weights, so sector figures are approximate. Base excludes €600,60 idle cash in Degiro.</p>
     </div>
 
-    <div class="section-head anim"><h2>Inside your Degiro account</h2><span class="hint">4 positions · €26.795 securities + €601 cash · as of your latest screenshot</span></div>
+    <div class="section-head with-action anim"><h2>Inside your Degiro account</h2><span class="hint" id="degiroHint" style="flex:1">—</span><button class="btn-add" id="degiroEditBtn">🖼️ Update from screenshot</button></div>
     <div class="card holdings anim">
       <table class="wide">
         <thead><tr><th>Holding</th><th>Type / market</th><th class="r">Value</th><th class="r">Unrealised</th></tr></thead>
         <tbody id="degiroBody"></tbody>
-        <tfoot><tr><td>Account total</td><td></td><td class="r" style="font-family:var(--mono);font-weight:600">27.396 €</td><td class="r" style="font-family:var(--mono);color:var(--grow)">+4.346 €</td></tr></tfoot>
+        <tfoot><tr><td>Account total</td><td></td><td class="r" id="degiroFootVal" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="degiroFootUnr" style="font-family:var(--mono);color:var(--grow)">—</td></tr></tfoot>
       </table>
     </div>
 
@@ -1285,6 +1285,24 @@ body.locked .gate{display:flex}
   </div>
 </div>
 
+<div class="modal-overlay" id="degiroModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Update Degiro holdings">
+    <div class="modal-head"><h3>Update Degiro holdings</h3><button id="degiroModalClose" aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <label>Screenshot of your Degiro positions (optional)</label>
+      <div class="dropzone" id="dgDrop"><span class="di">🖼️</span>Drop a screenshot here, or tap to choose<input type="file" id="dgFile" accept="image/*" hidden></div>
+      <img id="dgThumb" class="thumb" hidden alt="preview">
+      <div class="ocr-status" id="dgOcr"></div>
+      <div class="cands" id="dgCands"></div>
+      <p class="hintline">The screenshot is read on your device. Tap a detected number to drop it into whichever amount field you last tapped — then check every figure before saving.</p>
+      <div id="dgRows"></div>
+      <button class="btn-add" id="dgAddRow" style="margin-top:4px">＋ Add position</button>
+      <div class="dz-row" style="margin-top:14px"><div><label for="dgCash">Free cash (€)</label><input type="text" id="dgCash" class="fld" inputmode="decimal" placeholder="e.g. 600,60"></div><div></div></div>
+      <div class="modal-actions"><button class="btn-primary" id="dgSave">Save holdings</button></div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== PASSWORD GATE ===== -->
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Unlock dashboard">
   <div class="gate-card">
@@ -1295,7 +1313,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · fixes</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · degiro-edit</span></p>
   </div>
 </div>
 
@@ -1344,6 +1362,15 @@ body.locked .gate{display:flex}
     {id:'lu_debt',name:'House debt · Lu',cat:'Receivables',value:0},
     {id:'mortgage',name:'Caixa mortgage (your 50%)',cat:'Mortgage',value:simonMort,liability:true,locked:true},
   ];
+
+  /* ---------- Degiro holdings default (seeds state.degiro on first run) ---------- */
+  const DEGIRO_SEED=[
+    {name:'BAE Systems PLC',meta:'Stock · London · defence',value:5559.90,unrealised:928.98,pct:'+20,06%'},
+    {name:'Leonardo SpA',meta:'Stock · Milan · defence',value:5569.50,unrealised:1066.50,pct:'+23,68%'},
+    {name:'Amundi MSCI Greece UCITS ETF',meta:'ETF · Greece · emerging',value:9451.20,unrealised:4441.80,pct:'+88,66%'},
+    {name:'iShares MSCI Brazil UCITS ETF',meta:'ETF · Brazil · emerging',value:6212.25,unrealised:345.13,pct:'+5,88%'},
+  ];
+  const DEGIRO_CASH_SEED=600.60;
 
   /* ---------- totals ---------- */
   function totalsOf(accts){const cats={};order.forEach(c=>cats[c]=0);let liab=0;
@@ -1503,6 +1530,7 @@ body.locked .gate{display:flex}
     const dc=$('dateChip');if(dc)dc.textContent='UPDATED · '+fmtDate(last.ts).toUpperCase();
     renderWealth(t);
     renderCosts();
+    renderDegiro();
   }
 
   /* ============ WEALTH TAB ============ */
@@ -1603,21 +1631,7 @@ body.locked .gate{display:flex}
     pie('pieTotalDev','legTotalDev',[{n:'Developed markets',v:71.7,col:V('--brass')},{n:'Emerging markets',v:28.3,col:V('--grow')}]);
     pie('pieTotalSector','legTotalSector',[['Industrials',23.9],['Technology',20.4],['Financials',17.9],['Consumer cyclical',7.8],['Communication',6.9],['Healthcare',5.1],['Basic materials',4.6],['Energy',4.4],['Consumer defensive',4.0],['Utilities',3.5],['Real estate',1.5]].map((x,i)=>({n:x[0],v:x[1],col:pal[i]})));
 
-    /* Degiro holdings detail */
-    const degiro=[
-      ['BAE Systems PLC','Stock · London · defence',5559.90,928.98,'+20,06%'],
-      ['Leonardo SpA','Stock · Milan · defence',5569.50,1066.50,'+23,68%'],
-      ['Amundi MSCI Greece UCITS ETF','ETF · Greece · emerging',9451.20,4441.80,'+88,66%'],
-      ['iShares MSCI Brazil UCITS ETF','ETF · Brazil · emerging',6212.25,345.13,'+5,88%'],
-    ];
-    const dgb=$('degiroBody');
-    if(dgb){dgb.innerHTML='';
-      degiro.forEach(d=>{const tr=document.createElement('tr');
-        tr.innerHTML='<td><div style="font-weight:500">'+d[0]+'</div></td><td style="color:var(--muted);font-size:12px">'+d[1]+'</td><td class="r val">'+eur(d[2])+'</td><td class="r val" style="color:var(--grow)">+'+eur(d[3])+' <span style="color:var(--muted-2);font-size:10.5px">'+d[4]+'</span></td>';
-        dgb.appendChild(tr);});
-      const trc=document.createElement('tr');trc.setAttribute('style','opacity:.65');
-      trc.innerHTML='<td><div style="font-weight:500">Free cash</div></td><td style="color:var(--muted);font-size:12px">EUR · uninvested</td><td class="r val">'+eur(600.60)+'</td><td class="r val" style="color:var(--muted-2)">—</td>';
-      dgb.appendChild(trc);}
+    renderDegiro();
 
     const ob=obFull,paidDown=M.init-ob,paidPct=paidDown/M.init*100;
     set('kpiOut',eur0(ob));set('kpiOutSub',payLog.length+' payments · '+eur0(totalPaid)+' paid');set('outBig',eur0(ob));
@@ -1726,7 +1740,7 @@ body.locked .gate{display:flex}
     toast('Backup downloaded');});
   $('importBtn').addEventListener('click',()=>$('importFile').click());
   $('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
+    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
 
   /* ============ COSTS & UPKEEP ============ */
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1771,6 +1785,86 @@ body.locked .gate{display:flex}
       if(!rec.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="6"><div class="cost-empty">No recurring costs yet — add community fees, IBI, home insurance, utilities…<br>Use ＋ Add recurring above.</div></td>';rb.appendChild(tr);}
       rb.querySelectorAll('[data-del-recur]').forEach(b=>b.addEventListener('click',()=>delRecur(b.getAttribute('data-del-recur'))));
     }
+  }
+
+  /* ---------- Degiro holdings: render + screenshot-assisted editor ---------- */
+  function renderDegiro(){
+    const dgb=$('degiroBody');if(!dgb||!state)return;
+    const list=Array.isArray(state.degiro)?state.degiro:[];const cash=+state.degiroCash||0;
+    dgb.innerHTML='';let secVal=0,unrTot=0;
+    list.forEach(d=>{const v=+d.value||0,u=+d.unrealised||0;secVal+=v;unrTot+=u;
+      const uCol=u>=0?V('--grow'):V('--debt'),uSign=u>=0?'+':'−';
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td><div style="font-weight:500">'+esc(d.name)+'</div></td>'+
+        '<td style="color:var(--muted);font-size:12px">'+esc(d.meta||'')+'</td>'+
+        '<td class="r val">'+eur(v)+'</td>'+
+        '<td class="r val" style="color:'+uCol+'">'+uSign+eur(Math.abs(u))+(d.pct?' <span style="color:var(--muted-2);font-size:10.5px">'+esc(d.pct)+'</span>':'')+'</td>';
+      dgb.appendChild(tr);});
+    const trc=document.createElement('tr');trc.setAttribute('style','opacity:.65');
+    trc.innerHTML='<td><div style="font-weight:500">Free cash</div></td><td style="color:var(--muted);font-size:12px">EUR · uninvested</td><td class="r val">'+eur(cash)+'</td><td class="r val" style="color:var(--muted-2)">—</td>';
+    dgb.appendChild(trc);
+    set('degiroFootVal',eur0(secVal+cash));
+    const uf=$('degiroFootUnr');if(uf){uf.textContent=(unrTot>=0?'+':'−')+eur0(Math.abs(unrTot));uf.style.color=unrTot>=0?V('--grow'):V('--debt');}
+    set('degiroHint',list.length+' position'+(list.length!==1?'s':'')+' · '+eur0(secVal)+' securities + '+eur0(cash)+' cash');
+  }
+  const degiroModal=$('degiroModal');let dgLastNum=null;
+  function dgRowEl(d){d=d||{};const wrap=document.createElement('div');wrap.className='dg-erow';
+    wrap.style.cssText='border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px';
+    wrap.innerHTML='<input class="fld dg-name" placeholder="Name (e.g. BAE Systems PLC)" style="font-family:var(--body);margin-bottom:6px">'+
+      '<input class="fld dg-meta" placeholder="Type / market (e.g. ETF · Greece · emerging)" style="font-family:var(--body);margin-bottom:6px">'+
+      '<div class="dz-row"><div><label>Value (€)</label><input class="fld dg-value" inputmode="decimal" placeholder="0"></div>'+
+      '<div><label>Unrealised (€)</label><input class="fld dg-unr" inputmode="decimal" placeholder="0"></div></div>'+
+      '<div class="dz-row" style="margin-top:6px"><div><label>% (optional)</label><input class="fld dg-pct" placeholder="+20,06%" style="font-family:var(--body)"></div>'+
+      '<div style="display:flex;align-items:flex-end;justify-content:flex-end"><button type="button" class="cost-row-del dg-del">✕ Remove</button></div></div>';
+    const dec2=n=>Number(n).toFixed(2).replace('.',',');
+    wrap.querySelector('.dg-name').value=d.name||'';
+    wrap.querySelector('.dg-meta').value=d.meta||'';
+    wrap.querySelector('.dg-value').value=d.value!=null?dec2(d.value):'';
+    wrap.querySelector('.dg-unr').value=d.unrealised!=null?dec2(d.unrealised):'';
+    wrap.querySelector('.dg-pct').value=d.pct||'';
+    wrap.querySelector('.dg-del').addEventListener('click',()=>wrap.remove());
+    [wrap.querySelector('.dg-value'),wrap.querySelector('.dg-unr')].forEach(inp=>inp.addEventListener('focus',()=>dgLastNum=inp));
+    return wrap;}
+  function openDegiro(){const rows=$('dgRows');rows.innerHTML='';
+    (state.degiro||[]).forEach(d=>rows.appendChild(dgRowEl(d)));
+    if(!(state.degiro||[]).length)rows.appendChild(dgRowEl());
+    $('dgCash').value=state.degiroCash!=null?Number(state.degiroCash).toFixed(2).replace('.',','):'';
+    $('dgOcr').textContent='';$('dgCands').innerHTML='';$('dgThumb').hidden=true;dgLastNum=null;
+    degiroModal.hidden=false;}
+  async function dgHandleImage(file){
+    try{$('dgThumb').src=URL.createObjectURL(file);$('dgThumb').hidden=false;}catch(e){}
+    $('dgCands').innerHTML='';$('dgOcr').innerHTML='<span class="spin"></span> Reading the screenshot on your device…';
+    try{await loadTesseract();const res=await Tesseract.recognize(file,'eng');
+      const nums=parseNumbers((res&&res.data&&res.data.text)||'');
+      if(nums.length){$('dgOcr').textContent='Tap a number to drop it into the last amount field you tapped:';
+        nums.forEach(n=>{const b=document.createElement('button');b.type='button';b.className='cand';b.textContent=eur(n);
+          b.addEventListener('click',()=>{if(dgLastNum){dgLastNum.value=n.toString().replace('.',',');dgLastNum.focus();}else{$('dgOcr').textContent='Tap an amount field first, then tap a number.';}});
+          $('dgCands').appendChild(b);});
+      }else{$('dgOcr').textContent='Couldn’t read numbers confidently — type them in below.';}
+    }catch(e){$('dgOcr').textContent='On‑device reading unavailable here — type the amounts below.';}}
+  function saveDegiro(){
+    const list=[];[...$('dgRows').querySelectorAll('.dg-erow')].forEach(r=>{
+      const name=(r.querySelector('.dg-name').value||'').trim();if(!name)return;
+      list.push({name,meta:(r.querySelector('.dg-meta').value||'').trim(),
+        value:normNum(r.querySelector('.dg-value').value)||0,
+        unrealised:normNum(r.querySelector('.dg-unr').value)||0,
+        pct:(r.querySelector('.dg-pct').value||'').trim()});});
+    const cash=normNum($('dgCash').value)||0;
+    pushUndo();state.degiro=list;state.degiroCash=cash;
+    persist();renderDegiro();
+    toast('Degiro holdings saved',{fn:doUndo});degiroModal.hidden=true;}
+  if($('degiroEditBtn')){
+    $('degiroEditBtn').addEventListener('click',openDegiro);
+    $('degiroModalClose').addEventListener('click',()=>degiroModal.hidden=true);
+    degiroModal.addEventListener('click',e=>{if(e.target===degiroModal)degiroModal.hidden=true;});
+    $('dgAddRow').addEventListener('click',()=>$('dgRows').appendChild(dgRowEl()));
+    $('dgCash').addEventListener('focus',()=>dgLastNum=$('dgCash'));
+    $('dgDrop').addEventListener('click',()=>$('dgFile').click());
+    $('dgDrop').addEventListener('dragover',e=>{e.preventDefault();$('dgDrop').classList.add('drag');});
+    $('dgDrop').addEventListener('dragleave',()=>$('dgDrop').classList.remove('drag'));
+    $('dgDrop').addEventListener('drop',e=>{e.preventDefault();$('dgDrop').classList.remove('drag');if(e.dataTransfer.files[0])dgHandleImage(e.dataTransfer.files[0]);});
+    $('dgFile').addEventListener('change',()=>{if($('dgFile').files[0])dgHandleImage($('dgFile').files[0]);});
+    $('dgSave').addEventListener('click',saveDegiro);
   }
 
   /* Salva sub-tabs */
@@ -2071,6 +2165,8 @@ body.locked .gate{display:flex}
     }
     if(!state.propertyCosts)state.propertyCosts=[];
     if(!state.recurringCosts)state.recurringCosts=[];
+    if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);
+    if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;
     dedupeHistory();
     initStatic();
     renderDynamic();
