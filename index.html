@@ -365,6 +365,11 @@ body{margin:0;background:
 .itip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--muted-2);color:var(--muted);font-size:10px;font-family:var(--mono);font-style:normal;cursor:help;position:relative;vertical-align:middle;margin-left:6px;flex:none}
 .itip .itip-box{display:none;position:absolute;bottom:140%;left:50%;transform:translateX(-50%);width:min(290px,74vw);background:var(--ink-2);border:1px solid var(--line-strong);border-radius:10px;padding:10px 12px;font-size:11.5px;font-family:var(--body);color:var(--text);line-height:1.6;z-index:30;box-shadow:0 10px 28px rgba(0,0,0,.45);text-transform:none;letter-spacing:normal;white-space:normal;text-align:left;font-weight:400}
 .itip:hover .itip-box,.itip:focus .itip-box,.itip:focus-within .itip-box{display:block}
+/* ledger amount "last updated" tooltip */
+.tipcell{position:relative;cursor:help;outline:none}
+.tipcell .tipbox{display:none;position:absolute;bottom:132%;right:10px;white-space:nowrap;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:9px;padding:7px 11px;font-family:var(--body);font-size:11px;font-weight:400;color:var(--muted);letter-spacing:normal;text-transform:none;text-align:right;z-index:40;box-shadow:0 10px 26px rgba(0,0,0,.45);pointer-events:none}
+.tipcell .tipbox b{display:block;color:var(--text);font-family:var(--mono);font-weight:600;font-size:12px;margin-top:1px}
+.tipcell:hover .tipbox,.tipcell:focus .tipbox,.tipcell:focus-within .tipbox{display:block}
 
 /* Salva sub-tabs */
 .subtabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--line)}
@@ -1313,7 +1318,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · degiro-edit</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · acct-updated-tips</span></p>
   </div>
 </div>
 
@@ -1469,6 +1474,7 @@ body.locked .gate{display:flex}
   /* ---------- date helpers ---------- */
   function fmtDate(ts){return new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
   function fmtDateTime(ts){const d=new Date(ts);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
+  function relTime(ts){if(!ts)return'';const s=Math.round((Date.now()-ts)/1000);if(s<60)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' hour'+(h!==1?'s':'')+' ago';const d=Math.round(h/24);if(d<31)return d+' day'+(d!==1?'s':'')+' ago';const mo=Math.round(d/30.44);if(mo<12)return mo+' month'+(mo!==1?'s':'')+' ago';const y=(d/365.25);return y.toFixed(y<10?1:0)+' yr ago';}
 
   /* ============ DYNAMIC RENDER ============ */
   function renderDynamic(){
@@ -1516,7 +1522,8 @@ body.locked .gate{display:flex}
     const lb=$('ledgerBody');
     if(lb){lb.innerHTML='';state.accounts.forEach(a=>{const trr=document.createElement('tr');if(a.liability)trr.className='liab';
       const col=a.liability?V('--debt'):(catMeta[a.cat]||V('--muted'));
-      trr.innerHTML='<td class="acct">'+a.name+'</td><td><span class="tag"><i style="background:'+col+'"></i>'+a.cat+'</span></td><td class="r val">'+(a.liability?'−':'')+eur(a.value)+'</td>';lb.appendChild(trr);});}
+      const tip=a.updatedAt?'<span class="tipbox">Last updated '+relTime(a.updatedAt)+'<b>'+fmtDateTime(a.updatedAt)+'</b></span>':'';
+      trr.innerHTML='<td class="acct">'+a.name+'</td><td><span class="tag"><i style="background:'+col+'"></i>'+a.cat+'</span></td><td class="r val tipcell" tabindex="0">'+(a.liability?'−':'')+eur(a.value)+tip+'</td>';lb.appendChild(trr);});}
 
     const ib=$('invBody');
     if(ib){ib.innerHTML='';
@@ -1580,7 +1587,7 @@ body.locked .gate{display:flex}
   /* ---------- commit / add ---------- */
   function commit(accId,newValue){
     const a=state.accounts.find(x=>x.id===accId);if(!a)return;
-    a.value=newValue;
+    a.value=newValue;a.updatedAt=Date.now();
     recordSnapshot(a.name+' → '+eur0(newValue));
     persist();renderDynamic();toast('Updated '+a.name+' · snapshot saved');
   }
@@ -2167,6 +2174,8 @@ body.locked .gate{display:flex}
     if(!state.recurringCosts)state.recurringCosts=[];
     if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);
     if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;
+    const baseTs=(state.history&&state.history.length)?state.history[state.history.length-1].ts:state.updatedAt;
+    state.accounts.forEach(a=>{if(a.updatedAt==null)a.updatedAt=baseTs;});
     dedupeHistory();
     initStatic();
     renderDynamic();
