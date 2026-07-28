@@ -439,6 +439,7 @@ body.locked .gate{display:flex}
       <button class="btn-ghost" id="exportBtn" title="Download a JSON backup">Export</button>
       <button class="btn-ghost" id="importBtn" title="Restore from a backup">Import</button>
       <button class="btn-ghost" id="lockBtn" title="Lock the dashboard">Lock</button>
+      <div class="datechip" id="syncChip" title="Cloud sync status" style="display:flex;align-items:center;gap:7px"><span id="syncDot" style="width:7px;height:7px;border-radius:50%;background:var(--muted-2);flex:none"></span><span id="syncTxt">—</span></div>
       <div class="datechip" id="dateChip">UPDATED · 1 JUL 2026</div>
     </div>
     <input type="file" id="importFile" accept="application/json" hidden>
@@ -500,6 +501,7 @@ body.locked .gate{display:flex}
 
   <!-- ============ TAB 2 · INVESTMENTS ============ -->
   <section class="panel" id="tab-inv" role="tabpanel">
+    <div class="recon anim" style="background:rgba(110,136,176,.08);border-color:rgba(110,136,176,.28);margin-bottom:18px"><span class="ic" style="color:var(--cash)">i</span><p><b style="color:var(--text)">What's live vs illustrative here.</b> Your <b>VWCE and Degiro balances</b> update when you log them via ＋ Update. Everything else on this tab — the holdings breakdown, sector/country/developed‑vs‑emerging pies, top holdings, and the deployment plan — is a <b>manually maintained reference</b>, not a live feed, and won't move on its own. Treat the percentages as approximate and the plan as of 2026.</p></div>
     <div class="kpis k5 anim">
       <div class="kpi brass-kpi"><div class="k">VWCE now</div><div class="v" id="kpiVwceNow">—</div><div class="n">FTSE All‑World (Acc)</div></div>
       <div class="kpi"><div class="k">Degiro now</div><div class="v" id="kpiDegiro">—</div><div class="n">Stocks + EM trackers</div></div>
@@ -1200,8 +1202,8 @@ body.locked .gate{display:flex}
     </div>
 
     <p class="foot-note">
-      Your data lives in this browser (localStorage) and in the backups you export — nothing is sent anywhere. Screenshot reading happens on‑device.<br>
-      Use <b>Export</b> regularly and to move your history between devices. A planning tool, not financial advice.
+      Your data is <b>encrypted on this device</b> with your password before anything is stored or synced — the sync server only ever holds an opaque blob it cannot read. Screenshot reading happens on‑device. Nothing readable leaves your browser.<br>
+      Use <b>Export</b> regularly for an offline backup. A planning tool, not financial advice.
     </p>
   </section>
 
@@ -1220,6 +1222,14 @@ body.locked .gate{display:flex}
         <label for="mNewCat">Category</label>
         <select id="mNewCat" class="fld"></select>
       </div>
+      <details id="mEditFields" hidden style="margin:2px 0 4px">
+        <summary style="cursor:pointer;color:var(--muted);font-size:12.5px;list-style:none">✎ Rename, recategorise or delete this account</summary>
+        <div class="dz-row" style="margin-top:10px">
+          <div><label for="mEditName">Rename</label><input type="text" id="mEditName" class="fld" style="font-family:var(--body)"></div>
+          <div><label for="mEditCat">Category</label><select id="mEditCat" class="fld"></select></div>
+        </div>
+        <button class="cost-row-del" id="mDeleteBtn" style="margin-top:8px;font-size:12.5px">✕ Delete this account</button>
+      </details>
 
       <label>Screenshot of the balance (optional)</label>
       <div class="dropzone" id="dropzone"><span class="di">🖼️</span>Drop a screenshot here, or tap to choose<input type="file" id="mFile" accept="image/*" hidden></div>
@@ -1285,7 +1295,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · gifts-decision2</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · fixes</span></p>
   </div>
 </div>
 
@@ -1370,10 +1380,32 @@ body.locked .gate{display:flex}
   async function remoteGet(){if(!SYNC.enabled||!SYNC.key)return undefined;
     try{const r=await fetch('/api/state?k='+SYNC.key,{cache:'no-store'});
       if(r.status===404)return null;if(!r.ok)return undefined;return await r.json();}catch(e){return undefined;}}
-  let pushTimer=null;
-  function schedulePush(pkg){if(!SYNC.enabled||!SYNC.key)return;clearTimeout(pushTimer);
-    pushTimer=setTimeout(()=>{fetch('/api/state?k='+SYNC.key,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(pkg)})
-      .then(r=>{if(!r.ok)throw 0;}).catch(()=>{if(!SYNC.warned){SYNC.warned=true;toast('Cloud sync unavailable — saving on this device only');}});},1200);}
+  /* ---------- sync status + conflict guard ---------- */
+  let pushTimer=null,pendingPkg=null;
+  let syncBaseTs=0;     /* ts of the remote blob we're reconciled with */
+  let lastSyncTs=0;     /* when we last successfully pushed */
+  let syncStatus=SYNC.enabled?'idle':'local';
+  function agoTxt(ts){if(!ts)return'';const s=Math.floor((Date.now()-ts)/1000);
+    if(s<45)return'just now';const m=Math.floor(s/60);if(m<60)return m+' min ago';const h=Math.floor(m/60);if(h<24)return h+' h ago';return Math.floor(h/24)+' d ago';}
+  function renderSync(){const dot=$('syncDot'),txt=$('syncTxt');if(!dot||!txt)return;
+    const map={synced:['var(--grow)','Synced'+(lastSyncTs?' · '+agoTxt(lastSyncTs):'')],
+      saving:['var(--brass)','Saving…'],idle:['var(--muted-2)','Sync ready'],
+      conflict:['var(--debt)','Cloud is newer'],offline:['var(--alert)','Device only · sync down'],
+      local:['var(--muted-2)','Local only']};
+    const m=map[syncStatus]||map.idle;dot.style.background=m[0];txt.textContent=m[1];}
+  function setSync(s){syncStatus=s;renderSync();}
+  function schedulePush(pkg){if(!SYNC.enabled||!SYNC.key){setSync('local');return;}
+    pendingPkg=pkg;setSync('saving');clearTimeout(pushTimer);pushTimer=setTimeout(doPush,1200);}
+  async function doPush(){const pkg=pendingPkg;if(!pkg)return;
+    try{
+      const remote=await remoteGet();
+      if(remote&&(remote.ts||0)>syncBaseTs){setSync('conflict');
+        toast('Cloud has newer data from another device — reload to load it (Export first if unsure)',{label:'Reload',fn:()=>location.reload()});return;}
+      const r=await fetch('/api/state?k='+SYNC.key,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(pkg)});
+      if(!r.ok)throw 0;
+      syncBaseTs=pkg.ts||Date.now();lastSyncTs=Date.now();setSync('synced');
+    }catch(e){setSync('offline');if(!SYNC.warned){SYNC.warned=true;toast('Cloud sync unavailable — saving on this device only');}}}
+  setInterval(()=>{if(syncStatus==='synced')renderSync();},30000);
 
   function syncMort(){const m=state.accounts.find(a=>a.id==='mortgage');if(m)m.value=simonMort;}
   function persist(){if(!state)return;state.updatedAt=Date.now();
@@ -1505,12 +1537,17 @@ body.locked .gate{display:flex}
     if(hb){hb.innerHTML='';
       for(let i=h.length-1;i>=0;i--){const s=h[i],prev=h[i-1];const delta=prev?s.net-prev.net:0,up=delta>=0;
         const trr=document.createElement('tr');
+        const del=h.length>1?' <button class="cost-row-del" data-del-snap="'+s.ts+'" title="Delete snapshot" aria-label="Delete snapshot">✕</button>':'';
         trr.innerHTML='<td>'+fmtDateTime(s.ts)+(i===0?' <span class="src">start</span>':'')+'</td>'+
           '<td class="src">'+(s.note||'—')+'</td>'+
           '<td class="r val">'+eur0(s.net)+'</td>'+
-          '<td class="r delta '+(prev?(up?'up':'down'):'')+'">'+(prev?(up?'+':'−')+eur0(Math.abs(delta)):'—')+'</td>';
-        hb.appendChild(trr);}}
+          '<td class="r delta '+(prev?(up?'up':'down'):'')+'">'+(prev?(up?'+':'−')+eur0(Math.abs(delta)):'—')+del+'</td>';
+        hb.appendChild(trr);}
+      hb.querySelectorAll('[data-del-snap]').forEach(b=>b.addEventListener('click',()=>delSnapshot(b.getAttribute('data-del-snap'))));}
   }
+  function delSnapshot(ts){if(!state.history||state.history.length<2){toast('Keep at least one snapshot');return;}
+    pushUndo();state.history=state.history.filter(s=>String(s.ts)!==String(ts));
+    persist();renderDynamic();toast('Snapshot deleted',{fn:doUndo});}
 
   /* ---------- commit / add ---------- */
   function commit(accId,newValue){
@@ -1520,12 +1557,24 @@ body.locked .gate{display:flex}
     persist();renderDynamic();toast('Updated '+a.name+' · snapshot saved');
   }
 
-  /* ---------- toast ---------- */
-  let toTimer;function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(toTimer);toTimer=setTimeout(()=>el.classList.remove('show'),2600);}
+  /* ---------- toast (optional Undo action) ---------- */
+  let toTimer;function toast(msg,action){const el=$('toast');if(!el)return;
+    el.innerHTML='';el.appendChild(document.createTextNode(msg));
+    if(action&&typeof action.fn==='function'){const b=document.createElement('button');b.type='button';b.textContent=action.label||'Undo';
+      b.style.cssText='margin-left:12px;background:none;border:1px solid rgba(0,0,0,.3);color:inherit;font:inherit;font-weight:700;padding:2px 11px;border-radius:6px;cursor:pointer';
+      b.addEventListener('click',()=>{el.classList.remove('show');action.fn();});el.appendChild(b);}
+    el.classList.add('show');clearTimeout(toTimer);toTimer=setTimeout(()=>el.classList.remove('show'),action?6500:2600);}
+
+  /* ---------- single-level undo (guards edits/deletes) ---------- */
+  let undoSnap=null;
+  function pushUndo(){try{undoSnap=clone(state);}catch(e){undoSnap=null;}}
+  function doUndo(){if(!undoSnap)return;state=undoSnap;undoSnap=null;persist();renderDynamic();toast('Restored');}
 
   /* ============ STATIC RENDER (once) ============ */
   function initStatic(){
-    const sched=[{mo:'Jun',amt:30000,done:true},{mo:'Jul',amt:15000,done:true},{mo:'Aug',amt:15000},{mo:'Sep',amt:15000},{mo:'Oct',amt:15000},{mo:'Nov',amt:15000},{mo:'Dec',amt:15000,div:true}];
+    const _now=new Date(),_moIdx={Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    const _done=mo=>_now.getFullYear()>2026||(_now.getFullYear()===2026&&_now.getMonth()>_moIdx[mo]);
+    const sched=[{mo:'Jun',amt:30000},{mo:'Jul',amt:15000},{mo:'Aug',amt:15000},{mo:'Sep',amt:15000},{mo:'Oct',amt:15000},{mo:'Nov',amt:15000},{mo:'Dec',amt:15000,div:true}].map(s=>({...s,done:_done(s.mo)}));
     const rungs=$('rungs');let cum=0;
     if(rungs)sched.forEach(s=>{cum+=s.amt;const d=document.createElement('div');d.className='rung'+(s.done?' now':'');
       const barTxt=s.div?'bonds + comm':('+'+(s.amt/1000)+'k');
@@ -1588,13 +1637,14 @@ body.locked .gate{display:flex}
   }
 
   /* ============ UPDATE MODAL + OCR ============ */
-  const modal=$('modal'),mAccount=$('mAccount'),mValue=$('mValue'),mFile=$('mFile'),dropzone=$('dropzone'),thumb=$('thumb'),ocrStatus=$('ocrStatus'),cands=$('cands'),newFields=$('newAcctFields'),mNewName=$('mNewName'),mNewCat=$('mNewCat');
+  const modal=$('modal'),mAccount=$('mAccount'),mValue=$('mValue'),mFile=$('mFile'),dropzone=$('dropzone'),thumb=$('thumb'),ocrStatus=$('ocrStatus'),cands=$('cands'),newFields=$('newAcctFields'),mNewName=$('mNewName'),mNewCat=$('mNewCat'),mEditFields=$('mEditFields'),mEditName=$('mEditName'),mEditCat=$('mEditCat'),mDeleteBtn=$('mDeleteBtn');
   function fillAccountSelect(){mAccount.innerHTML='';
     state.accounts.filter(a=>!a.locked).forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' — '+eur0(a.value);mAccount.appendChild(o);});
     const o=document.createElement('option');o.value='__new';o.textContent='＋ New account…';mAccount.appendChild(o);
-    if(mNewCat&&!mNewCat.childElementCount)order.forEach(c=>{const oo=document.createElement('option');oo.value=c;oo.textContent=c;mNewCat.appendChild(oo);});}
+    [mNewCat,mEditCat].forEach(sel=>{if(sel&&!sel.childElementCount)order.forEach(c=>{const oo=document.createElement('option');oo.value=c;oo.textContent=c;sel.appendChild(oo);});});}
   function syncSelectValue(){const isNew=mAccount.value==='__new';newFields.hidden=!isNew;
-    if(!isNew){const a=state.accounts.find(x=>x.id===mAccount.value);if(a)mValue.placeholder='current: '+eur0(a.value);}}
+    if(mEditFields){mEditFields.hidden=isNew;mEditFields.open=false;}
+    if(!isNew){const a=state.accounts.find(x=>x.id===mAccount.value);if(a){mValue.placeholder='current: '+eur0(a.value);if(mEditName)mEditName.value=a.name;if(mEditCat)mEditCat.value=a.cat;}}}
   function openModal(){fillAccountSelect();mValue.value='';cands.innerHTML='';ocrStatus.textContent='';thumb.hidden=true;newFields.hidden=true;modal.hidden=false;syncSelectValue();}
   function closeModal(){modal.hidden=true;}
   $('updateBtn').addEventListener('click',openModal);
@@ -1635,14 +1685,38 @@ body.locked .gate{display:flex}
   }
 
   $('mCommit').addEventListener('click',()=>{
-    const val=normNum(mValue.value);
-    if(val==null||val<0){toast('Enter a valid amount');return;}
     if(mAccount.value==='__new'){
+      const val=normNum(mValue.value);
+      if(val==null||val<0){toast('Enter a valid amount');return;}
       const nm=(mNewName.value||'').trim();if(!nm){toast('Name the new account');return;}
+      pushUndo();
       state.accounts.push({id:'acc_'+Date.now(),name:nm,cat:mNewCat.value,value:val});
       recordSnapshot(nm+' added → '+eur0(val));persist();renderDynamic();
-      toast('Account added · snapshot saved');closeModal();return;}
-    commit(mAccount.value,val);closeModal();
+      toast('Account added · snapshot saved',{fn:doUndo});closeModal();return;}
+    /* existing account: value optional (rename/recategorise on their own is allowed) */
+    const a=state.accounts.find(x=>x.id===mAccount.value);if(!a){closeModal();return;}
+    const raw=(mValue.value||'').trim();
+    let val=null;if(raw!==''){val=normNum(raw);if(val==null||val<0){toast('Enter a valid amount');return;}}
+    const newName=(mEditName&&mEditName.value||'').trim();
+    const newCat=(mEditCat&&mEditCat.value)||a.cat;
+    const nameChg=newName&&newName!==a.name, catChg=newCat!==a.cat, valChg=val!=null&&val!==a.value;
+    if(!nameChg&&!catChg&&!valChg){toast('Nothing to change');return;}
+    pushUndo();
+    const changes=[];
+    if(nameChg){changes.push('renamed to '+newName);a.name=newName;}
+    if(catChg){changes.push('→ '+newCat);a.cat=newCat;}
+    if(valChg){a.value=val;changes.push(eur0(val));}
+    if(valChg)recordSnapshot((newName||a.name)+' → '+eur0(val));
+    else recordSnapshot((newName||a.name)+' · '+changes.join(' · '));
+    persist();renderDynamic();
+    toast('Saved · '+changes.join(' · '),{fn:doUndo});closeModal();
+  });
+  if(mDeleteBtn)mDeleteBtn.addEventListener('click',()=>{
+    const a=state.accounts.find(x=>x.id===mAccount.value);if(!a||a.locked){toast('This account can’t be deleted');return;}
+    pushUndo();
+    state.accounts=state.accounts.filter(x=>x.id!==a.id);
+    recordSnapshot(a.name+' deleted');persist();renderDynamic();
+    toast(a.name+' deleted',{fn:doUndo});closeModal();
   });
 
   /* ---------- export / import ---------- */
@@ -2039,6 +2113,7 @@ body.locked .gate{display:flex}
         chosen=(v1&&v1.accounts&&v1.history)?v1:null;  /* adopt legacy plaintext data if present */
       }
       pass=p;state=chosen;
+      syncBaseTs=(remotePkg&&remotePkg.ts)||(chosen&&chosen.updatedAt)||0;renderSync();
       boot();
       document.body.classList.remove('locked');
       gatePass.value='';if(gatePass2)gatePass2.value='';

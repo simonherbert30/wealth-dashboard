@@ -2,6 +2,9 @@
   "name": "wealth-dashboard",
   "private": true,
   "type": "module",
+  "scripts": {
+    "check": "node scripts/check-syntax.mjs"
+  },
   "dependencies": {
     "@vercel/blob": "2.6.0"
   }
