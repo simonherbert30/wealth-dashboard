@@ -370,6 +370,9 @@ body{margin:0;background:
 .tipcell .tipbox{display:none;position:absolute;bottom:132%;right:10px;white-space:nowrap;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:9px;padding:7px 11px;font-family:var(--body);font-size:11px;font-weight:400;color:var(--muted);letter-spacing:normal;text-transform:none;text-align:right;z-index:40;box-shadow:0 10px 26px rgba(0,0,0,.45);pointer-events:none}
 .tipcell .tipbox b{display:block;color:var(--text);font-family:var(--mono);font-weight:600;font-size:12px;margin-top:1px}
 .tipcell:hover .tipbox,.tipcell:focus .tipbox,.tipcell:focus-within .tipbox{display:block}
+/* live parsed-value preview in the Degiro editor */
+.dgprev{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:3px;min-height:13px;letter-spacing:.2px}
+.dgprev.big{color:var(--alert)}
 
 /* Salva sub-tabs */
 .subtabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--line)}
@@ -1302,7 +1305,7 @@ body.locked .gate{display:flex}
       <p class="hintline">The screenshot is read on your device. Tap a detected number to drop it into whichever amount field you last tapped — then check every figure before saving.</p>
       <div id="dgRows"></div>
       <button class="btn-add" id="dgAddRow" style="margin-top:4px">＋ Add position</button>
-      <div class="dz-row" style="margin-top:14px"><div><label for="dgCash">Free cash (€)</label><input type="text" id="dgCash" class="fld" inputmode="decimal" placeholder="e.g. 600,60"></div><div></div></div>
+      <div class="dz-row" style="margin-top:14px"><div><label for="dgCash">Free cash (€)</label><input type="text" id="dgCash" class="fld" inputmode="decimal" placeholder="e.g. 600,60"><div class="dgprev" id="dgCashPrev"></div></div><div></div></div>
       <div class="modal-actions"><button class="btn-primary" id="dgSave">Save holdings</button></div>
     </div>
   </div>
@@ -1318,7 +1321,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · acct-updated-tips</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · acct-tips-derived</span></p>
   </div>
 </div>
 
@@ -1475,6 +1478,13 @@ body.locked .gate{display:flex}
   function fmtDate(ts){return new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
   function fmtDateTime(ts){const d=new Date(ts);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
   function relTime(ts){if(!ts)return'';const s=Math.round((Date.now()-ts)/1000);if(s<60)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' hour'+(h!==1?'s':'')+' ago';const d=Math.round(h/24);if(d<31)return d+' day'+(d!==1?'s':'')+' ago';const mo=Math.round(d/30.44);if(mo<12)return mo+' month'+(mo!==1?'s':'')+' ago';const y=(d/365.25);return y.toFixed(y<10?1:0)+' yr ago';}
+  /* Derive when an account's value was last changed, from the snapshot notes
+     (each note lists "<Account> → <value>" for the accounts that changed).
+     Falls back to the first snapshot (initial setup) if never individually updated. */
+  function acctUpdatedAt(a){const h=state&&state.history;if(!h||!h.length)return a&&a.updatedAt;
+    for(let i=h.length-1;i>=0;i--){const n=h[i].note?String(h[i].note):'';
+      if(n.indexOf(a.name+' → ')!==-1||n.indexOf(a.name+' added → ')!==-1)return h[i].ts;}
+    return h[0].ts;}
 
   /* ============ DYNAMIC RENDER ============ */
   function renderDynamic(){
@@ -1522,7 +1532,8 @@ body.locked .gate{display:flex}
     const lb=$('ledgerBody');
     if(lb){lb.innerHTML='';state.accounts.forEach(a=>{const trr=document.createElement('tr');if(a.liability)trr.className='liab';
       const col=a.liability?V('--debt'):(catMeta[a.cat]||V('--muted'));
-      const tip=a.updatedAt?'<span class="tipbox">Last updated '+relTime(a.updatedAt)+'<b>'+fmtDateTime(a.updatedAt)+'</b></span>':'';
+      const ut=acctUpdatedAt(a);
+      const tip=ut?'<span class="tipbox">Last updated '+relTime(ut)+'<b>'+fmtDateTime(ut)+'</b></span>':'';
       trr.innerHTML='<td class="acct">'+a.name+'</td><td><span class="tag"><i style="background:'+col+'"></i>'+a.cat+'</span></td><td class="r val tipcell" tabindex="0">'+(a.liability?'−':'')+eur(a.value)+tip+'</td>';lb.appendChild(trr);});}
 
     const ib=$('invBody');
@@ -1819,8 +1830,8 @@ body.locked .gate{display:flex}
     wrap.style.cssText='border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px';
     wrap.innerHTML='<input class="fld dg-name" placeholder="Name (e.g. BAE Systems PLC)" style="font-family:var(--body);margin-bottom:6px">'+
       '<input class="fld dg-meta" placeholder="Type / market (e.g. ETF · Greece · emerging)" style="font-family:var(--body);margin-bottom:6px">'+
-      '<div class="dz-row"><div><label>Value (€)</label><input class="fld dg-value" inputmode="decimal" placeholder="0"></div>'+
-      '<div><label>Unrealised (€)</label><input class="fld dg-unr" inputmode="decimal" placeholder="0"></div></div>'+
+      '<div class="dz-row"><div><label>Value (€)</label><input class="fld dg-value" inputmode="decimal" placeholder="0"><div class="dgprev dg-value-prev"></div></div>'+
+      '<div><label>Unrealised (€)</label><input class="fld dg-unr" inputmode="decimal" placeholder="0"><div class="dgprev dg-unr-prev"></div></div></div>'+
       '<div class="dz-row" style="margin-top:6px"><div><label>% (optional)</label><input class="fld dg-pct" placeholder="+20,06%" style="font-family:var(--body)"></div>'+
       '<div style="display:flex;align-items:flex-end;justify-content:flex-end"><button type="button" class="cost-row-del dg-del">✕ Remove</button></div></div>';
     const dec2=n=>Number(n).toFixed(2).replace('.',',');
@@ -1830,12 +1841,25 @@ body.locked .gate{display:flex}
     wrap.querySelector('.dg-unr').value=d.unrealised!=null?dec2(d.unrealised):'';
     wrap.querySelector('.dg-pct').value=d.pct||'';
     wrap.querySelector('.dg-del').addEventListener('click',()=>wrap.remove());
-    [wrap.querySelector('.dg-value'),wrap.querySelector('.dg-unr')].forEach(inp=>inp.addEventListener('focus',()=>dgLastNum=inp));
+    const vI=wrap.querySelector('.dg-value'),uI=wrap.querySelector('.dg-unr');
+    dgWirePreview(vI,wrap.querySelector('.dg-value-prev'),true);
+    dgWirePreview(uI,wrap.querySelector('.dg-unr-prev'),false);
+    [vI,uI].forEach(inp=>inp.addEventListener('focus',()=>dgLastNum=inp));
     return wrap;}
+  /* show exactly what a typed amount will save as, so a mis-parsed value
+     (e.g. "94.545" read as 94.545,00 instead of 9.451,20) is caught before saving */
+  function dgWirePreview(inp,span,flagBig){const upd=()=>{const raw=(inp.value||'').trim();
+      if(!raw){span.textContent='';span.classList.remove('big');return;}
+      const v=normNum(raw);
+      if(v==null){span.textContent='= ?';span.classList.remove('big');return;}
+      span.textContent='= '+eur(v);span.classList.toggle('big',!!flagBig&&Math.abs(v)>=50000);};
+    inp.addEventListener('input',upd);upd();}
   function openDegiro(){const rows=$('dgRows');rows.innerHTML='';
     (state.degiro||[]).forEach(d=>rows.appendChild(dgRowEl(d)));
     if(!(state.degiro||[]).length)rows.appendChild(dgRowEl());
-    $('dgCash').value=state.degiroCash!=null?Number(state.degiroCash).toFixed(2).replace('.',','):'';
+    const cashI=$('dgCash');cashI.value=state.degiroCash!=null?Number(state.degiroCash).toFixed(2).replace('.',','):'';
+    if(!cashI._prevWired){dgWirePreview(cashI,$('dgCashPrev'),false);cashI._prevWired=1;}
+    cashI.dispatchEvent(new Event('input'));
     $('dgOcr').textContent='';$('dgCands').innerHTML='';$('dgThumb').hidden=true;dgLastNum=null;
     degiroModal.hidden=false;}
   async function dgHandleImage(file){
@@ -2174,8 +2198,6 @@ body.locked .gate{display:flex}
     if(!state.recurringCosts)state.recurringCosts=[];
     if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);
     if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;
-    const baseTs=(state.history&&state.history.length)?state.history[state.history.length-1].ts:state.updatedAt;
-    state.accounts.forEach(a=>{if(a.updatedAt==null)a.updatedAt=baseTs;});
     dedupeHistory();
     initStatic();
     renderDynamic();
