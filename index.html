@@ -374,7 +374,7 @@ body{margin:0;background:
 .dgprev{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:3px;min-height:13px;letter-spacing:.2px}
 .dgprev.big{color:var(--alert)}
 /* friend (read-only, restricted) mode */
-body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur]{display:none!important}
+body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend #editUtilBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur]{display:none!important}
 .tab.tab-locked .tl::after{content:" 🔒";font-size:10px;opacity:.7}
 .tab.tab-locked{opacity:.5}
 .panel.blurred{filter:blur(9px);pointer-events:none;user-select:none;transition:filter .2s}
@@ -769,10 +769,10 @@ body.locked .gate{display:flex}
       </div>
     </div>
 
-    <div class="section-head anim"><h2>What it cost to buy</h2><span class="hint">Everything paid on top of the price · €88.698 in cash</span></div>
+    <div class="section-head anim"><h2>What it cost to buy</h2><span class="hint">Everything paid on top of the price · €88.028 in cash after the gestoría refund</span></div>
     <div class="card costs anim">
       <table>
-        <thead><tr><th>Item</th><th>Paid by</th><th class="r">Amount</th></tr></thead>
+        <thead><tr><th>Item</th><th class="r">Amount</th></tr></thead>
         <tbody id="costBody"></tbody>
       </table>
     </div>
@@ -815,7 +815,7 @@ body.locked .gate{display:flex}
         <div class="kpi brass-kpi"><div class="k">One‑off costs</div><div class="v" id="costOneoffTotal">—</div><div class="n">furniture &amp; setup so far</div></div>
         <div class="kpi"><div class="k">Recurring / month</div><div class="v" id="costRecurMonth">—</div><div class="n">community + insurance</div></div>
         <div class="kpi"><div class="k">Recurring / year</div><div class="v" id="costRecurYear">—</div><div class="n" id="costRecurCount">2 recurring costs</div></div>
-        <div class="kpi pos"><div class="k">First‑year all‑in</div><div class="v" id="costFirstYear">—</div><div class="n">setup + 1 yr running</div></div>
+        <div class="kpi pos"><div class="k">First‑year all‑in</div><div class="v" id="costFirstYear">—</div><div class="n">setup + recurring + utilities</div></div>
       </div>
 
       <div class="section-head with-action anim"><h2>One‑off costs</h2><button class="btn-add" id="addCostBtn">＋ Add cost</button></div>
@@ -836,8 +836,17 @@ body.locked .gate{display:flex}
         </table>
       </div>
 
+      <div class="section-head with-action anim"><h2>Utilities</h2><span class="hint" style="flex:1">Water · electricity · gas</span><button class="btn-add" id="editUtilBtn">✎ Set amounts</button></div>
+      <div class="card holdings anim">
+        <table class="wide">
+          <thead><tr><th>Utility</th><th class="r">Per month</th><th class="r">Per year</th></tr></thead>
+          <tbody id="utilBody"></tbody>
+          <tfoot><tr><td>Total utilities</td><td class="r" id="utilFootMonth" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="utilFootYear" style="font-family:var(--mono);font-weight:600">—</td></tr></tfoot>
+        </table>
+      </div>
+
       <p class="foot-note">
-        One‑off setup costs were read from your “Buy Furniture” sheet (total €2.379,87). Add repairs, upgrades and future purchases with ＋ Add cost; track running costs like community fees, IBI, home insurance or utilities under recurring.<br>
+        One‑off setup costs were read from your “Buy Furniture” sheet (total €2.379,87). Add repairs, upgrades and future purchases with ＋ Add cost; track community fees, IBI and insurance under recurring, and water/electricity/gas under Utilities.<br>
         This is a spending log to see what the flat really costs over time — it doesn't change your net worth.
       </p>
     </div><!-- /salva-sub-costs -->
@@ -1323,6 +1332,19 @@ body.locked .gate{display:flex}
   </div>
 </div>
 
+<div class="modal-overlay" id="utilModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Set utility costs">
+    <div class="modal-head"><h3>Utilities · per month</h3><button id="utilModalClose" aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <p class="hintline">Your typical monthly bill for each. The yearly figure is ×12.</p>
+      <div class="dz-row"><div><label for="utilWater">Water (€/mo)</label><input type="text" id="utilWater" class="fld" inputmode="decimal" placeholder="0"></div>
+      <div><label for="utilElec">Electricity (€/mo)</label><input type="text" id="utilElec" class="fld" inputmode="decimal" placeholder="0"></div></div>
+      <div class="dz-row" style="margin-top:8px"><div><label for="utilGas">Gas (€/mo)</label><input type="text" id="utilGas" class="fld" inputmode="decimal" placeholder="0"></div><div></div></div>
+      <div class="modal-actions"><button class="btn-primary" id="utilSave">Save</button></div>
+    </div>
+  </div>
+</div>
+
 <div class="friend-veil" id="friendVeil" hidden><div class="fv-card"><span class="fv-ic">🔒</span><span>Private section</span><small>Visible to the owner only</small></div></div>
 
 <!-- ===== PASSWORD GATE ===== -->
@@ -1336,7 +1358,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · friends-view</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · degiro-sync+utilities</span></p>
   </div>
 </div>
 
@@ -1710,14 +1732,18 @@ body.locked .gate{display:flex}
       const area=dP+' L'+x(yrs)+' '+yy(0)+' L'+x(0)+' '+yy(0)+' Z';const nowX=x(fullN/12),nowY=yy(ob);
       svg.innerHTML='<defs><linearGradient id="ag" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="'+V('--estate')+'" stop-opacity="0.32"/><stop offset="1" stop-color="'+V('--estate')+'" stop-opacity="0"/></linearGradient></defs><path d="'+area+'" fill="url(#ag)"/><path d="'+dP+'" fill="none" stroke="'+V('--estate')+'" stroke-width="2"/><line x1="'+nowX+'" y1="'+pad.t+'" x2="'+nowX+'" y2="'+(H-pad.b)+'" stroke="'+V('--brass')+'" stroke-width="1" stroke-dasharray="3 3"/><circle cx="'+nowX+'" cy="'+nowY+'" r="4" fill="'+V('--brass')+'"/><text x="'+(nowX+6)+'" y="'+(pad.t+12)+'" fill="'+V('--brass')+'" font-family="'+V('--mono')+'" font-size="10">now</text><text x="'+x(0)+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10">2026</text><text x="'+x(15)+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="middle">2041</text><text x="'+x(30)+'" y="'+(H-9)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10" text-anchor="end">2056</text><text x="'+x(0)+'" y="'+(pad.t+4)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="10">272k</text>';}
 
-    const costs=[{i:'Down payment (20%)',w:'',v:68000},{i:'ITP transfer tax',w:'Buyer',v:17000,tax:true},{i:'Notaría',w:'Buyer',v:1500},{i:'Registro (registry inscription)',w:'Buyer',v:900},{i:'Gestión',w:'Buyer',v:288},{i:'Lawyer (Clara)',w:'Lu',v:605},{i:'Appraisal',w:'Lu',v:405}];
-    const cb2=$('costBody');if(cb2){cb2.innerHTML='';costs.forEach(c=>{const trr=document.createElement('tr');if(c.tax)trr.className='tax';trr.innerHTML='<td class="lbl">'+c.i+'</td><td class="who">'+(c.w||'')+'</td><td class="r val">'+eur0(c.v)+'</td>';cb2.appendChild(trr);});const tt=document.createElement('tr');tt.className='tot';tt.innerHTML='<td>Total cash at purchase</td><td class="who">of which taxes 17.000 €</td><td class="r val">88.698 €</td>';cb2.appendChild(tt);}
+    const costs=[{i:'Down payment (20%)',v:68000},{i:'ITP transfer tax',v:17000,tax:true},{i:'Notaría',v:1500},{i:'Registro (registry inscription)',v:900},{i:'Gestión',v:288},{i:'Lawyer (Clara)',v:605},{i:'Appraisal',v:405},{i:'Gestoría refund',v:-670.55,refund:true}];
+    const cb2=$('costBody');if(cb2){cb2.innerHTML='';costs.forEach(c=>{const trr=document.createElement('tr');if(c.tax)trr.className='tax';
+      const amt=c.refund?'<span style="color:var(--grow)">−'+eur(Math.abs(c.v))+'</span>':eur0(c.v);
+      trr.innerHTML='<td class="lbl">'+c.i+'</td><td class="r val">'+amt+'</td>';cb2.appendChild(trr);});
+      const tt=document.createElement('tr');tt.className='tot';tt.innerHTML='<td>Total cash at purchase <span style="font-family:var(--body);font-weight:400;color:var(--muted);font-size:11px">· of which taxes 17.000 €</span></td><td class="r val">88.028 €</td>';cb2.appendChild(tt);}
   }
 
   /* ============ UPDATE MODAL + OCR ============ */
   const modal=$('modal'),mAccount=$('mAccount'),mValue=$('mValue'),mFile=$('mFile'),dropzone=$('dropzone'),thumb=$('thumb'),ocrStatus=$('ocrStatus'),cands=$('cands'),newFields=$('newAcctFields'),mNewName=$('mNewName'),mNewCat=$('mNewCat'),mEditFields=$('mEditFields'),mEditName=$('mEditName'),mEditCat=$('mEditCat'),mDeleteBtn=$('mDeleteBtn');
   function fillAccountSelect(){mAccount.innerHTML='';
-    state.accounts.filter(a=>!a.locked).forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' — '+eur0(a.value);mAccount.appendChild(o);});
+    /* Degiro is derived from the holdings editor, so it isn't manually editable here */
+    state.accounts.filter(a=>!a.locked&&a.id!=='degiro').forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' — '+eur0(a.value);mAccount.appendChild(o);});
     const o=document.createElement('option');o.value='__new';o.textContent='＋ New account…';mAccount.appendChild(o);
     [mNewCat,mEditCat].forEach(sel=>{if(sel&&!sel.childElementCount)order.forEach(c=>{const oo=document.createElement('option');oo.value=c;oo.textContent=c;sel.appendChild(oo);});});}
   function syncSelectValue(){const isNew=mAccount.value==='__new';newFields.hidden=!isNew;
@@ -1804,7 +1830,7 @@ body.locked .gate{display:flex}
     toast('Backup downloaded');});
   $('importBtn').addEventListener('click',()=>$('importFile').click());
   $('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
+    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});if(!state.utilities)state.utilities={water:0,electricity:0,gas:0};persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
 
   /* ============ COSTS & UPKEEP ============ */
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1816,11 +1842,18 @@ body.locked .gate{display:flex}
     const one=state.propertyCosts||[],rec=state.recurringCosts||[];
     const total=one.reduce((s,c)=>s+(+c.amount||0),0);
     const annual=rec.reduce((s,c)=>s+annualise(c),0);
+    const util=state.utilities||{water:0,electricity:0,gas:0};
+    const utilMonth=(+util.water||0)+(+util.electricity||0)+(+util.gas||0);
+    const utilYear=utilMonth*12;
+    const ub=$('utilBody');
+    if(ub){ub.innerHTML='';[['Water',+util.water||0],['Electricity',+util.electricity||0],['Gas',+util.gas||0]].forEach(u=>{
+      const tr=document.createElement('tr');tr.innerHTML='<td>'+u[0]+'</td><td class="r val">'+eur(u[1])+'</td><td class="r val">'+eur0(u[1]*12)+'</td>';ub.appendChild(tr);});}
+    set('utilFootMonth',eur(utilMonth));set('utilFootYear',eur0(utilYear));
     set('costOneoffTotal',eur0(total));set('costFootTotal',eur0(total));
     set('costRecurMonth',rec.length?eur0(annual/12):'0 €');
     set('costRecurYear',eur0(annual));
     set('costRecurCount',rec.length?(rec.length+' recurring cost'+(rec.length>1?'s':'')):'none yet');
-    set('costFirstYear',eur0(total+annual));
+    set('costFirstYear',eur0(total+annual+utilYear));
     set('recurFootTotal',eur0(annual));
     const cb=$('costBody2');
     if(cb){cb.innerHTML='';
@@ -1939,7 +1972,13 @@ body.locked .gate{display:flex}
         cost:normNum(r.querySelector('.dg-cost').value)||0});});
     const cash=normNum($('dgCash').value)||0;
     pushUndo();state.degiro=list;state.degiroCash=cash;
-    persist();renderDegiro();
+    /* holdings are the single source of truth: derive the Degiro account value
+       (securities + cash) so the KPI, Held-today row and net worth all agree */
+    const total=list.reduce((s,d)=>s+(+d.value||0),0)+cash;
+    const dgAcct=state.accounts.find(a=>a.id==='degiro');
+    if(dgAcct&&Math.round((dgAcct.value||0)*100)!==Math.round(total*100)){
+      dgAcct.value=total;dgAcct.updatedAt=Date.now();recordSnapshot('Degiro → '+eur0(total));}
+    persist();renderDynamic();
     toast('Degiro holdings saved',{fn:doUndo});degiroModal.hidden=true;}
   if($('degiroEditBtn')){
     $('degiroEditBtn').addEventListener('click',openDegiro);
@@ -1953,6 +1992,18 @@ body.locked .gate{display:flex}
     $('dgDrop').addEventListener('drop',e=>{e.preventDefault();$('dgDrop').classList.remove('drag');if(e.dataTransfer.files[0])dgHandleImage(e.dataTransfer.files[0]);});
     $('dgFile').addEventListener('change',()=>{if($('dgFile').files[0])dgHandleImage($('dgFile').files[0]);});
     $('dgSave').addEventListener('click',saveDegiro);
+  }
+
+  /* ---------- Utilities (water / electricity / gas) editor ---------- */
+  if($('editUtilBtn')){
+    const um=$('utilModal');const d2=n=>n?Number(n).toFixed(2).replace('.',','):'';
+    $('editUtilBtn').addEventListener('click',()=>{const u=state.utilities||{};
+      $('utilWater').value=d2(u.water);$('utilElec').value=d2(u.electricity);$('utilGas').value=d2(u.gas);um.hidden=false;});
+    $('utilModalClose').addEventListener('click',()=>um.hidden=true);
+    um.addEventListener('click',e=>{if(e.target===um)um.hidden=true;});
+    $('utilSave').addEventListener('click',()=>{pushUndo();
+      state.utilities={water:normNum($('utilWater').value)||0,electricity:normNum($('utilElec').value)||0,gas:normNum($('utilGas').value)||0};
+      persist();renderCosts();toast('Utilities saved',{fn:doUndo});um.hidden=true;});
   }
 
   /* Salva sub-tabs */
@@ -2256,6 +2307,11 @@ body.locked .gate{display:flex}
     if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);
     if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;
     state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});
+    if(!state.utilities)state.utilities={water:0,electricity:0,gas:0};
+    /* keep the Degiro account value in sync with the holdings (single source of truth) */
+    const _dg=state.accounts.find(a=>a.id==='degiro');
+    if(_dg){const _t=(state.degiro||[]).reduce((s,d)=>s+(+d.value||0),0)+(+state.degiroCash||0);
+      if(Math.round((_dg.value||0)*100)!==Math.round(_t*100))_dg.value=_t;}
     dedupeHistory();
     initStatic();
     renderDynamic();
