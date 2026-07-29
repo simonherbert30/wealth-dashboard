@@ -836,10 +836,10 @@ body.locked .gate{display:flex}
         </table>
       </div>
 
-      <div class="section-head with-action anim"><h2>Utilities</h2><span class="hint" style="flex:1">Water · electricity · gas</span><button class="btn-add" id="editUtilBtn">✎ Set amounts</button></div>
+      <div class="section-head with-action anim"><h2>Utilities</h2><span class="hint" style="flex:1">Water · electricity · gas · water meter</span><button class="btn-add" id="editUtilBtn">✎ Set amounts</button></div>
       <div class="card holdings anim">
         <table class="wide">
-          <thead><tr><th>Utility</th><th class="r">Per month</th><th class="r">Per year</th></tr></thead>
+          <thead><tr><th>Utility</th><th class="r">Bill</th><th class="r">Per year</th></tr></thead>
           <tbody id="utilBody"></tbody>
           <tfoot><tr><td>Total utilities</td><td class="r" id="utilFootMonth" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="utilFootYear" style="font-family:var(--mono);font-weight:600">—</td></tr></tfoot>
         </table>
@@ -1334,12 +1334,10 @@ body.locked .gate{display:flex}
 
 <div class="modal-overlay" id="utilModal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-label="Set utility costs">
-    <div class="modal-head"><h3>Utilities · per month</h3><button id="utilModalClose" aria-label="Close">✕</button></div>
+    <div class="modal-head"><h3>Utility costs</h3><button id="utilModalClose" aria-label="Close">✕</button></div>
     <div class="modal-body">
-      <p class="hintline">Your typical monthly bill for each. The yearly figure is ×12.</p>
-      <div class="dz-row"><div><label for="utilWater">Water (€/mo)</label><input type="text" id="utilWater" class="fld" inputmode="decimal" placeholder="0"></div>
-      <div><label for="utilElec">Electricity (€/mo)</label><input type="text" id="utilElec" class="fld" inputmode="decimal" placeholder="0"></div></div>
-      <div class="dz-row" style="margin-top:8px"><div><label for="utilGas">Gas (€/mo)</label><input type="text" id="utilGas" class="fld" inputmode="decimal" placeholder="0"></div><div></div></div>
+      <p class="hintline">Enter each bill and how often it's charged. The per-year figure is computed from the frequency.</p>
+      <div id="utilEditRows"></div>
       <div class="modal-actions"><button class="btn-primary" id="utilSave">Save</button></div>
     </div>
   </div>
@@ -1358,7 +1356,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · degiro-sync+utilities</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · utilities-freq</span></p>
   </div>
 </div>
 
@@ -1830,25 +1828,40 @@ body.locked .gate{display:flex}
     toast('Backup downloaded');});
   $('importBtn').addEventListener('click',()=>$('importFile').click());
   $('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});if(!state.utilities)state.utilities={water:0,electricity:0,gas:0};persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
+    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});migrateUtilities();persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
 
   /* ============ COSTS & UPKEEP ============ */
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function annualise(c){const a=+c.amount||0;return c.freq==='monthly'?a*12:c.freq==='quarterly'?a*4:a;}
   function freqLabel(f){return f==='monthly'?'Monthly':f==='quarterly'?'Quarterly':'Yearly';}
+  /* utilities: fixed rows with a per-item billing frequency; labels keep the bank/provider name */
+  const UTIL_KEYS=[['water','Water (Aigües)'],['electricity','Electricity (Endesa)'],['gas','Gas'],['waterMeter','Water meter (Smartconta)']];
+  const UTIL_FREQS=[['monthly','Monthly'],['bimonthly','Every 2 months'],['quarterly','Quarterly'],['yearly','Yearly']];
+  function utilAnnualOf(u){const a=+((u&&u.amount))||0,f=(u&&u.freq)||'monthly';return f==='yearly'?a:f==='quarterly'?a*4:f==='bimonthly'?a*6:a*12;}
+  function freqShort(f){return f==='yearly'?'/yr':f==='quarterly'?'/qtr':f==='bimonthly'?'/2mo':'/mo';}
+  /* one-time: move utilities to {key:{amount,freq}} form and seed the July 2026 bills from bank records */
+  function migrateUtilities(){if(state.utilV2)return;const o=state.utilities||{};
+    const num=v=>typeof v==='number'?v:(v&&+v.amount)||0,frq=(v,d)=>(v&&v.freq)||d;
+    state.utilities={
+      water:{amount:num(o.water)||205.95,freq:frq(o.water,'monthly')},
+      electricity:{amount:num(o.electricity)||130.79,freq:frq(o.electricity,'monthly')},
+      gas:{amount:num(o.gas)||0,freq:frq(o.gas,'monthly')},
+      waterMeter:{amount:num(o.waterMeter)||21.97,freq:'yearly'}};
+    state.utilV2=true;}
   function delCost(id){state.propertyCosts=state.propertyCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Cost removed');}
   function delRecur(id){state.recurringCosts=state.recurringCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Recurring cost removed');}
   function renderCosts(){
     const one=state.propertyCosts||[],rec=state.recurringCosts||[];
     const total=one.reduce((s,c)=>s+(+c.amount||0),0);
     const annual=rec.reduce((s,c)=>s+annualise(c),0);
-    const util=state.utilities||{water:0,electricity:0,gas:0};
-    const utilMonth=(+util.water||0)+(+util.electricity||0)+(+util.gas||0);
-    const utilYear=utilMonth*12;
+    const util=state.utilities||{};
+    let utilYear=0;
     const ub=$('utilBody');
-    if(ub){ub.innerHTML='';[['Water',+util.water||0],['Electricity',+util.electricity||0],['Gas',+util.gas||0]].forEach(u=>{
-      const tr=document.createElement('tr');tr.innerHTML='<td>'+u[0]+'</td><td class="r val">'+eur(u[1])+'</td><td class="r val">'+eur0(u[1]*12)+'</td>';ub.appendChild(tr);});}
-    set('utilFootMonth',eur(utilMonth));set('utilFootYear',eur0(utilYear));
+    if(ub){ub.innerHTML='';UTIL_KEYS.forEach(([k,label])=>{const u=util[k]||{amount:0,freq:'monthly'};const y=utilAnnualOf(u);utilYear+=y;
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td>'+label+'</td><td class="r val" style="color:var(--muted)">'+eur(+u.amount||0)+' <span style="font-size:10px;color:var(--muted-2)">'+freqShort(u.freq)+'</span></td><td class="r val">'+eur0(y)+'</td>';
+      ub.appendChild(tr);});}
+    set('utilFootMonth','≈ '+eur(utilYear/12));set('utilFootYear',eur0(utilYear));
     set('costOneoffTotal',eur0(total));set('costFootTotal',eur0(total));
     set('costRecurMonth',rec.length?eur0(annual/12):'0 €');
     set('costRecurYear',eur0(annual));
@@ -1994,16 +2007,24 @@ body.locked .gate{display:flex}
     $('dgSave').addEventListener('click',saveDegiro);
   }
 
-  /* ---------- Utilities (water / electricity / gas) editor ---------- */
+  /* ---------- Utilities editor (per-item amount + frequency) ---------- */
   if($('editUtilBtn')){
     const um=$('utilModal');const d2=n=>n?Number(n).toFixed(2).replace('.',','):'';
-    $('editUtilBtn').addEventListener('click',()=>{const u=state.utilities||{};
-      $('utilWater').value=d2(u.water);$('utilElec').value=d2(u.electricity);$('utilGas').value=d2(u.gas);um.hidden=false;});
+    $('editUtilBtn').addEventListener('click',()=>{const rows=$('utilEditRows');rows.innerHTML='';
+      UTIL_KEYS.forEach(([k,label])=>{const u=(state.utilities||{})[k]||{amount:0,freq:'monthly'};
+        const w=document.createElement('div');w.className='util-erow';w.style.cssText='margin-bottom:10px';
+        w.innerHTML='<label style="display:block;margin-bottom:4px">'+label+'</label>'+
+          '<div class="dz-row"><div><input class="fld u-amt" data-key="'+k+'" inputmode="decimal" placeholder="0"></div>'+
+          '<div><select class="fld u-freq">'+UTIL_FREQS.map(f=>'<option value="'+f[0]+'">'+f[1]+'</option>').join('')+'</select></div></div>';
+        w.querySelector('.u-amt').value=d2(u.amount);w.querySelector('.u-freq').value=u.freq||'monthly';
+        rows.appendChild(w);});
+      um.hidden=false;});
     $('utilModalClose').addEventListener('click',()=>um.hidden=true);
     um.addEventListener('click',e=>{if(e.target===um)um.hidden=true;});
-    $('utilSave').addEventListener('click',()=>{pushUndo();
-      state.utilities={water:normNum($('utilWater').value)||0,electricity:normNum($('utilElec').value)||0,gas:normNum($('utilGas').value)||0};
-      persist();renderCosts();toast('Utilities saved',{fn:doUndo});um.hidden=true;});
+    $('utilSave').addEventListener('click',()=>{pushUndo();const out={};
+      $('utilEditRows').querySelectorAll('.util-erow').forEach(r=>{const k=r.querySelector('.u-amt').dataset.key;
+        out[k]={amount:normNum(r.querySelector('.u-amt').value)||0,freq:r.querySelector('.u-freq').value};});
+      state.utilities=out;persist();renderCosts();toast('Utilities saved',{fn:doUndo});um.hidden=true;});
   }
 
   /* Salva sub-tabs */
@@ -2307,7 +2328,7 @@ body.locked .gate{display:flex}
     if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);
     if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;
     state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});
-    if(!state.utilities)state.utilities={water:0,electricity:0,gas:0};
+    migrateUtilities();
     /* keep the Degiro account value in sync with the holdings (single source of truth) */
     const _dg=state.accounts.find(a=>a.id==='degiro');
     if(_dg){const _t=(state.degiro||[]).reduce((s,d)=>s+(+d.value||0),0)+(+state.degiroCash||0);
