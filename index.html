@@ -373,6 +373,17 @@ body{margin:0;background:
 /* live parsed-value preview in the Degiro editor */
 .dgprev{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:3px;min-height:13px;letter-spacing:.2px}
 .dgprev.big{color:var(--alert)}
+/* friend (read-only, restricted) mode */
+body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur]{display:none!important}
+.tab.tab-locked .tl::after{content:" 🔒";font-size:10px;opacity:.7}
+.tab.tab-locked{opacity:.5}
+.panel.blurred{filter:blur(9px);pointer-events:none;user-select:none;transition:filter .2s}
+.friend-veil{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:60;pointer-events:none}
+.friend-veil .fv-card{background:var(--ink-2);border:1px solid var(--line-strong);border-radius:16px;padding:26px 34px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;gap:6px}
+.friend-veil .fv-card .fv-ic{font-size:30px}
+.friend-veil .fv-card span{font-family:var(--body);font-weight:600;font-size:15px;color:var(--text)}
+.friend-veil .fv-card small{font-family:var(--mono);font-size:11px;letter-spacing:.4px;color:var(--muted-2)}
+.friend-badge{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--brass);border:1px solid rgba(201,169,106,.4);border-radius:5px;padding:3px 8px}
 
 /* Salva sub-tabs */
 .subtabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--line)}
@@ -1311,17 +1322,20 @@ body.locked .gate{display:flex}
   </div>
 </div>
 
+<div class="friend-veil" id="friendVeil" hidden><div class="fv-card"><span class="fv-ic">🔒</span><span>Private section</span><small>Visible to the owner only</small></div></div>
+
 <!-- ===== PASSWORD GATE ===== -->
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Unlock dashboard">
   <div class="gate-card">
     <div class="gate-logo"><span class="dot"></span> Wealth Dashboard</div>
     <h2 id="gateTitle">Unlock</h2>
     <p class="gate-sub" id="gateSub">Enter your password to decrypt your data.</p>
+    <input type="text" id="gateUser" placeholder="Username (friends only — leave blank if it's your dashboard)" autocomplete="username">
     <input type="password" id="gatePass" placeholder="Password" autocomplete="current-password">
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · dg-derived-pl</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · friends-view</span></p>
   </div>
 </div>
 
@@ -1393,6 +1407,12 @@ body.locked .gate{display:flex}
   const LS='wealthDash_v1';        /* legacy plaintext (migrated, then removed) */
   const LS2='wealthDash_v2enc';    /* encrypted envelope */
   let state=null, pass=null;
+  /* read-only guest access: friends log in with this fixed credential and see
+     only the Investments + Salva tabs. Their copy is a mirror the owner
+     publishes, encrypted under FRIEND_PW at a friend-specific sync path. */
+  const FRIEND_PW='olisimijar';
+  const FRIEND_ALLOWED=['inv','salva'];
+  let friendMode=false, friendSyncKey=null, friendPushTimer=null;
   const SYNC={enabled:(location.protocol==='http:'||location.protocol==='https:'),key:null,warned:false};
   const seedCosts=[];      /* personal data no longer ships in code */
   const seedRecurring=[];
@@ -1443,9 +1463,21 @@ body.locked .gate{display:flex}
   setInterval(()=>{if(syncStatus==='synced')renderSync();},30000);
 
   function syncMort(){const m=state.accounts.find(a=>a.id==='mortgage');if(m)m.value=simonMort;}
-  function persist(){if(!state)return;state.updatedAt=Date.now();
+  function persist(){if(!state)return;
+    if(friendMode)return; /* guests are read-only — never write or push */
+    state.updatedAt=Date.now();
     if(!pass)return; /* no password session — nothing is written in plaintext */
-    encState(pass,state).then(pkg=>{try{localStorage.setItem(LS2,JSON.stringify(pkg));}catch(e){}schedulePush(pkg);}).catch(()=>{});}
+    encState(pass,state).then(pkg=>{try{localStorage.setItem(LS2,JSON.stringify(pkg));}catch(e){}schedulePush(pkg);}).catch(()=>{});
+    publishFriendMirror();}
+  /* owner publishes a friend-readable mirror (encrypted under FRIEND_PW) so guests can load it */
+  function publishFriendMirror(){if(!SYNC.enabled||friendMode||!state)return;
+    clearTimeout(friendPushTimer);
+    friendPushTimer=setTimeout(async()=>{
+      try{if(!friendSyncKey)friendSyncKey=await kdfHex(FRIEND_PW);
+        const pkg=await encState(FRIEND_PW,state);
+        await fetch('/api/state?k='+friendSyncKey,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(pkg)});
+      }catch(e){}
+    },1500);}
   function snapEntry(note){const t=totalsOf(state.accounts);return {ts:Date.now(),net:t.net,gross:t.gross,cats:clone(t.cats),liab:t.liab,note};}
   function sameDay(a,b){return new Date(a).toDateString()===new Date(b).toDateString();}
   function recordSnapshot(note){const entry=snapEntry(note);const h=state.history,last=h[h.length-1];
@@ -1471,8 +1503,21 @@ body.locked .gate{display:flex}
     t.classList.add('active');t.setAttribute('aria-selected','true');
     Object.values(panels).forEach(p=>p&&p.classList.remove('active'));
     const p=panels[t.dataset.tab];if(p)p.classList.add('active');
+    if(friendMode)updateFriendVeil(t.dataset.tab);
     window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
   }));
+  function updateFriendVeil(tab){const veil=$('friendVeil');
+    Object.values(panels).forEach(p=>p&&p.classList.remove('blurred'));
+    const allowed=FRIEND_ALLOWED.includes(tab);
+    if(!allowed){const p=panels[tab];if(p)p.classList.add('blurred');}
+    if(veil)veil.hidden=allowed;}
+  function applyFriendRestrictions(){
+    document.body.classList.add('friend');
+    tabs.forEach(t=>t.classList.toggle('tab-locked',!FRIEND_ALLOWED.includes(t.dataset.tab)));
+    const lb=$('lockBtn');if(lb){lb.textContent='Log out';lb.title='Log out';}
+    const sub=$('brandSub')||document.querySelector('.brandmark .sub');if(sub)sub.textContent='Shared view · Investments & Salva 40';
+    const st=$('syncTxt');if(st)st.textContent='Shared · read-only';const sd=$('syncDot');if(sd)sd.style.background='var(--brass)';
+    const invTab=tabs.find(t=>t.dataset.tab==='inv');if(invTab)invTab.click();else updateFriendVeil('net');}
 
   /* ---------- date helpers ---------- */
   function fmtDate(ts){return new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
@@ -1619,7 +1664,7 @@ body.locked .gate{display:flex}
   /* ============ STATIC RENDER (once) ============ */
   function initStatic(){
     const _now=new Date(),_moIdx={Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-    const _done=mo=>_now.getFullYear()>2026||(_now.getFullYear()===2026&&_now.getMonth()>_moIdx[mo]);
+    const _done=mo=>_now.getFullYear()>2026||(_now.getFullYear()===2026&&_now.getMonth()>=_moIdx[mo]);/* deployments land on the 1st, so a month counts as done once we're in it */
     const sched=[{mo:'Jun',amt:30000},{mo:'Jul',amt:15000},{mo:'Aug',amt:15000},{mo:'Sep',amt:15000},{mo:'Oct',amt:15000},{mo:'Nov',amt:15000},{mo:'Dec',amt:15000,div:true}].map(s=>({...s,done:_done(s.mo)}));
     const rungs=$('rungs');let cum=0;
     if(rungs)sched.forEach(s=>{cum+=s.amt;const d=document.createElement('div');d.className='rung'+(s.done?' now':'');
@@ -2218,19 +2263,36 @@ body.locked .gate{display:flex}
   }
 
   /* ---------- password gate ---------- */
-  const gate=$('gate'),gatePass=$('gatePass'),gatePass2=$('gatePass2'),gateGo=$('gateGo'),gateErr=$('gateErr'),gateSub=$('gateSub');
+  const gate=$('gate'),gatePass=$('gatePass'),gatePass2=$('gatePass2'),gateGo=$('gateGo'),gateErr=$('gateErr'),gateSub=$('gateSub'),gateUser=$('gateUser');
   function gateError(msg){if(gateErr)gateErr.textContent=msg;if(gateGo){gateGo.disabled=false;gateGo.textContent='Unlock';}}
   (function initGate(){
     let hasV2=false;try{hasV2=!!localStorage.getItem(LS2);}catch(e){}
     if(!hasV2&&gatePass2){gatePass2.hidden=false;
       if(gateSub)gateSub.textContent='First time on this device: choose a password (or enter your existing one twice to pull your synced data).';}
   })();
+  async function unlockFriend(){
+    if(!SYNC.enabled){gateError('Friend access only works on the online dashboard.');return;}
+    try{
+      friendSyncKey=await kdfHex(FRIEND_PW);
+      const r=await fetch('/api/state?k='+friendSyncKey,{cache:'no-store'});
+      if(r.status===404){gateError('No shared data yet — ask the owner to open their dashboard once, then try again.');return;}
+      if(!r.ok){gateError('Could not load the shared data. Try again in a moment.');return;}
+      const pkg=await r.json();
+      const st=await decState(FRIEND_PW,pkg);
+      friendMode=true;pass=null;SYNC.key=null;state=st;
+      boot();
+      applyFriendRestrictions();
+      document.body.classList.remove('locked');
+      if(gatePass)gatePass.value='';if(gateUser)gateUser.value='';
+    }catch(e){gateError('Wrong friend credentials.');}}
   async function unlock(){
     const p=(gatePass&&gatePass.value)||'';
+    const u=((gateUser&&gateUser.value)||'').trim().toLowerCase();
     if(!p){gateError('Enter a password');return;}
     if(!(window.crypto&&crypto.subtle)){gateError('This browser blocks encryption on this page (needs https or a local file).');return;}
     if(gateGo){gateGo.disabled=true;gateGo.textContent='Unlocking…';}
     if(gateErr)gateErr.textContent='';
+    if(u===FRIEND_PW&&p===FRIEND_PW){await unlockFriend();if(gateGo){gateGo.disabled=false;gateGo.textContent='Unlock';}return;}
     try{
       if(SYNC.enabled){try{SYNC.key=await kdfHex(p);}catch(e){SYNC.key=null;}}
       let localPkg=null;try{const raw=localStorage.getItem(LS2);if(raw)localPkg=JSON.parse(raw);}catch(e){}
@@ -2261,6 +2323,8 @@ body.locked .gate{display:flex}
   }
   if(gateGo)gateGo.addEventListener('click',unlock);
   if(gatePass)gatePass.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+  if(gateUser)gateUser.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+  if(gateUser)gateUser.addEventListener('input',()=>{if(gatePass2&&gateUser.value.trim())gatePass2.hidden=true;});
   if(gatePass2)gatePass2.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
   const lockBtn=$('lockBtn');
   if(lockBtn)lockBtn.addEventListener('click',()=>{pass=null;state=null;location.reload();});
