@@ -1268,6 +1268,7 @@ body.locked .gate{display:flex}
 
       <label for="mValue">New total (€)</label>
       <input type="text" id="mValue" inputmode="decimal" placeholder="e.g. 342,78">
+      <div class="dgprev" id="mValuePrev"></div>
 
       <div class="modal-actions"><button class="btn-primary" id="mCommit">Update &amp; take snapshot</button></div>
       <p class="hintline">The screenshot is read on your device to suggest the number — always glance at it and correct if needed before saving. Each save recalculates your net worth and logs a point on the Wealth tab.</p>
@@ -1356,7 +1357,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · utilities-simple</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · parse-fix+update-preview</span></p>
   </div>
 </div>
 
@@ -1747,12 +1748,13 @@ body.locked .gate{display:flex}
   function syncSelectValue(){const isNew=mAccount.value==='__new';newFields.hidden=!isNew;
     if(mEditFields){mEditFields.hidden=isNew;mEditFields.open=false;}
     if(!isNew){const a=state.accounts.find(x=>x.id===mAccount.value);if(a){mValue.placeholder='current: '+eur0(a.value);if(mEditName)mEditName.value=a.name;if(mEditCat)mEditCat.value=a.cat;}}}
-  function openModal(){fillAccountSelect();mValue.value='';cands.innerHTML='';ocrStatus.textContent='';thumb.hidden=true;newFields.hidden=true;modal.hidden=false;syncSelectValue();}
+  function openModal(){fillAccountSelect();mValue.value='';cands.innerHTML='';ocrStatus.textContent='';thumb.hidden=true;newFields.hidden=true;modal.hidden=false;syncSelectValue();mValue.dispatchEvent(new Event('input'));}
   function closeModal(){modal.hidden=true;}
   $('updateBtn').addEventListener('click',openModal);
   $('modalClose').addEventListener('click',closeModal);
   modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
   mAccount.addEventListener('change',syncSelectValue);
+  dgWirePreview(mValue,$('mValuePrev'),false);   /* live "= X €" so a mis-typed amount is caught before saving */
   dropzone.addEventListener('click',()=>mFile.click());
   dropzone.addEventListener('dragover',e=>{e.preventDefault();dropzone.classList.add('drag');});
   dropzone.addEventListener('dragleave',()=>dropzone.classList.remove('drag'));
@@ -1762,7 +1764,7 @@ body.locked .gate{display:flex}
   function normNum(raw){raw=(raw||'').replace(/[^\d.,]/g,'');if(!raw)return null;
     const hasC=raw.includes(','),hasD=raw.includes('.');
     if(hasC&&hasD){if(raw.lastIndexOf(',')>raw.lastIndexOf('.'))raw=raw.replace(/\./g,'').replace(',','.');else raw=raw.replace(/,/g,'');}
-    else if(hasC){const dec=raw.split(',').pop();raw=(dec.length===2)?raw.replace(/\./g,'').replace(',','.'):raw.replace(/,/g,'');}
+    else if(hasC){const dec=raw.split(',').pop();raw=(dec.length<=2)?raw.replace(/\./g,'').replace(',','.'):raw.replace(/,/g,'');}
     else if(hasD){const dec=raw.split('.').pop();if(dec.length===3)raw=raw.replace(/\./g,'');}
     const n=parseFloat(raw);return isNaN(n)?null:n;}
   function parseNumbers(text){const out=[];const re=/(\d[\d.,\s]{1,15}\d|\d)/g;let m;
@@ -1780,8 +1782,8 @@ body.locked .gate{display:flex}
       const res=await Tesseract.recognize(file,'eng');
       const nums=parseNumbers((res&&res.data&&res.data.text)||'');
       if(nums.length){ocrStatus.textContent='Tap the right amount, or type it below:';
-        nums.forEach(n=>{const b=document.createElement('button');b.type='button';b.className='cand';b.textContent=eur(n);b.addEventListener('click',()=>{mValue.value=n.toString().replace('.',',');});cands.appendChild(b);});
-        mValue.value=nums[0].toString().replace('.',',');
+        nums.forEach(n=>{const b=document.createElement('button');b.type='button';b.className='cand';b.textContent=eur(n);b.addEventListener('click',()=>{mValue.value=n.toString().replace('.',',');mValue.dispatchEvent(new Event('input'));});cands.appendChild(b);});
+        mValue.value=nums[0].toString().replace('.',',');mValue.dispatchEvent(new Event('input'));
       }else{ocrStatus.textContent='Couldn’t read a number confidently — please type it below.';}
     }catch(err){ocrStatus.textContent='On‑device reading unavailable here — just type the amount below.';}
   }
