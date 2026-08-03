@@ -1357,7 +1357,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · parse-fix+update-preview</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · utils-as-billed</span></p>
   </div>
 </div>
 
@@ -1856,12 +1856,12 @@ body.locked .gate{display:flex}
       tr.innerHTML='<td>'+label+'</td><td class="r val">'+eur(a)+'</td>';
       ub.appendChild(tr);});}
     set('utilFootTotal',eur(utilSum));
-    const utilYear=utilSum*12;
     set('costOneoffTotal',eur0(total));set('costFootTotal',eur0(total));
     set('costRecurMonth',rec.length?eur0(annual/12):'0 €');
     set('costRecurYear',eur0(annual));
     set('costRecurCount',rec.length?(rec.length+' recurring cost'+(rec.length>1?'s':'')):'none yet');
-    set('costFirstYear',eur0(total+annual+utilYear));
+    /* utilities count as the actual bills received (raw sum, not annualised) */
+    set('costFirstYear',eur0(total+annual+utilSum));
     set('recurFootTotal',eur0(annual));
     const cb=$('costBody2');
     if(cb){cb.innerHTML='';
