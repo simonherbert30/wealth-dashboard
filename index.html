@@ -1357,7 +1357,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · utils-as-billed</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · movers-trim</span></p>
   </div>
 </div>
 
@@ -1633,8 +1633,7 @@ body.locked .gate{display:flex}
 
     const mb=$('moversBody');
     if(mb){mb.innerHTML='';
-      const rows=[];order.forEach(c=>rows.push({n:c,delta:(t.cats[c]||0)-(first.cats[c]||0)}));
-      rows.push({n:'Mortgage paydown',delta:(first.liab||0)-(t.liab||0)});
+      const rows=[];order.filter(c=>c!=='Real estate').forEach(c=>rows.push({n:c,delta:(t.cats[c]||0)-(first.cats[c]||0)}));
       const maxAbs=Math.max(1,...rows.map(r=>Math.abs(r.delta)));
       rows.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
       rows.forEach(r=>{const up=r.delta>=0,w=Math.abs(r.delta)/maxAbs*100,dir=up?'up':'down';
