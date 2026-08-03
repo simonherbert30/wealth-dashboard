@@ -1357,7 +1357,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · movers-trim</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · mortgage-auto</span></p>
   </div>
 </div>
 
@@ -1377,11 +1377,15 @@ body.locked .gate{display:flex}
 
   /* ---------- mortgage: single source of truth ---------- */
   const M={init:272000,term:360,pay:1041.74,rate:0.0018872};
-  const payLog=[
-    {d:'7 May 2026',a:157.37,stub:true},
-    {d:'1 Jun 2026',a:1041.74},
-    {d:'1 Jul 2026',a:1041.74},
-  ];
+  /* Payments auto-accrue: an interest-only stub on 7 May 2026, then one full
+     payment on the 1st of every month from Jun 2026 up to the current month.
+     So the outstanding balance decreases on its own each 1st — no manual edit. */
+  const payLog=[{d:'7 May 2026',a:157.37,stub:true}];
+  (function(){const start=new Date(2026,5,1);const now=new Date();
+    let n=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth())+1;
+    n=Math.max(0,Math.min(M.term,n));
+    for(let i=0;i<n;i++){const d=new Date(2026,5+i,1);
+      payLog.push({d:d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),a:M.pay});}})();
   let obFull=M.init,totalPaid=0,fullN=0,intPaid=0;
   payLog.forEach(p=>{totalPaid+=p.a;if(p.stub){intPaid+=p.a;}else{const i=obFull*M.rate;intPaid+=i;obFull-=(p.a-i);fullN++;}});
   const simonMort=obFull/2, propValue=170000;
