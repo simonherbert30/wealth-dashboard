@@ -495,7 +495,7 @@ body.locked .gate{display:flex}
     <div class="kpis k5 anim" style="animation-delay:.05s">
       <div class="kpi"><div class="k">Equity + savings + cash</div><div class="v" id="kpiFinAssets">—</div><div class="n">financial assets</div></div>
       <div class="kpi"><div class="k">Invested equity</div><div class="v" id="kpiInvested">—</div><div class="n">VWCE + Degiro</div></div>
-      <div class="kpi pos"><div class="k">Property equity</div><div class="v" id="kpiPropEq">—</div><div class="n">170k − 135,5k mortgage</div></div>
+      <div class="kpi pos"><div class="k">Property equity</div><div class="v" id="kpiPropEq">—</div><div class="n" id="kpiPropSub">—</div></div>
       <div class="kpi"><div class="k">Receivables</div><div class="v" id="kpiRecv">—</div><div class="n">Owed back to you</div></div>
       <div class="kpi debt-kpi"><div class="k">Mortgage</div><div class="v" id="kpiMort">—</div><div class="n">Your 50% · Caixa</div></div>
     </div>
@@ -1357,7 +1357,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · mortgage-auto</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · propsub-dynamic</span></p>
   </div>
 </div>
 
@@ -1571,6 +1571,7 @@ body.locked .gate{display:flex}
     set('kpiFinAssets',eur0((t.cats['Equity']||0)+(t.cats['Savings']||0)+(t.cats['Cash']||0)));
     set('kpiInvested',eur0(t.cats['Equity']||0));
     set('kpiPropEq',eur0((t.cats['Real estate']||0)-simonMort));
+    set('kpiPropSub',Math.round((t.cats['Real estate']||0)/1000)+'k − '+(simonMort/1000).toFixed(1).replace('.',',')+'k mortgage');
     set('kpiRecv',eur0(t.cats['Receivables']||0));
     set('kpiMort',eur0(t.liab));
     set('ledgerNet',eur(t.net));
