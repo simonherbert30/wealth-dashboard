@@ -374,7 +374,7 @@ body{margin:0;background:
 .dgprev{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:3px;min-height:13px;letter-spacing:.2px}
 .dgprev.big{color:var(--alert)}
 /* friend (read-only, restricted) mode */
-body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend #editUtilBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur]{display:none!important}
+body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend #addUtilBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur],body.friend [data-del-util]{display:none!important}
 .tab.tab-locked .tl::after{content:" 🔒";font-size:10px;opacity:.7}
 .tab.tab-locked{opacity:.5}
 .panel.blurred{filter:blur(9px);pointer-events:none;user-select:none;transition:filter .2s}
@@ -836,12 +836,12 @@ body.locked .gate{display:flex}
         </table>
       </div>
 
-      <div class="section-head with-action anim"><h2>Utilities</h2><span class="hint" style="flex:1">Water · electricity · gas</span><button class="btn-add" id="editUtilBtn">✎ Set amounts</button></div>
+      <div class="section-head with-action anim"><h2>Utilities</h2><button class="btn-add" id="addUtilBtn">＋ Add bill</button></div>
       <div class="card holdings anim">
         <table class="wide">
-          <thead><tr><th>Utility</th><th class="r">Bill</th></tr></thead>
+          <thead><tr><th>When</th><th>Utility</th><th class="r">Amount</th><th></th></tr></thead>
           <tbody id="utilBody"></tbody>
-          <tfoot><tr><td>Total utilities</td><td class="r" id="utilFootTotal" style="font-family:var(--mono);font-weight:600">—</td></tr></tfoot>
+          <tfoot><tr><td colspan="2">Total utilities</td><td class="r" id="utilFootTotal" style="font-family:var(--mono);font-weight:600">—</td><td></td></tr></tfoot>
         </table>
       </div>
 
@@ -1334,12 +1334,17 @@ body.locked .gate{display:flex}
 </div>
 
 <div class="modal-overlay" id="utilModal" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-label="Set utility costs">
-    <div class="modal-head"><h3>Utility costs</h3><button id="utilModalClose" aria-label="Close">✕</button></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Add a utility bill">
+    <div class="modal-head"><h3>Add a utility bill</h3><button id="utilModalClose" aria-label="Close">✕</button></div>
     <div class="modal-body">
-      <p class="hintline">Your typical monthly bill for each utility.</p>
-      <div id="utilEditRows"></div>
-      <div class="modal-actions"><button class="btn-primary" id="utilSave">Save</button></div>
+      <div class="dz-row">
+        <div><label for="uType">Utility</label><select id="uType" class="fld"><option value="water">Water (Aigües)</option><option value="electricity">Electricity (Endesa)</option><option value="gas">Gas</option></select></div>
+        <div><label for="uWhen">When</label><input type="text" id="uWhen" class="fld" style="font-family:var(--body)" placeholder="e.g. Aug 2026"></div>
+      </div>
+      <label for="uAmount">Amount (€)</label>
+      <input type="text" id="uAmount" class="fld" inputmode="decimal" placeholder="e.g. 130,79">
+      <div class="dgprev" id="uAmountPrev"></div>
+      <div class="modal-actions"><button class="btn-primary" id="utilCommit">Add bill</button></div>
     </div>
   </div>
 </div>
@@ -1357,7 +1362,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · propsub-dynamic</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · utilities-log</span></p>
   </div>
 </div>
 
@@ -1840,25 +1845,35 @@ body.locked .gate{display:flex}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function annualise(c){const a=+c.amount||0;return c.freq==='monthly'?a*12:c.freq==='quarterly'?a*4:a;}
   function freqLabel(f){return f==='monthly'?'Monthly':f==='quarterly'?'Quarterly':'Yearly';}
-  /* utilities: plain monthly amounts; labels keep the bank/provider name */
-  const UTIL_KEYS=[['water','Water (Aigües)'],['electricity','Electricity (Endesa)'],['gas','Gas']];
-  /* normalise to plain numbers; seed the bank-record bills once (guarded by utilV3) */
-  function migrateUtilities(){const o=state.utilities||{};const num=v=>typeof v==='number'?v:(v&&+v.amount)||0;
-    if(state.utilV3){state.utilities={water:num(o.water),electricity:num(o.electricity),gas:num(o.gas)};return;}
-    state.utilities={water:num(o.water)||205.95,electricity:num(o.electricity)||130.79,gas:num(o.gas)||0};state.utilV3=true;}
+  /* utilities: a dated log of bills, like one-off costs — [{id,type,when,amount}] */
+  const UT_LABEL={water:'Water (Aigües)',electricity:'Electricity (Endesa)',gas:'Gas'};
+  /* one-time: convert the old {water,electricity,gas} amounts into dated log entries */
+  function migrateUtilities(){if(Array.isArray(state.utilities))return;
+    const o=state.utilities||{},num=v=>typeof v==='number'?v:(v&&+v.amount)||0,arr=[];
+    const w=num(o.water),e=num(o.electricity),g=num(o.gas);
+    if(w)arr.push({id:'util_w',type:'water',when:'16 Jul 2026',amount:w});
+    if(e)arr.push({id:'util_e',type:'electricity',when:'22 Jul 2026',amount:e});
+    if(g)arr.push({id:'util_g',type:'gas',when:'Jul 2026',amount:g});
+    state.utilities=arr;}
+  function delUtil(id){state.utilities=(state.utilities||[]).filter(u=>u.id!==id);persist();renderCosts();toast('Utility bill removed');}
   function delCost(id){state.propertyCosts=state.propertyCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Cost removed');}
   function delRecur(id){state.recurringCosts=state.recurringCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Recurring cost removed');}
   function renderCosts(){
     const one=state.propertyCosts||[],rec=state.recurringCosts||[];
     const total=one.reduce((s,c)=>s+(+c.amount||0),0);
     const annual=rec.reduce((s,c)=>s+annualise(c),0);
-    const util=state.utilities||{};
+    const utils=Array.isArray(state.utilities)?state.utilities:[];
     let utilSum=0;
     const ub=$('utilBody');
-    if(ub){ub.innerHTML='';UTIL_KEYS.forEach(([k,label])=>{const a=+util[k]||0;utilSum+=a;
-      const tr=document.createElement('tr');
-      tr.innerHTML='<td>'+label+'</td><td class="r val">'+eur(a)+'</td>';
-      ub.appendChild(tr);});}
+    if(ub){ub.innerHTML='';
+      utils.forEach(u=>{utilSum+=(+u.amount||0);const tr=document.createElement('tr');
+        const when=u.when?'<span class="when-tag">'+esc(u.when)+'</span>':'<span class="when-tag">—</span>';
+        tr.innerHTML='<td>'+when+'</td><td style="font-weight:500">'+esc(UT_LABEL[u.type]||u.type||'')+'</td>'+
+          '<td class="r val">'+eur(+u.amount||0)+'</td>'+
+          '<td class="r"><button class="cost-row-del" data-del-util="'+u.id+'" title="Remove">✕</button></td>';
+        ub.appendChild(tr);});
+      if(!utils.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="4"><div class="cost-empty">No utility bills yet — use ＋ Add bill.</div></td>';ub.appendChild(tr);}
+      ub.querySelectorAll('[data-del-util]').forEach(b=>b.addEventListener('click',()=>delUtil(b.getAttribute('data-del-util'))));}
     set('utilFootTotal',eur(utilSum));
     set('costOneoffTotal',eur0(total));set('costFootTotal',eur0(total));
     set('costRecurMonth',rec.length?eur0(annual/12):'0 €');
@@ -2006,23 +2021,18 @@ body.locked .gate{display:flex}
     $('dgSave').addEventListener('click',saveDegiro);
   }
 
-  /* ---------- Utilities editor (per-item amount + frequency) ---------- */
-  if($('editUtilBtn')){
-    const um=$('utilModal');const d2=n=>n?Number(n).toFixed(2).replace('.',','):'';
-    $('editUtilBtn').addEventListener('click',()=>{const rows=$('utilEditRows');rows.innerHTML='';
-      UTIL_KEYS.forEach(([k,label])=>{const a=+((state.utilities||{})[k])||0;
-        const w=document.createElement('div');w.className='util-erow';w.style.cssText='margin-bottom:10px';
-        w.innerHTML='<label style="display:block;margin-bottom:4px">'+label+' (€/mo)</label>'+
-          '<input class="fld u-amt" data-key="'+k+'" inputmode="decimal" placeholder="0">';
-        w.querySelector('.u-amt').value=d2(a);
-        rows.appendChild(w);});
-      um.hidden=false;});
+  /* ---------- Utilities: add a dated bill (like one-off costs) ---------- */
+  if($('addUtilBtn')){
+    const um=$('utilModal');
+    $('addUtilBtn').addEventListener('click',()=>{$('uType').selectedIndex=0;$('uWhen').value='';$('uAmount').value='';um.hidden=false;$('uAmount').dispatchEvent(new Event('input'));});
     $('utilModalClose').addEventListener('click',()=>um.hidden=true);
     um.addEventListener('click',e=>{if(e.target===um)um.hidden=true;});
-    $('utilSave').addEventListener('click',()=>{pushUndo();const out={};
-      $('utilEditRows').querySelectorAll('.util-erow').forEach(r=>{const k=r.querySelector('.u-amt').dataset.key;
-        out[k]=normNum(r.querySelector('.u-amt').value)||0;});
-      state.utilities=out;persist();renderCosts();toast('Utilities saved',{fn:doUndo});um.hidden=true;});
+    dgWirePreview($('uAmount'),$('uAmountPrev'),false);
+    $('utilCommit').addEventListener('click',()=>{const amt=normNum($('uAmount').value);
+      if(amt==null||amt<0){toast('Enter an amount');return;}
+      pushUndo();if(!Array.isArray(state.utilities))state.utilities=[];
+      state.utilities.push({id:'util_'+Date.now(),type:$('uType').value,when:($('uWhen').value||'').trim(),amount:amt});
+      persist();renderCosts();toast('Utility bill added',{fn:doUndo});um.hidden=true;});
   }
 
   /* Salva sub-tabs */
