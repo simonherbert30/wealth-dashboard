@@ -1272,7 +1272,7 @@ body.locked .gate{display:flex}
     <div class="section-head anim"><h2>Monthly income</h2><span class="hint">Net cash + Edenred meal vouchers · June &amp; December include the extra pay (paga extra)</span></div>
     <div class="card wealth-chart anim">
       <svg id="incSvg" viewBox="0 0 720 260" preserveAspectRatio="none" style="width:100%;height:auto;display:block" aria-hidden="true"></svg>
-      <div class="inc-legend" style="display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)"><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--grow);margin-right:5px"></i>Regular month</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--brass);margin-right:5px"></i>Extra‑pay month</span></div>
+      <div class="inc-legend" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)"><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--grow);margin-right:5px"></i>Net salary</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--brass);margin-right:5px"></i>Paga extra</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--cash);margin-right:5px"></i>Meal vouchers</span></div>
     </div>
 
     <div class="section-head anim"><h2>By year</h2><span class="hint">Received = cash + vouchers (payslips) · gross &amp; tax are cash‑only (annual certificate)</span></div>
@@ -1433,7 +1433,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · income-vouchers</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · income-stacked</span></p>
   </div>
 </div>
 
@@ -2003,13 +2003,15 @@ body.locked .gate{display:flex}
   function drawIncomeChart(list){const svg=$('incSvg');if(!svg)return;
     const W=720,H=260,pad={l:6,r:6,t:10,b:22},n=list.length;
     const maxV=Math.max.apply(null,list.map(r=>r[1]))*1.05||1;
-    const cw=(W-pad.l-pad.r)/n,bw=Math.max(2,cw*0.72);
+    const cw=(W-pad.l-pad.r)/n,bw=Math.max(2,cw*0.72),usable=H-pad.t-pad.b;
     let bars='',xl='',prevY=null;
-    list.forEach((r,i)=>{const h=r[1]/maxV*(H-pad.t-pad.b),x=pad.l+i*cw+(cw-bw)/2,y=H-pad.b-h;
-      const col=r[2]>0?V('--brass'):V('--grow');
-      const bits=[];if(r[2]>0)bits.push('extra '+eur0(r[2]));if(r[3]>0)bits.push(eur0(r[3])+' vouchers');
-      const note=bits.length?' (incl. '+bits.join(' + ')+')':'';
-      bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="1" fill="'+col+'"><title>'+ymLabel(r[0])+' · '+eur0(r[1])+note+'</title></rect>';
+    list.forEach((r,i)=>{const total=r[1],extra=r[2]||0,vouchers=r[3]||0,base=Math.max(0,total-extra-vouchers);
+      const x=pad.l+i*cw+(cw-bw)/2;let yb=H-pad.b,seg='';
+      [[base,V('--grow')],[extra,V('--brass')],[vouchers,V('--cash')]].forEach(sv=>{if(sv[0]<=0)return;
+        const hh=sv[0]/maxV*usable,yy=yb-hh;
+        seg+='<rect x="'+x.toFixed(1)+'" y="'+yy.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+hh.toFixed(1)+'" fill="'+sv[1]+'"/>';yb=yy;});
+      const parts=['salary '+eur0(base)];if(extra>0)parts.push('extra '+eur0(extra));if(vouchers>0)parts.push('vouchers '+eur0(vouchers));
+      bars+='<g><title>'+ymLabel(r[0])+' · '+eur0(total)+' ('+parts.join(' + ')+')</title>'+seg+'</g>';
       const yr=r[0].slice(0,4);if(yr!==prevY){xl+='<text x="'+(pad.l+i*cw+1)+'" y="'+(H-6)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="11">'+yr+'</text>';prevY=yr;}});
     svg.innerHTML=bars+xl;}
   function delCost(id){state.propertyCosts=state.propertyCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Cost removed');}
