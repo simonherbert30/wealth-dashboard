@@ -373,6 +373,12 @@ body{margin:0;background:
 /* live parsed-value preview in the Degiro editor */
 .dgprev{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:3px;min-height:13px;letter-spacing:.2px}
 .dgprev.big{color:var(--alert)}
+/* segmented toggle (Expenses monthly/yearly) */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-right:8px;flex:none}
+.seg-btn{appearance:none;background:none;border:none;font-family:var(--body);font-size:12.5px;font-weight:600;color:var(--muted);padding:7px 15px;cursor:pointer;transition:.15s}
+.seg-btn+.seg-btn{border-left:1px solid var(--line)}
+.seg-btn.active{background:var(--brass);color:var(--ink)}
+.seg-btn:not(.active):hover{color:var(--text)}
 /* friend (read-only, restricted) mode */
 body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend #addUtilBtn,body.friend #addExpBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur],body.friend [data-del-util],body.friend [data-del-exp],body.friend [data-edit-exp]{display:none!important}
 .tab.tab-locked .tl::after{content:" 🔒";font-size:10px;opacity:.7}
@@ -1239,15 +1245,17 @@ body.locked .gate{display:flex}
 
   <!-- ============ TAB 6 · EXPENSES ============ -->
   <section class="panel" id="tab-expenses" role="tabpanel">
-    <div class="section-head with-action anim"><h2>Expenses</h2><span class="hint" style="flex:1">Recurring subscriptions &amp; living costs · monthly = yearly ÷ 12</span><button class="btn-add" id="addExpBtn">＋ Add expense</button></div>
+    <div class="section-head with-action anim"><h2>Expenses</h2><span class="hint" id="expHint" style="flex:1">—</span>
+      <div class="seg" id="expToggle"><button class="seg-btn active" data-mode="monthly">Monthly</button><button class="seg-btn" data-mode="yearly">Yearly</button></div>
+      <button class="btn-add" id="addExpBtn">＋ Add expense</button></div>
     <div class="card holdings anim">
       <table class="wide">
-        <thead><tr><th>Expense</th><th>Payment</th><th class="r">Mo 2024</th><th class="r">Yr 2024</th><th class="r">Mo 2025</th><th class="r">Yr 2025</th><th class="r">Mo 2026</th><th class="r">Yr 2026</th><th></th></tr></thead>
+        <thead><tr><th>Expense</th><th>Payment</th><th class="r">2024</th><th class="r">2025</th><th class="r">2026</th><th></th></tr></thead>
         <tbody id="expBody"></tbody>
-        <tfoot><tr><td colspan="2">Total</td><td class="r" id="expM24" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expY24" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expM25" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expY25" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expM26" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expY26" style="font-family:var(--mono);font-weight:600">—</td><td></td></tr></tfoot>
+        <tfoot><tr><td colspan="2">Total</td><td class="r" id="expT24" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expT25" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expT26" style="font-family:var(--mono);font-weight:600">—</td><td></td></tr></tfoot>
       </table>
     </div>
-    <p class="foot-note">Personal recurring costs. Monthly figures are the yearly ÷ 12; totals are the sum of the rows. A spending log — it doesn't affect your net worth.</p>
+    <p class="foot-note">Personal recurring costs. Toggle Monthly / Yearly; monthly figures are the yearly ÷ 12. Totals are the sum of the rows — a spending log that doesn't affect your net worth.</p>
   </section>
 
 </div>
@@ -1398,7 +1406,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · expenses-tab</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · expenses-toggle</span></p>
   </div>
 </div>
 
@@ -1906,21 +1914,21 @@ body.locked .gate{display:flex}
     state.utilities=arr;}
   function delUtil(id){state.utilities=(state.utilities||[]).filter(u=>u.id!==id);persist();renderCosts();toast('Utility bill removed');}
   /* ---------- Expenses (recurring subscriptions & living costs) ---------- */
+  let expMode='monthly';
   function renderExpenses(){const eb=$('expBody');if(!eb||!state)return;
-    const list=Array.isArray(state.expenses)?state.expenses:[];const mo=y=>Math.round((+y||0)/12);
-    eb.innerHTML='';const T={m24:0,y24:0,m25:0,y25:0,m26:0,y26:0};
-    list.forEach(x=>{const y24=+x.y2024||0,y25=+x.y2025||0,y26=+x.y2026||0,m24=mo(y24),m25=mo(y25),m26=mo(y26);
-      T.y24+=y24;T.y25+=y25;T.y26+=y26;T.m24+=m24;T.m25+=m25;T.m26+=m26;
+    const list=Array.isArray(state.expenses)?state.expenses:[];
+    const val=y=>expMode==='monthly'?Math.round((+y||0)/12):(+y||0);
+    eb.innerHTML='';let t24=0,t25=0,t26=0;
+    list.forEach(x=>{const v24=val(x.y2024),v25=val(x.y2025),v26=val(x.y2026);t24+=v24;t25+=v25;t26+=v26;
       const tr=document.createElement('tr');
       tr.innerHTML='<td style="font-weight:500">'+esc(x.name)+'</td>'+
         '<td><span class="tag" style="text-transform:capitalize">'+esc(x.payment||'monthly')+'</span></td>'+
-        '<td class="r val">'+eur0(m24)+'</td><td class="r val">'+eur0(y24)+'</td>'+
-        '<td class="r val">'+eur0(m25)+'</td><td class="r val">'+eur0(y25)+'</td>'+
-        '<td class="r val">'+eur0(m26)+'</td><td class="r val">'+eur0(y26)+'</td>'+
+        '<td class="r val">'+eur0(v24)+'</td><td class="r val">'+eur0(v25)+'</td><td class="r val">'+eur0(v26)+'</td>'+
         '<td class="r" style="white-space:nowrap"><button class="cost-row-del" data-edit-exp="'+x.id+'" title="Edit" style="color:var(--muted)">✎</button> <button class="cost-row-del" data-del-exp="'+x.id+'" title="Remove">✕</button></td>';
       eb.appendChild(tr);});
-    if(!list.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="9"><div class="cost-empty">No expenses yet — use ＋ Add expense.</div></td>';eb.appendChild(tr);}
-    set('expM24',eur0(T.m24));set('expY24',eur0(T.y24));set('expM25',eur0(T.m25));set('expY25',eur0(T.y25));set('expM26',eur0(T.m26));set('expY26',eur0(T.y26));
+    if(!list.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="6"><div class="cost-empty">No expenses yet — use ＋ Add expense.</div></td>';eb.appendChild(tr);}
+    set('expT24',eur0(t24));set('expT25',eur0(t25));set('expT26',eur0(t26));
+    set('expHint',expMode==='monthly'?'Monthly cost per year (yearly ÷ 12)':'Yearly cost per year');
     eb.querySelectorAll('[data-del-exp]').forEach(b=>b.addEventListener('click',()=>delExp(b.getAttribute('data-del-exp'))));
     eb.querySelectorAll('[data-edit-exp]').forEach(b=>b.addEventListener('click',()=>openExp(b.getAttribute('data-edit-exp'))));}
   function delExp(id){state.expenses=(state.expenses||[]).filter(x=>x.id!==id);persist();renderExpenses();toast('Expense removed');}
@@ -2109,7 +2117,9 @@ body.locked .gate{display:flex}
       persist();renderCosts();toast('Utility bill added',{fn:doUndo});um.hidden=true;});
   }
 
-  /* ---------- Expenses: add / edit / remove ---------- */
+  /* ---------- Expenses: add / edit / remove + monthly/yearly toggle ---------- */
+  if($('expToggle')){[...$('expToggle').querySelectorAll('.seg-btn')].forEach(b=>b.addEventListener('click',()=>{
+    expMode=b.dataset.mode;$('expToggle').querySelectorAll('.seg-btn').forEach(x=>x.classList.toggle('active',x===b));renderExpenses();}));}
   if($('addExpBtn')){
     const em=$('expModal');
     $('addExpBtn').addEventListener('click',()=>openExp(null));
