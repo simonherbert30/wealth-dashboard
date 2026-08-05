@@ -1263,26 +1263,26 @@ body.locked .gate{display:flex}
   <section class="panel" id="tab-income" role="tabpanel">
     <div class="kpis k5 anim">
       <div class="kpi brass-kpi"><div class="k">Latest month</div><div class="v" id="incLatest">—</div><div class="n" id="incLatestSub">—</div></div>
-      <div class="kpi pos"><div class="k">Last 12 months</div><div class="v" id="incTrail">—</div><div class="n">net take‑home</div></div>
+      <div class="kpi pos"><div class="k">Last 12 months</div><div class="v" id="incTrail">—</div><div class="n">cash + vouchers</div></div>
       <div class="kpi"><div class="k">Avg / month</div><div class="v" id="incAvg">—</div><div class="n">rolling 12‑month</div></div>
       <div class="kpi"><div class="k">Last full year</div><div class="v" id="incLastYear">—</div><div class="n" id="incLastYearSub">—</div></div>
       <div class="kpi"><div class="k">vs a year ago</div><div class="v" id="incYoY">—</div><div class="n">same month last year</div></div>
     </div>
 
-    <div class="section-head anim"><h2>Monthly net income</h2><span class="hint">Take‑home per month · June &amp; December include the extra pay (paga extra)</span></div>
+    <div class="section-head anim"><h2>Monthly income</h2><span class="hint">Net cash + Edenred meal vouchers · June &amp; December include the extra pay (paga extra)</span></div>
     <div class="card wealth-chart anim">
       <svg id="incSvg" viewBox="0 0 720 260" preserveAspectRatio="none" style="width:100%;height:auto;display:block" aria-hidden="true"></svg>
       <div class="inc-legend" style="display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)"><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--grow);margin-right:5px"></i>Regular month</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--brass);margin-right:5px"></i>Extra‑pay month</span></div>
     </div>
 
-    <div class="section-head anim"><h2>By year</h2><span class="hint">Net received (payslips) vs gross &amp; tax (annual certificate)</span></div>
+    <div class="section-head anim"><h2>By year</h2><span class="hint">Received = cash + vouchers (payslips) · gross &amp; tax are cash‑only (annual certificate)</span></div>
     <div class="card holdings anim">
       <table class="wide">
-        <thead><tr><th>Year</th><th class="r">Months</th><th class="r">Net received</th><th class="r">Gross</th><th class="r">IRPF tax</th><th class="r">Eff. rate</th></tr></thead>
+        <thead><tr><th>Year</th><th class="r">Months</th><th class="r">Received</th><th class="r">Gross</th><th class="r">IRPF tax</th><th class="r">Eff. rate</th></tr></thead>
         <tbody id="incYearBody"></tbody>
       </table>
     </div>
-    <p class="foot-note">Built from your payslips (Jul 2022 – Jul 2026). Net is the líquido a percibir that reaches your account; gross and IRPF are from the annual Certificado de Retenciones. A 14‑payment year: extra pay lands in June and December. Reference data — it doesn't change your net worth.</p>
+    <p class="foot-note">Built from your payslips (Jul 2022 – Jul 2026). Income = net cash (líquido a percibir) + Edenred meal vouchers, which you can spend freely, so they count as income. Gross and IRPF are cash‑only, from the annual Certificado de Retenciones. A 14‑payment year: extra pay lands in June and December. Meal vouchers began Sept 2022. Reference data — it doesn't change your net worth.</p>
   </section>
 
 </div>
@@ -1433,7 +1433,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · income-tab</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · income-vouchers</span></p>
   </div>
 </div>
 
@@ -1507,8 +1507,9 @@ body.locked .gate{display:flex}
     {id:'exp_pitch',name:'Pitch & Putt',payment:'yearly',y2024:37,y2025:37,y2026:37},
     {id:'exp_golf',name:'Golf',payment:'yearly',y2024:173,y2025:112,y2026:112},
   ];
-  /* income: monthly net take-home from payslips [ym, net, extra-pay portion] */
-  const INCOME_SEED=[["2022-07",2093.92,0],["2022-08",2327.74,0],["2022-09",2138.26,0],["2022-10",2138.26,0],["2022-11",2105.75,0],["2022-12",3275.88,1190.83],["2023-01",2758.46,0],["2023-02",2167.94,0],["2023-03",2176.08,0],["2023-04",2176.08,0],["2023-05",2176.08,0],["2023-06",4603.66,2427.58],["2023-07",2176.08,0],["2023-08",2176.08,0],["2023-09",2176.08,0],["2023-10",2176.08,0],["2023-11",2176.08,0],["2023-12",4596.26,2447.98],["2024-01",2227.46,0],["2024-02",2221.11,0],["2024-03",2229.28,0],["2024-04",2229.28,0],["2024-05",2229.28,0],["2024-06",4736.58,2507.3],["2024-07",2229.28,0],["2024-08",2229.28,0],["2024-09",2229.28,0],["2024-10",2229.28,0],["2024-11",2229.28,0],["2024-12",4708.51,2507.3],["2025-01",2224.96,0],["2025-02",2224.96,0],["2025-03",2224.96,0],["2025-04",2224.96,0],["2025-05",2218.88,0],["2025-06",4732.26,2507.3],["2025-07",2224.96,0],["2025-08",2224.96,0],["2025-09",2224.96,0],["2025-10",2224.96,0],["2025-11",2224.96,0],["2025-12",4840.14,2507.3],["2026-01",2373.85,0],["2026-02",2373.85,0],["2026-03",2373.85,0],["2026-04",2368.11,0],["2026-05",2373.85,0],["2026-06",5036.73,2662.88],["2026-07",2405.18,0]];
+  /* income per month: [ym, total, extra-pay portion, meal-voucher portion]
+     total = net cash (líquido) + Edenred meal vouchers (spendable card → counted as income) */
+  const INCOME_SEED=[["2022-07",2093.92,0.0,0.0],["2022-08",2327.74,0.0,0.0],["2022-09",2378.26,0.0,240.0],["2022-10",2378.26,0.0,240.0],["2022-11",2345.75,0.0,240.0],["2022-12",3515.88,1190.83,240.0],["2023-01",2998.46,0.0,240.0],["2023-02",2407.94,0.0,240.0],["2023-03",2416.08,0.0,240.0],["2023-04",2416.08,0.0,240.0],["2023-05",2416.08,0.0,240.0],["2023-06",4843.66,2427.58,240.0],["2023-07",2416.08,0.0,240.0],["2023-08",2416.08,0.0,240.0],["2023-09",2416.08,0.0,240.0],["2023-10",2416.08,0.0,240.0],["2023-11",2416.08,0.0,240.0],["2023-12",4836.26,2447.98,240.0],["2024-01",2467.46,0.0,240.0],["2024-02",2461.11,0.0,240.0],["2024-03",2469.28,0.0,240.0],["2024-04",2469.28,0.0,240.0],["2024-05",2469.28,0.0,240.0],["2024-06",4976.58,2507.3,240.0],["2024-07",2469.28,0.0,240.0],["2024-08",2469.28,0.0,240.0],["2024-09",2469.28,0.0,240.0],["2024-10",2469.28,0.0,240.0],["2024-11",2469.28,0.0,240.0],["2024-12",4948.51,2507.3,240.0],["2025-01",2464.96,0.0,240.0],["2025-02",2464.96,0.0,240.0],["2025-03",2464.96,0.0,240.0],["2025-04",2464.96,0.0,240.0],["2025-05",2458.88,0.0,240.0],["2025-06",4972.26,2507.3,240.0],["2025-07",2464.96,0.0,240.0],["2025-08",2464.96,0.0,240.0],["2025-09",2464.96,0.0,240.0],["2025-10",2464.96,0.0,240.0],["2025-11",2464.96,0.0,240.0],["2025-12",5080.14,2507.3,240.0],["2026-01",2613.85,0.0,240.0],["2026-02",2613.85,0.0,240.0],["2026-03",2613.85,0.0,240.0],["2026-04",2608.11,0.0,240.0],["2026-05",2613.85,0.0,240.0],["2026-06",5276.73,2662.88,240.0],["2026-07",2605.18,0.0,200.0]];
   /* annual gross + IRPF withheld from the Certificado de Retenciones {year:[gross,irpf]} */
   const INCOME_CERT={2023:[41140.54,8783.51],2024:[41541.77,8973.06],2025:[41724.42,9012.50]};
 
@@ -1930,7 +1931,7 @@ body.locked .gate{display:flex}
     toast('Backup downloaded');});
   $('importBtn').addEventListener('click',()=>$('importFile').click());
   $('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});migrateUtilities();if(!Array.isArray(state.expenses))state.expenses=clone(EXPENSE_SEED);if(!Array.isArray(state.income))state.income=clone(INCOME_SEED);persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
+    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});migrateUtilities();if(!Array.isArray(state.expenses))state.expenses=clone(EXPENSE_SEED);if(!state.incomeV2){state.income=clone(INCOME_SEED);state.incomeV2=true;}persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
 
   /* ============ COSTS & UPKEEP ============ */
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -2006,7 +2007,9 @@ body.locked .gate{display:flex}
     let bars='',xl='',prevY=null;
     list.forEach((r,i)=>{const h=r[1]/maxV*(H-pad.t-pad.b),x=pad.l+i*cw+(cw-bw)/2,y=H-pad.b-h;
       const col=r[2]>0?V('--brass'):V('--grow');
-      bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="1" fill="'+col+'"><title>'+ymLabel(r[0])+' · '+eur0(r[1])+(r[2]>0?' (incl. extra '+eur0(r[2])+')':'')+'</title></rect>';
+      const bits=[];if(r[2]>0)bits.push('extra '+eur0(r[2]));if(r[3]>0)bits.push(eur0(r[3])+' vouchers');
+      const note=bits.length?' (incl. '+bits.join(' + ')+')':'';
+      bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="1" fill="'+col+'"><title>'+ymLabel(r[0])+' · '+eur0(r[1])+note+'</title></rect>';
       const yr=r[0].slice(0,4);if(yr!==prevY){xl+='<text x="'+(pad.l+i*cw+1)+'" y="'+(H-6)+'" fill="'+V('--muted')+'" font-family="'+V('--mono')+'" font-size="11">'+yr+'</text>';prevY=yr;}});
     svg.innerHTML=bars+xl;}
   function delCost(id){state.propertyCosts=state.propertyCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Cost removed');}
@@ -2508,7 +2511,7 @@ body.locked .gate{display:flex}
     state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});
     migrateUtilities();
     if(!Array.isArray(state.expenses))state.expenses=clone(EXPENSE_SEED);
-    if(!Array.isArray(state.income))state.income=clone(INCOME_SEED);
+    if(!state.incomeV2){state.income=clone(INCOME_SEED);state.incomeV2=true;} /* re-seed once with meal vouchers included */
     /* keep the Degiro account value in sync with the holdings (single source of truth) */
     const _dg=state.accounts.find(a=>a.id==='degiro');
     if(_dg){const _t=(state.degiro||[]).reduce((s,d)=>s+(+d.value||0),0)+(+state.degiroCash||0);
