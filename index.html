@@ -477,8 +477,7 @@ body.locked .gate{display:flex}
     <button class="tab" role="tab" aria-selected="false" data-tab="salva"><span class="ti">03</span> <span class="tl">Salva 40</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="gifts"><span class="ti">04</span> <span class="tl">Gifts</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="wealth"><span class="ti">05</span> <span class="tl">Wealth</span></button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="expenses"><span class="ti">06</span> <span class="tl">Expenses</span></button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="income"><span class="ti">07</span> <span class="tl">Income</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="cashflow"><span class="ti">06</span> <span class="tl">Cash flow</span></button>
   </nav>
 
   <!-- ============ TAB 1 · NET WORTH ============ -->
@@ -720,9 +719,9 @@ body.locked .gate{display:flex}
   <!-- ============ TAB 3 · SALVA 40 ============ -->
   <section class="panel" id="tab-salva" role="tabpanel">
     <div class="subtabs" role="tablist">
-      <button class="subtab active" data-sub="property" role="tab">Property &amp; mortgage</button>
-      <button class="subtab" data-sub="costs" role="tab">Costs &amp; upkeep</button>
-      <button class="subtab" data-sub="market" role="tab">Market &amp; value</button>
+      <button class="subtab active" data-sub="salva-sub-property" role="tab">Property &amp; mortgage</button>
+      <button class="subtab" data-sub="salva-sub-costs" role="tab">Costs &amp; upkeep</button>
+      <button class="subtab" data-sub="salva-sub-market" role="tab">Market &amp; value</button>
     </div>
     <div id="salva-sub-property" class="subpanel active">
     <div class="card prop-hero anim">
@@ -1244,8 +1243,13 @@ body.locked .gate{display:flex}
     </p>
   </section>
 
-  <!-- ============ TAB 6 · EXPENSES ============ -->
-  <section class="panel" id="tab-expenses" role="tabpanel">
+  <!-- ============ TAB 6 · CASH FLOW ============ -->
+  <section class="panel" id="tab-cashflow" role="tabpanel">
+    <div class="subtabs" role="tablist">
+      <button class="subtab active" data-sub="cf-income" role="tab">Income</button>
+      <button class="subtab" data-sub="cf-expenses" role="tab">Expenses</button>
+    </div>
+    <div id="cf-expenses" class="subpanel">
     <div class="section-head with-action anim"><h2>Expenses</h2><span class="hint" id="expHint" style="flex:1">—</span>
       <div class="seg" id="expToggle"><button class="seg-btn active" data-mode="monthly">Monthly</button><button class="seg-btn" data-mode="yearly">Yearly</button></div>
       <button class="btn-add" id="addExpBtn">＋ Add expense</button></div>
@@ -1257,10 +1261,18 @@ body.locked .gate{display:flex}
       </table>
     </div>
     <p class="foot-note">Personal recurring costs. Toggle Monthly / Yearly; monthly figures are the yearly ÷ 12. Totals are the sum of the rows — a spending log that doesn't affect your net worth.</p>
-  </section>
+    </div><!-- /cf-expenses -->
 
-  <!-- ============ TAB 7 · INCOME ============ -->
-  <section class="panel" id="tab-income" role="tabpanel">
+    <div id="cf-income" class="subpanel active">
+    <div class="card anim" style="background:linear-gradient(180deg,var(--surface),var(--ink-2));border-color:var(--line-strong);padding:22px 26px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted)">Total earned at ZF Services</div>
+        <div style="font-size:32px;font-weight:700;color:var(--brass);margin-top:5px;line-height:1" id="incZfTotal">—</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:5px" id="incZfSub">—</div>
+      </div>
+      <div style="text-align:right"><div style="font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase">Since</div><div style="font-family:var(--mono);font-size:16px;color:var(--text);margin-top:3px" id="incZfSince">—</div></div>
+    </div>
+
     <div class="kpis k5 anim">
       <div class="kpi brass-kpi"><div class="k">Latest month</div><div class="v" id="incLatest">—</div><div class="n" id="incLatestSub">—</div></div>
       <div class="kpi pos"><div class="k">Last 12 months</div><div class="v" id="incTrail">—</div><div class="n">cash + vouchers</div></div>
@@ -1283,6 +1295,7 @@ body.locked .gate{display:flex}
       </table>
     </div>
     <p class="foot-note">Built from your payslips (Jul 2022 – Jul 2026). Income = net cash (líquido a percibir) + Edenred meal vouchers, which you can spend freely, so they count as income. Gross and IRPF are cash‑only, from the annual Certificado de Retenciones. A 14‑payment year: extra pay lands in June and December. Meal vouchers began Sept 2022. Reference data — it doesn't change your net worth.</p>
+    </div><!-- /cf-income -->
   </section>
 
 </div>
@@ -1433,7 +1446,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · income-stacked</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · cashflow-tab</span></p>
   </div>
 </div>
 
@@ -1618,7 +1631,7 @@ body.locked .gate{display:flex}
 
   /* ---------- tabs ---------- */
   const tabs=[...document.querySelectorAll('.tab')];
-  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),gifts:$('tab-gifts'),wealth:$('tab-wealth'),expenses:$('tab-expenses'),income:$('tab-income')};
+  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),gifts:$('tab-gifts'),wealth:$('tab-wealth'),cashflow:$('tab-cashflow')};
   tabs.forEach(t=>t.addEventListener('click',()=>{
     tabs.forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false');});
     t.classList.add('active');t.setAttribute('aria-selected','true');
@@ -1980,6 +1993,8 @@ body.locked .gate{display:flex}
     const list=(Array.isArray(state.income)?state.income:[]).slice().sort((a,b)=>a[0]<b[0]?-1:1);
     if(!list.length)return;
     const latest=list[list.length-1];
+    const grand=list.reduce((s,r)=>s+r[1],0);
+    set('incZfTotal',eur0(grand));set('incZfSub',ymLabel(list[0][0])+' → '+ymLabel(latest[0])+' · '+list.length+' months · net cash + meal vouchers');set('incZfSince',ymLabel(list[0][0]));
     set('incLatest',eur0(latest[1]));set('incLatestSub',ymLabel(latest[0]));
     const trail=list.slice(-12),trailSum=trail.reduce((s,r)=>s+r[1],0);
     set('incTrail',eur0(trailSum));set('incAvg',eur0(trailSum/trail.length));
@@ -2211,13 +2226,13 @@ body.locked .gate{display:flex}
   }
 
   /* Salva sub-tabs */
-  const subtabs=[...document.querySelectorAll('.subtab')];
-  const subpanels={property:$('salva-sub-property'),costs:$('salva-sub-costs'),market:$('salva-sub-market')};
-  subtabs.forEach(st=>st.addEventListener('click',()=>{
-    subtabs.forEach(x=>x.classList.remove('active'));st.classList.add('active');
-    Object.values(subpanels).forEach(p=>p&&p.classList.remove('active'));
-    const p=subpanels[st.dataset.sub];if(p)p.classList.add('active');
-  }));
+  /* generic sub-tabs: each .subtabs bar toggles the .subpanels within its own section (data-sub = panel id) */
+  document.querySelectorAll('.subtabs').forEach(bar=>{const btns=[...bar.querySelectorAll('.subtab')];
+    btns.forEach(st=>st.addEventListener('click',()=>{
+      btns.forEach(x=>x.classList.remove('active'));st.classList.add('active');
+      const sec=bar.closest('section');if(sec)sec.querySelectorAll('.subpanel').forEach(p=>p.classList.remove('active'));
+      const t=$(st.dataset.sub);if(t)t.classList.add('active');
+    }));});
 
   /* wealth chart — responsive sizing (px-true viewBox) + hover/touch tooltip */
   let wHover=null,wChartGeo=null;
