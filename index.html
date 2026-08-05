@@ -374,7 +374,7 @@ body{margin:0;background:
 .dgprev{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:3px;min-height:13px;letter-spacing:.2px}
 .dgprev.big{color:var(--alert)}
 /* friend (read-only, restricted) mode */
-body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend #addUtilBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur],body.friend [data-del-util]{display:none!important}
+body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend #addUtilBtn,body.friend #addExpBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur],body.friend [data-del-util],body.friend [data-del-exp],body.friend [data-edit-exp]{display:none!important}
 .tab.tab-locked .tl::after{content:" 🔒";font-size:10px;opacity:.7}
 .tab.tab-locked{opacity:.5}
 .panel.blurred{filter:blur(9px);pointer-events:none;user-select:none;transition:filter .2s}
@@ -471,6 +471,7 @@ body.locked .gate{display:flex}
     <button class="tab" role="tab" aria-selected="false" data-tab="salva"><span class="ti">03</span> <span class="tl">Salva 40</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="gifts"><span class="ti">04</span> <span class="tl">Gifts</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="wealth"><span class="ti">05</span> <span class="tl">Wealth</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="expenses"><span class="ti">06</span> <span class="tl">Expenses</span></button>
   </nav>
 
   <!-- ============ TAB 1 · NET WORTH ============ -->
@@ -1236,6 +1237,19 @@ body.locked .gate{display:flex}
     </p>
   </section>
 
+  <!-- ============ TAB 6 · EXPENSES ============ -->
+  <section class="panel" id="tab-expenses" role="tabpanel">
+    <div class="section-head with-action anim"><h2>Expenses</h2><span class="hint" style="flex:1">Recurring subscriptions &amp; living costs · monthly = yearly ÷ 12</span><button class="btn-add" id="addExpBtn">＋ Add expense</button></div>
+    <div class="card holdings anim">
+      <table class="wide">
+        <thead><tr><th>Expense</th><th>Payment</th><th class="r">Mo 2024</th><th class="r">Yr 2024</th><th class="r">Mo 2025</th><th class="r">Yr 2025</th><th class="r">Mo 2026</th><th class="r">Yr 2026</th><th></th></tr></thead>
+        <tbody id="expBody"></tbody>
+        <tfoot><tr><td colspan="2">Total</td><td class="r" id="expM24" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expY24" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expM25" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expY25" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expM26" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="expY26" style="font-family:var(--mono);font-weight:600">—</td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <p class="foot-note">Personal recurring costs. Monthly figures are the yearly ÷ 12; totals are the sum of the rows. A spending log — it doesn't affect your net worth.</p>
+  </section>
+
 </div>
 
 <!-- ===== UPDATE MODAL ===== -->
@@ -1349,6 +1363,28 @@ body.locked .gate{display:flex}
   </div>
 </div>
 
+<div class="modal-overlay" id="expModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Add an expense">
+    <div class="modal-head"><h3 id="expModalTitle">Add an expense</h3><button id="expModalClose" aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <div class="dz-row">
+        <div><label for="xName">Expense</label><input type="text" id="xName" class="fld" style="font-family:var(--body)" placeholder="e.g. Gym"></div>
+        <div><label for="xPay">Payment</label><select id="xPay" class="fld"><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div>
+      </div>
+      <p class="hintline">Yearly cost per year (leave 0 if not applicable). Monthly is shown as ÷ 12.</p>
+      <div class="dz-row">
+        <div><label for="xY24">2024 (€/yr)</label><input type="text" id="xY24" class="fld" inputmode="decimal" placeholder="0"></div>
+        <div><label for="xY25">2025 (€/yr)</label><input type="text" id="xY25" class="fld" inputmode="decimal" placeholder="0"></div>
+      </div>
+      <div class="dz-row" style="margin-top:8px">
+        <div><label for="xY26">2026 (€/yr)</label><input type="text" id="xY26" class="fld" inputmode="decimal" placeholder="0"></div>
+        <div></div>
+      </div>
+      <div class="modal-actions"><button class="btn-primary" id="expCommit">Save expense</button></div>
+    </div>
+  </div>
+</div>
+
 <div class="friend-veil" id="friendVeil" hidden><div class="fv-card"><span class="fv-ic">🔒</span><span>Private section</span><small>Visible to the owner only</small></div></div>
 
 <!-- ===== PASSWORD GATE ===== -->
@@ -1362,7 +1398,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · utilities-log</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · expenses-tab</span></p>
   </div>
 </div>
 
@@ -1424,6 +1460,18 @@ body.locked .gate{display:flex}
     {name:'iShares MSCI Brazil UCITS ETF',meta:'ETF · Brazil · emerging',value:6212.25,unrealised:345.13,pct:'+5,88%'},
   ];
   const DEGIRO_CASH_SEED=600.60;
+  /* personal recurring expenses, yearly cost per year (monthly shown = yearly ÷ 12) */
+  const EXPENSE_SEED=[
+    {id:'exp_rent',name:'Rent',payment:'monthly',y2024:7200,y2025:9300,y2026:0},
+    {id:'exp_revolut',name:'Revolut Ultra',payment:'monthly',y2024:540,y2025:540,y2026:540},
+    {id:'exp_wizzair',name:'Wizzair',payment:'yearly',y2024:500,y2025:500,y2026:275},
+    {id:'exp_apple',name:'Apple Cloud',payment:'monthly',y2024:12,y2025:12,y2026:12},
+    {id:'exp_gym',name:'Gym',payment:'monthly',y2024:582,y2025:671,y2026:0},
+    {id:'exp_amazon',name:'Amazon prime',payment:'monthly',y2024:0,y2025:0,y2026:60},
+    {id:'exp_strava',name:'Strava',payment:'yearly',y2024:50,y2025:50,y2026:50},
+    {id:'exp_pitch',name:'Pitch & Putt',payment:'yearly',y2024:37,y2025:37,y2026:37},
+    {id:'exp_golf',name:'Golf',payment:'yearly',y2024:173,y2025:112,y2026:112},
+  ];
 
   /* ---------- totals ---------- */
   function totalsOf(accts){const cats={};order.forEach(c=>cats[c]=0);let liab=0;
@@ -1528,7 +1576,7 @@ body.locked .gate{display:flex}
 
   /* ---------- tabs ---------- */
   const tabs=[...document.querySelectorAll('.tab')];
-  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),gifts:$('tab-gifts'),wealth:$('tab-wealth')};
+  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),gifts:$('tab-gifts'),wealth:$('tab-wealth'),expenses:$('tab-expenses')};
   tabs.forEach(t=>t.addEventListener('click',()=>{
     tabs.forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false');});
     t.classList.add('active');t.setAttribute('aria-selected','true');
@@ -1626,6 +1674,7 @@ body.locked .gate{display:flex}
     renderWealth(t);
     renderCosts();
     renderDegiro();
+    renderExpenses();
   }
 
   /* ============ WEALTH TAB ============ */
@@ -1839,7 +1888,7 @@ body.locked .gate{display:flex}
     toast('Backup downloaded');});
   $('importBtn').addEventListener('click',()=>$('importFile').click());
   $('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});migrateUtilities();persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
+    r.onload=()=>{try{const obj=JSON.parse(r.result);if(obj.accounts&&obj.history){state=obj;if(!state.propertyCosts)state.propertyCosts=clone(seedCosts);if(!state.recurringCosts)state.recurringCosts=[];if(!Array.isArray(state.degiro))state.degiro=clone(DEGIRO_SEED);if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});migrateUtilities();if(!Array.isArray(state.expenses))state.expenses=clone(EXPENSE_SEED);persist();renderDynamic();toast('Backup restored');}else toast('Not a valid backup');}catch(err){toast('Could not read that file');}};r.readAsText(f);});
 
   /* ============ COSTS & UPKEEP ============ */
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1856,6 +1905,31 @@ body.locked .gate{display:flex}
     if(g)arr.push({id:'util_g',type:'gas',when:'Jul 2026',amount:g});
     state.utilities=arr;}
   function delUtil(id){state.utilities=(state.utilities||[]).filter(u=>u.id!==id);persist();renderCosts();toast('Utility bill removed');}
+  /* ---------- Expenses (recurring subscriptions & living costs) ---------- */
+  function renderExpenses(){const eb=$('expBody');if(!eb||!state)return;
+    const list=Array.isArray(state.expenses)?state.expenses:[];const mo=y=>Math.round((+y||0)/12);
+    eb.innerHTML='';const T={m24:0,y24:0,m25:0,y25:0,m26:0,y26:0};
+    list.forEach(x=>{const y24=+x.y2024||0,y25=+x.y2025||0,y26=+x.y2026||0,m24=mo(y24),m25=mo(y25),m26=mo(y26);
+      T.y24+=y24;T.y25+=y25;T.y26+=y26;T.m24+=m24;T.m25+=m25;T.m26+=m26;
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td style="font-weight:500">'+esc(x.name)+'</td>'+
+        '<td><span class="tag" style="text-transform:capitalize">'+esc(x.payment||'monthly')+'</span></td>'+
+        '<td class="r val">'+eur0(m24)+'</td><td class="r val">'+eur0(y24)+'</td>'+
+        '<td class="r val">'+eur0(m25)+'</td><td class="r val">'+eur0(y25)+'</td>'+
+        '<td class="r val">'+eur0(m26)+'</td><td class="r val">'+eur0(y26)+'</td>'+
+        '<td class="r" style="white-space:nowrap"><button class="cost-row-del" data-edit-exp="'+x.id+'" title="Edit" style="color:var(--muted)">✎</button> <button class="cost-row-del" data-del-exp="'+x.id+'" title="Remove">✕</button></td>';
+      eb.appendChild(tr);});
+    if(!list.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="9"><div class="cost-empty">No expenses yet — use ＋ Add expense.</div></td>';eb.appendChild(tr);}
+    set('expM24',eur0(T.m24));set('expY24',eur0(T.y24));set('expM25',eur0(T.m25));set('expY25',eur0(T.y25));set('expM26',eur0(T.m26));set('expY26',eur0(T.y26));
+    eb.querySelectorAll('[data-del-exp]').forEach(b=>b.addEventListener('click',()=>delExp(b.getAttribute('data-del-exp'))));
+    eb.querySelectorAll('[data-edit-exp]').forEach(b=>b.addEventListener('click',()=>openExp(b.getAttribute('data-edit-exp'))));}
+  function delExp(id){state.expenses=(state.expenses||[]).filter(x=>x.id!==id);persist();renderExpenses();toast('Expense removed');}
+  let expEditId=null;
+  function openExp(id){expEditId=id||null;const x=id?(state.expenses||[]).find(e=>e.id===id):null;const d2=v=>v?String(v).replace('.',','):'';
+    $('expModalTitle').textContent=x?'Edit expense':'Add an expense';
+    $('xName').value=x?x.name:'';$('xPay').value=x?(x.payment||'monthly'):'monthly';
+    $('xY24').value=x?d2(x.y2024):'';$('xY25').value=x?d2(x.y2025):'';$('xY26').value=x?d2(x.y2026):'';
+    $('expModal').hidden=false;}
   function delCost(id){state.propertyCosts=state.propertyCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Cost removed');}
   function delRecur(id){state.recurringCosts=state.recurringCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Recurring cost removed');}
   function renderCosts(){
@@ -2033,6 +2107,21 @@ body.locked .gate{display:flex}
       pushUndo();if(!Array.isArray(state.utilities))state.utilities=[];
       state.utilities.push({id:'util_'+Date.now(),type:$('uType').value,when:($('uWhen').value||'').trim(),amount:amt});
       persist();renderCosts();toast('Utility bill added',{fn:doUndo});um.hidden=true;});
+  }
+
+  /* ---------- Expenses: add / edit / remove ---------- */
+  if($('addExpBtn')){
+    const em=$('expModal');
+    $('addExpBtn').addEventListener('click',()=>openExp(null));
+    $('expModalClose').addEventListener('click',()=>em.hidden=true);
+    em.addEventListener('click',e=>{if(e.target===em)em.hidden=true;});
+    $('expCommit').addEventListener('click',()=>{const name=($('xName').value||'').trim();
+      if(!name){toast('Enter a name');return;}
+      const rec={name,payment:$('xPay').value,y2024:normNum($('xY24').value)||0,y2025:normNum($('xY25').value)||0,y2026:normNum($('xY26').value)||0};
+      pushUndo();if(!Array.isArray(state.expenses))state.expenses=[];
+      if(expEditId){const x=state.expenses.find(e=>e.id===expEditId);if(x)Object.assign(x,rec);}
+      else{rec.id='exp_'+Date.now();state.expenses.push(rec);}
+      persist();renderExpenses();toast('Expense saved',{fn:doUndo});em.hidden=true;});
   }
 
   /* Salva sub-tabs */
@@ -2337,6 +2426,7 @@ body.locked .gate{display:flex}
     if(state.degiroCash==null)state.degiroCash=DEGIRO_CASH_SEED;
     state.degiro.forEach(d=>{if(d.cost==null)d.cost=(+d.value||0)-(+d.unrealised||0);delete d.unrealised;delete d.pct;});
     migrateUtilities();
+    if(!Array.isArray(state.expenses))state.expenses=clone(EXPENSE_SEED);
     /* keep the Degiro account value in sync with the holdings (single source of truth) */
     const _dg=state.accounts.find(a=>a.id==='degiro');
     if(_dg){const _t=(state.degiro||[]).reduce((s,d)=>s+(+d.value||0),0)+(+state.degiroCash||0);
