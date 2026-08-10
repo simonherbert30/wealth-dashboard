@@ -533,8 +533,8 @@ body.locked .gate{display:flex}
       <div class="kpi brass-kpi"><div class="k">VWCE now</div><div class="v" id="kpiVwceNow">—</div><div class="n">FTSE All‑World (Acc)</div></div>
       <div class="kpi"><div class="k">Degiro now</div><div class="v" id="kpiDegiro">—</div><div class="n">Stocks + EM trackers</div></div>
       <div class="kpi pos"><div class="k">Total invested</div><div class="v" id="kpiTotalInv">—</div><div class="n">VWCE + Degiro, at market</div></div>
-      <div class="kpi"><div class="k">Left to deploy</div><div class="v">75.000 €</div><div class="n">Aug → Dec</div></div>
-      <div class="kpi"><div class="k">Target mix</div><div class="v">85 / 7 / 3 / 5</div><div class="n">Equity / bonds / commod. / cash</div></div>
+      <div class="kpi"><div class="k">Left to deploy</div><div class="v">60.000 €</div><div class="n">€45k VWCE + €10k bonds + €5k gold</div></div>
+      <div class="kpi"><div class="k">Target mix</div><div class="v">85 / 7 / 3 / 5</div><div class="n">Equity / bonds / gold / cash</div></div>
     </div>
 
     <div class="section-head anim"><h2>Your total invested mix</h2><span class="hint">VWCE + Degiro combined · a look‑through of where every invested euro sits</span></div>
@@ -620,7 +620,7 @@ body.locked .gate{display:flex}
       <div class="tophold" id="topHold"></div>
     </div>
 
-    <div class="section-head anim"><h2>Invested &amp; investable</h2><span class="hint">Held today, plus December's two new sleeves</span></div>
+    <div class="section-head anim"><h2>Invested &amp; investable</h2><span class="hint">Held today, plus the planned bond &amp; gold sleeves</span></div>
     <div class="card holdings anim">
       <table>
         <thead><tr><th>Holding</th><th>Vehicle</th><th class="r">Value</th></tr></thead>
@@ -629,45 +629,44 @@ body.locked .gate{display:flex}
       </table>
     </div>
 
-    <div class="section-head anim"><h2>The 6‑month deployment</h2><span class="hint">VWCE June → November, then diversify in December</span></div>
+    <div class="section-head anim"><h2>The 9‑month deployment</h2><span class="hint">€60k total · €5k VWCE every month, plus bonds &amp; gold for the first five</span></div>
     <div class="deploy">
       <div class="card ladder anim">
-        <p class="lead">June and July are done (<b>€30k</b> then <b>€15k</b> into VWCE). You carry <b>€15k/month</b> through November, then in <b>December you pivot</b> — €10k into world bonds and €5k into commodities instead of more equity. Each rung is one buy on a fixed date.</p>
+        <p class="lead">On the <b>1st of each month</b>: <b>€5.000 into VWCE</b> for 9 months (<b>€45k</b>). For the <b>first 5 months</b> you also add <b>€2.000 into world bonds</b> and <b>€1.000 into gold</b> — €10k + €5k. Total commitment <b>€60.000</b>. Each rung is one set of buys on a fixed date.</p>
         <div class="rungs" id="rungs"></div>
       </div>
       <div class="card growth anim" style="animation-delay:.05s">
-        <h3>VWCE balance, month by month</h3>
+        <h3>Cumulative deployed, month by month</h3>
         <p class="cap">Contributions only — market movement not shown</p>
         <div class="gbars" id="gbars"></div>
-        <div class="src-note"><b>Source:</b> the ongoing buys draw from Trade Republic savings (€75.987). <b>December</b> ends the equity build at ~€105k and adds the bond + commodity sleeves — see below.</div>
+        <div class="src-note"><b>Source:</b> the buys draw from Trade Republic savings (€75.987). The plan ends at <b>€60k deployed</b> — €45k VWCE, €10k world bonds, €5k gold.</div>
       </div>
     </div>
 
-    <div class="section-head anim"><h2>December: diversify</h2><span class="hint">€15.000 into two things VWCE doesn't hold</span></div>
+    <div class="section-head anim"><h2>The two extra sleeves</h2><span class="hint">€15.000 over the first 5 months into things VWCE doesn't hold</span></div>
     <div class="diversify-grid">
       <div class="card div-card bonds anim">
         <span class="dstrip"></span>
         <div class="dk">Sleeve 1 · World bonds</div>
         <div class="damt">10.000 €</div>
-        <div class="dsub">Bonds zig when equities zag. A global investment‑grade bond sleeve softens the ride and gives you something to rebalance from in a crash.</div>
+        <div class="dsub"><b>€2.000/month × 5.</b> Bonds zig when equities zag. A global investment‑grade bond sleeve softens the ride and gives you something to rebalance from in a crash.</div>
         <div class="pick">
           <div class="pt">Vanguard Global Aggregate Bond UCITS ETF — EUR Hedged (Acc)</div>
-          <div class="pmeta"><span class="tk">VAGF</span><span>IE00BG47KH54</span><span>TER 0,08%</span><span>Acc · Ireland</span></div>
+          <div class="pmeta"><span class="tk">VAGF</span><span>IE00BG47KH54</span><span>TER 0,10%</span><span>Acc · Ireland</span></div>
         </div>
-        <div class="pick alt"><div class="pt">Near‑identical alternative: <b>iShares Core Global Aggregate Bond EUR‑Hedged Acc</b> — AGGH · TER 0,10%</div></div>
         <p class="why"><b>Why EUR‑hedged:</b> on a global bond fund, unhedged currency swings would dwarf the modest yield — hedging to euro removes that noise so the bonds actually behave like bonds. Accumulating keeps it tax‑simple in Spain, same as VWCE.</p>
       </div>
       <div class="card div-card comm anim" style="animation-delay:.05s">
         <span class="dstrip"></span>
-        <div class="dk">Sleeve 2 · Commodities</div>
+        <div class="dk">Sleeve 2 · Gold</div>
         <div class="damt">5.000 €</div>
-        <div class="dsub">Low correlation to stocks and bonds, and a classic inflation hedge — the thing that rose in 2022 while everything else fell.</div>
+        <div class="dsub"><b>€1.000/month × 5.</b> Low correlation to stocks and bonds, and a classic store of value &amp; inflation hedge — the thing that holds when everything else wobbles.</div>
         <div class="pick">
-          <div class="pt">Invesco Bloomberg Commodity UCITS ETF (Acc)</div>
-          <div class="pmeta"><span class="tk">CMOD</span><span>IE00BD6FTQ80</span><span>TER 0,19%</span><span>Acc · broad basket</span></div>
+          <div class="pt">iShares Physical Gold ETC</div>
+          <div class="pmeta"><span class="tk">SGLN</span><span>IE00B4ND3602</span><span>TER 0,12%</span><span>Physical · unhedged</span></div>
         </div>
-        <div class="pick alt"><div class="pt">Prefer pure gold/silver? <b>iShares Physical Gold ETC</b> — SGLN · TER 0,12% (physical, unhedged)</div></div>
-        <p class="why"><b>Broad vs precious:</b> CMOD spreads across energy, metals, agriculture <em>and</em> precious metals (incl. gold & silver) — the better all‑round diversifier. If you specifically want the gold/silver store‑of‑value angle, a physical gold ETC is the clean, cheap route. Splitting the €5k across both is also fine.</p>
+        <div class="pick alt"><div class="pt">Alternatives: <b>Invesco Physical Gold</b> — SGLD · TER 0,12%, or <b>Xetra‑Gold</b> (physical, Germany)</div></div>
+        <p class="why"><b>Physical gold:</b> a physically‑backed ETC tracks the gold price directly, with no equity or credit risk. Unhedged is standard — gold is a global store of value. Accumulating (no dividends) keeps it clean.</p>
       </div>
     </div>
 
@@ -864,6 +863,33 @@ body.locked .gate{display:flex}
         <div class="kpi"><div class="k">Implied value · 76 m²<span class="itip" tabindex="0">i<span class="itip-box">The Barcelona €/m² statistics divide sale prices by the surface in the property registry — Salvà 40's registry entry states 76 m², so that is the exact like‑for‑like basis. Catastro's figures bracket it: 75 m² (flat only) and 80 m² (incl. 5 m² common share).</span></span></div><div class="v">≈ 331.200 €</div><div class="n">paid 340.000 € — right at market</div></div>
         <div class="kpi"><div class="k">Poble Sec · 5 years</div><div class="v">+33,1%</div><div class="n">Barcelona average +36,7%</div></div>
         <div class="kpi"><div class="k">Poble Sec · 10 years</div><div class="v">+68,4%</div><div class="n">Barcelona average +67,6%</div></div>
+      </div>
+
+      <div class="section-head anim"><h2>Bank appraisal · TINSA</h2><span class="hint">Independent valuation for the mortgage · 24 Feb 2026</span></div>
+      <div class="mort-grid">
+        <div class="card mort-panel anim">
+          <h3>Appraised value</h3>
+          <div style="font-size:34px;font-weight:700;color:var(--grow);line-height:1;margin:6px 0 2px">380.564 €</div>
+          <div style="color:var(--muted);font-size:12.5px;margin-bottom:14px">Valor de tasación / valor hipotecario · comparison method</div>
+          <div class="mrow"><span class="mk">You paid · 24 Apr 2026</span><span class="mv">340.000 €</span></div>
+          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Appraised above purchase</span><span class="mv" style="color:var(--grow);font-weight:600">+40.564 € · +11,9%</span></div>
+          <div class="mrow"><span class="mk">Unit value</span><span class="mv">5.642 €/m² útil</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ on 76 m² registry basis</span><span class="mv" style="color:var(--muted)">≈ 5.008 €/m²</span></div>
+          <div class="mrow"><span class="mk">Land value · repercusión suelo</span><span class="mv">229.759 €</span></div>
+          <div class="mrow"><span class="mk">Reconstruction / insurance value</span><span class="mv">150.804 €</span></div>
+          <div class="loan-badge">TINSA (Bank of Spain reg. nº 4313) valued the flat at <b>380.564 €</b> — <b>€40.564 above</b> the price you paid two months later. The dashboard still carries the property at <b>cost (340.000 €)</b>, so this is unrealised upside not yet on your net‑worth balance sheet.</div>
+        </div>
+        <div class="card mort-panel anim" style="animation-delay:.05s">
+          <h3>Appraisal details</h3>
+          <div class="mrow"><span class="mk">Appraiser</span><span class="mv">TINSA Tasaciones</span></div>
+          <div class="mrow"><span class="mk">Valuer</span><span class="mv">Ana Terrón de Pedro (arch.)</span></div>
+          <div class="mrow"><span class="mk">Expediente</span><span class="mv">B‑01824/26</span></div>
+          <div class="mrow"><span class="mk">Date</span><span class="mv">24 Feb 2026</span></div>
+          <div class="mrow"><span class="mk">Method</span><span class="mv">Comparison (comparables)</span></div>
+          <div class="mrow"><span class="mk">Surfaces</span><span class="mv">67,45 útil · 75 reg. · 86,3 built</span></div>
+          <div class="mrow"><span class="mk">Age · condition</span><span class="mv">149 yrs · Bueno</span></div>
+          <div class="loan-badge" style="margin-top:14px">Caveats noted by TINSA: the flat predates current urban norms (<b>volumen/uso disconforme</b> — legal, built under prior rules) and no energy‑efficiency certificate was supplied. Neither reduces the appraised figure.</div>
+        </div>
       </div>
 
       <div class="section-head anim"><h2>Poble Sec vs the city</h2><span class="hint">Average €/m² of homes sold · registered transactions 2012–2026</span></div>
@@ -1446,7 +1472,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · cashflow-tab</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · deploy-plan+tasacion</span></p>
   </div>
 </div>
 
@@ -1721,8 +1747,8 @@ body.locked .gate{display:flex}
       [['vwce','Trade Republic · FTSE All‑World ETF (Acc)'],['degiro','Stocks &amp; emerging markets'],['trade_republic','Savings · deployment fuel'],['revolut_sav','Savings']].forEach(h=>{
         const a=state.accounts.find(x=>x.id===h[0]);if(!a)return;const trr=document.createElement('tr');
         trr.innerHTML='<td><div style="font-weight:500">'+a.name+'</div><div class="sub">'+h[1]+'</div></td><td></td><td class="r val">'+eur(a.value)+'</td>';ib.appendChild(trr);});
-      [['World bonds','Planned · VAGF (EUR‑hedged, Acc)',10000],['Commodities','Planned · CMOD broad basket',5000]].forEach(p=>{const trr=document.createElement('tr');trr.setAttribute('style','opacity:.6');
-        trr.innerHTML='<td><div style="font-weight:500">'+p[0]+' <span style="font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--brass);border:1px solid rgba(201,169,106,.4);border-radius:4px;padding:1px 5px;margin-left:6px">DEC</span></div><div class="sub">'+p[1]+'</div></td><td></td><td class="r val">'+eur(p[2])+'</td>';ib.appendChild(trr);});}
+      [['World bonds','Planned · VAGF (EUR‑hedged, Acc) · €2k/mo × 5',10000],['Gold','Planned · SGLN physical gold · €1k/mo × 5',5000]].forEach(p=>{const trr=document.createElement('tr');trr.setAttribute('style','opacity:.6');
+        trr.innerHTML='<td><div style="font-weight:500">'+p[0]+' <span style="font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--brass);border:1px solid rgba(201,169,106,.4);border-radius:4px;padding:1px 5px;margin-left:6px">PLAN</span></div><div class="sub">'+p[1]+'</div></td><td></td><td class="r val">'+eur(p[2])+'</td>';ib.appendChild(trr);});}
 
     const last=state.history[state.history.length-1];
     const dc=$('dateChip');if(dc)dc.textContent='UPDATED · '+fmtDate(last.ts).toUpperCase();
@@ -1799,19 +1825,24 @@ body.locked .gate{display:flex}
 
   /* ============ STATIC RENDER (once) ============ */
   function initStatic(){
-    const _now=new Date(),_moIdx={Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-    const _done=mo=>_now.getFullYear()>2026||(_now.getFullYear()===2026&&_now.getMonth()>=_moIdx[mo]);/* deployments land on the 1st, so a month counts as done once we're in it */
-    const sched=[{mo:'Jun',amt:30000},{mo:'Jul',amt:15000},{mo:'Aug',amt:15000},{mo:'Sep',amt:15000},{mo:'Oct',amt:15000},{mo:'Nov',amt:15000},{mo:'Dec',amt:15000,div:true}].map(s=>({...s,done:_done(s.mo)}));
-    const rungs=$('rungs');let cum=0;
-    if(rungs)sched.forEach(s=>{cum+=s.amt;const d=document.createElement('div');d.className='rung'+(s.done?' now':'');
-      const barTxt=s.div?'bonds + comm':('+'+(s.amt/1000)+'k');
-      const barStyle=s.div?'width:50%;background:linear-gradient(90deg,var(--cash),var(--brass))':'width:'+(s.amt/30000*100)+'%';
-      d.innerHTML='<div class="mo">'+s.mo+'<small>'+(s.done?'✓ done':'2026')+'</small></div><div class="bar" style="'+barStyle+'">'+barTxt+'</div><div class="tot">'+eur0(cum)+'<small>'+(s.div?'incl. €15k div':'deployed')+'</small></div>';rungs.appendChild(d);});
+    /* deployment plan: from next month's 1st — €5k VWCE ×9, +€2k bonds & +€1k gold for the first 5 */
+    const _moN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const _now=new Date(),_st=new Date(_now.getFullYear(),_now.getMonth()+1,1);
+    const rungs=$('rungs');
+    if(rungs){rungs.innerHTML='';let cum=0;
+      for(let i=0;i<9;i++){const d=new Date(_st.getFullYear(),_st.getMonth()+i,1);
+        const bond=i<5?2000:0,gold=i<5?1000:0,tot=5000+bond+gold;cum+=tot;
+        const parts=['VWCE 5k'];if(bond)parts.push('bonds 2k');if(gold)parts.push('gold 1k');
+        const el=document.createElement('div');el.className='rung'+(i===0?' now':'');
+        el.innerHTML='<div class="mo">'+_moN[d.getMonth()]+'<small>'+String(d.getFullYear()).slice(2)+'</small></div>'+
+          '<div class="bar" style="width:'+(tot/8000*100).toFixed(0)+'%;background:linear-gradient(90deg,var(--brass),var(--cash))">'+parts.join(' · ')+'</div>'+
+          '<div class="tot">'+eur0(cum)+'<small>deployed</small></div>';rungs.appendChild(el);}}
 
     const gb=$('gbars');
-    if(gb){const series=[{l:'Now',v:45336.41,now:true}];let b2=45336.41;['Aug','Sep','Oct','Nov'].forEach(l=>{b2+=15000;series.push({l,v:b2});});
+    if(gb){gb.innerHTML='';let cum=0;const series=[];
+      for(let i=0;i<9;i++){const d=new Date(_st.getFullYear(),_st.getMonth()+i,1);cum+=5000+(i<5?3000:0);series.push({l:_moN[d.getMonth()],v:cum});}
       const maxV=series[series.length-1].v;
-      series.forEach(s=>{const col=document.createElement('div');col.className='gcol'+(s.now?' now':'');const hh=Math.max(4,s.v/maxV*150);
+      series.forEach((s,i)=>{const col=document.createElement('div');col.className='gcol'+(i===0?' now':'');const hh=Math.max(4,s.v/maxV*150);
         col.innerHTML='<div class="gv">'+Math.round(s.v/1000)+'k</div><div class="gb" style="height:'+hh+'px"></div><div class="gl">'+s.l+'</div>';gb.appendChild(col);});}
 
     function pie(svgId,legId,data){const svg=$(svgId);if(!svg)return;svg.innerHTML='';const r=60,cc=2*Math.PI*r,w=26;
