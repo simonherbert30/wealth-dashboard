@@ -629,10 +629,10 @@ body.locked .gate{display:flex}
       </table>
     </div>
 
-    <div class="section-head anim"><h2>The 9‑month deployment</h2><span class="hint">€60k total · €5k VWCE every month, plus bonds &amp; gold for the first five</span></div>
+    <div class="section-head anim"><h2>The deployment plan</h2><span class="hint">3 months done + 9 to go · €5k VWCE monthly, plus bonds &amp; gold for the first five</span></div>
     <div class="deploy">
       <div class="card ladder anim">
-        <p class="lead">On the <b>1st of each month</b>: <b>€5.000 into VWCE</b> for 9 months (<b>€45k</b>). For the <b>first 5 months</b> you also add <b>€2.000 into world bonds</b> and <b>€1.000 into gold</b> — €10k + €5k. Total commitment <b>€60.000</b>. Each rung is one set of buys on a fixed date.</p>
+        <p class="lead">The last <b>3 months</b> are already in (<b>€5k VWCE</b> each). Going forward, on the <b>1st of each month</b>: <b>€5.000 into VWCE</b> for 9 months (<b>€45k</b>), plus <b>€2.000 world bonds</b> and <b>€1.000 gold</b> for the <b>first 5</b> (€10k + €5k). <b>€60.000</b> still to deploy. Each rung is one set of buys on a fixed date.</p>
         <div class="rungs" id="rungs"></div>
       </div>
       <div class="card growth anim" style="animation-delay:.05s">
@@ -800,13 +800,13 @@ body.locked .gate{display:flex}
       <div class="card own-card anim" style="animation-delay:.05s">
         <h3>On your balance sheet</h3>
         <div class="own-list">
-          <div class="mrow"><span class="mk">Property value (your 50%)</span><span class="mv">170.000 €</span></div>
+          <div class="mrow"><span class="mk">Property value (your 50%)<span class="itip" tabindex="0">i<span class="itip-box">Marked to the TINSA bank appraisal of 24 Feb 2026: €380.564 total → your 50% ≈ €190.282. You paid €340.000 (€170.000/half), so this reflects €40.564 of appraised upside. See the Market &amp; value sub‑tab.</span></span></div><span class="mv">190.282 €</span></div>
           <div class="mrow"><span class="mk">Mortgage (your 50%)</span><span class="mv" id="bsMort" style="color:var(--debt)">− 135.471 €</span></div>
           <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Property equity</span><span class="mv" id="bsEq" style="color:var(--grow);font-weight:600">34.529 €</span></div>
           <div class="mrow"><span class="mk">+ Receivable from Luciana</span><span class="mv">22.175 €</span></div>
           <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Your total stake in Salva 40</span><span class="mv" id="bsStake" style="font-weight:600">56.704 €</span></div>
         </div>
-        <div class="recon" style="background:rgba(95,184,154,.08);border-color:rgba(95,184,154,.28)"><span class="ic" style="color:var(--grow)">✓</span><p><b style="color:var(--grow)">Confirmed 50/50.</b> Half the payment (€520,87) = half the loan = half the flat, so €170.000 / €135.000 / €35.000 is correct. The 75/25 is only who <em>fronted the cash</em> — squared off by Luciana's €22.175 debt to you.</p></div>
+        <div class="recon" style="background:rgba(95,184,154,.08);border-color:rgba(95,184,154,.28)"><span class="ic" style="color:var(--grow)">✓</span><p><b style="color:var(--grow)">Confirmed 50/50.</b> Half the payment (€520,87) = half the loan = half the flat — at purchase €170.000 / €135.000 / €35.000. The flat is now <b>marked to the TINSA appraisal (€380.564)</b>, so your 50% shows ≈ €190.282 above. The 75/25 is only who <em>fronted the cash</em> — squared off by Luciana's €22.175 debt to you.</p></div>
       </div>
     </div>
 
@@ -1472,7 +1472,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · deploy-plan+tasacion</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · deploy-12mo+mark380</span></p>
   </div>
 </div>
 
@@ -1503,7 +1503,7 @@ body.locked .gate{display:flex}
       payLog.push({d:d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),a:M.pay});}})();
   let obFull=M.init,totalPaid=0,fullN=0,intPaid=0;
   payLog.forEach(p=>{totalPaid+=p.a;if(p.stub){intPaid+=p.a;}else{const i=obFull*M.rate;intPaid+=i;obFull-=(p.a-i);fullN++;}});
-  const simonMort=obFull/2, propValue=170000;
+  const simonMort=obFull/2, propValue=190281.85;/* your 50% of the TINSA appraisal €380.563,69 (marked to appraisal, was cost 170.000) */
 
   /* ---------- categories ---------- */
   const catMeta={'Equity':V('--brass'),'Real estate':V('--estate'),'Savings':V('--grow'),'Receivables':V('--recv'),'Cash':V('--cash')};
@@ -1621,6 +1621,7 @@ body.locked .gate{display:flex}
   setInterval(()=>{if(syncStatus==='synced')renderSync();},30000);
 
   function syncMort(){const m=state.accounts.find(a=>a.id==='mortgage');if(m)m.value=simonMort;}
+  function syncSalva(){const s=state.accounts.find(a=>a.id==='salva');if(s)s.value=propValue;}
   function persist(){if(!state)return;
     if(friendMode)return; /* guests are read-only — never write or push */
     state.updatedAt=Date.now();
@@ -1693,7 +1694,7 @@ body.locked .gate{display:flex}
 
   /* ============ DYNAMIC RENDER ============ */
   function renderDynamic(){
-    syncMort();
+    syncMort();syncSalva();
     const t=totalsOf(state.accounts);
     set('netVal',grp(t.net));
     set('footAssets',eur0(t.gross));
@@ -1825,25 +1826,28 @@ body.locked .gate{display:flex}
 
   /* ============ STATIC RENDER (once) ============ */
   function initStatic(){
-    /* deployment plan: from next month's 1st — €5k VWCE ×9, +€2k bonds & +€1k gold for the first 5 */
+    /* deployment: 3 months already done (€5k VWCE each) + 9 forward — €5k VWCE ×9, +€2k bonds & +€1k gold for the first 5 */
     const _moN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const _now=new Date(),_st=new Date(_now.getFullYear(),_now.getMonth()+1,1);
+    const _now=new Date(),_f0=new Date(_now.getFullYear(),_now.getMonth()+1,1);/* first forward month */
+    const _plan=[];
+    for(let k=-3;k<9;k++){const d=new Date(_f0.getFullYear(),_f0.getMonth()+k,1);const done=k<0;
+      const bond=(!done&&k<5)?2000:0,gold=(!done&&k<5)?1000:0,tot=5000+bond+gold;
+      _plan.push({d,done,bond,gold,tot,first:k===0});}
+    let _cum=0;_plan.forEach(p=>{_cum+=p.tot;p.cum=_cum;});const _maxCum=_cum;
     const rungs=$('rungs');
-    if(rungs){rungs.innerHTML='';let cum=0;
-      for(let i=0;i<9;i++){const d=new Date(_st.getFullYear(),_st.getMonth()+i,1);
-        const bond=i<5?2000:0,gold=i<5?1000:0,tot=5000+bond+gold;cum+=tot;
-        const parts=['VWCE 5k'];if(bond)parts.push('bonds 2k');if(gold)parts.push('gold 1k');
-        const el=document.createElement('div');el.className='rung'+(i===0?' now':'');
-        el.innerHTML='<div class="mo">'+_moN[d.getMonth()]+'<small>'+String(d.getFullYear()).slice(2)+'</small></div>'+
-          '<div class="bar" style="width:'+(tot/8000*100).toFixed(0)+'%;background:linear-gradient(90deg,var(--brass),var(--cash))">'+parts.join(' · ')+'</div>'+
-          '<div class="tot">'+eur0(cum)+'<small>deployed</small></div>';rungs.appendChild(el);}}
+    if(rungs){rungs.innerHTML='';_plan.forEach(p=>{
+      const parts=['VWCE 5k'];if(p.bond)parts.push('bonds 2k');if(p.gold)parts.push('gold 1k');
+      const el=document.createElement('div');el.className='rung'+(p.first?' now':'');
+      const bg=p.done?'var(--grow)':'linear-gradient(90deg,var(--brass),var(--cash))';
+      el.innerHTML='<div class="mo">'+_moN[p.d.getMonth()]+'<small>'+(p.done?'✓ done':String(p.d.getFullYear()).slice(2))+'</small></div>'+
+        '<div class="bar" style="width:'+(p.tot/8000*100).toFixed(0)+'%;background:'+bg+'">'+parts.join(' · ')+'</div>'+
+        '<div class="tot">'+eur0(p.cum)+'<small>deployed</small></div>';rungs.appendChild(el);});}
 
     const gb=$('gbars');
-    if(gb){gb.innerHTML='';let cum=0;const series=[];
-      for(let i=0;i<9;i++){const d=new Date(_st.getFullYear(),_st.getMonth()+i,1);cum+=5000+(i<5?3000:0);series.push({l:_moN[d.getMonth()],v:cum});}
-      const maxV=series[series.length-1].v;
-      series.forEach((s,i)=>{const col=document.createElement('div');col.className='gcol'+(i===0?' now':'');const hh=Math.max(4,s.v/maxV*150);
-        col.innerHTML='<div class="gv">'+Math.round(s.v/1000)+'k</div><div class="gb" style="height:'+hh+'px"></div><div class="gl">'+s.l+'</div>';gb.appendChild(col);});}
+    if(gb){gb.innerHTML='';const usable=130;/* leave room for the value + month labels inside the 180px track */
+      _plan.forEach(p=>{const col=document.createElement('div');col.className='gcol'+(p.first?' now':'');const hh=Math.max(4,p.cum/_maxCum*usable);
+        const bg=p.done?'linear-gradient(180deg,var(--grow),rgba(95,184,154,.3))':'linear-gradient(180deg,var(--brass),rgba(201,169,106,.3))';
+        col.innerHTML='<div class="gv">'+Math.round(p.cum/1000)+'k</div><div class="gb" style="height:'+hh.toFixed(0)+'px;background:'+bg+'"></div><div class="gl">'+_moN[p.d.getMonth()]+'</div>';gb.appendChild(col);});}
 
     function pie(svgId,legId,data){const svg=$(svgId);if(!svg)return;svg.innerHTML='';const r=60,cc=2*Math.PI*r,w=26;
       const tr=document.createElementNS(NS,'circle');tr.setAttribute('cx',75);tr.setAttribute('cy',75);tr.setAttribute('r',r);tr.setAttribute('fill','none');tr.setAttribute('stroke','rgba(255,255,255,.05)');tr.setAttribute('stroke-width',w);svg.appendChild(tr);
