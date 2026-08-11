@@ -120,17 +120,19 @@ body{margin:0;background:
 .rung{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:16px;padding:14px 0;border-bottom:1px dashed rgba(255,255,255,.08)}
 .rung:last-child{border-bottom:none}
 .rung .mo{font-family:var(--mono);font-size:12px;color:var(--brass)}.rung .mo small{display:block;color:var(--muted-2);font-size:10px}
-.rung .bar{height:26px;border-radius:6px;background:linear-gradient(90deg,rgba(201,169,106,.85),rgba(201,169,106,.35));display:flex;align-items:center;padding-left:12px;font-family:var(--mono);font-size:12px;color:#1a1305;font-weight:600;min-width:60px}
-.rung .tot{font-family:var(--mono);font-size:13px;text-align:right}.rung .tot small{display:block;color:var(--muted);font-size:10.5px}
-.rung.now .bar{background:linear-gradient(90deg,rgba(110,136,176,.7),rgba(110,136,176,.25));color:#0b1220}
+.rung .bar{position:relative;height:26px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden;display:flex;align-items:center;min-width:0}
+.rung .barfill{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+.rung .barlbl{position:relative;z-index:1;padding-left:12px;white-space:nowrap;font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--text)}
+.rung .tot{font-family:var(--mono);font-size:13px;text-align:right;white-space:nowrap}.rung .tot small{display:block;color:var(--muted);font-size:10.5px}
 .growth{padding:24px 26px}
 .growth h3{font-family:var(--disp);font-weight:600;font-size:14px;margin:0 0 4px}
 .growth .cap{color:var(--muted);font-size:12px;margin:0 0 20px}
-.gbars{display:flex;align-items:flex-end;gap:10px;height:180px;padding-top:8px}
-.gcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
-.gcol .gb{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--brass),rgba(201,169,106,.3));min-height:4px}
+.gbars{display:flex;align-items:flex-end;gap:5px;height:180px;padding-top:8px;overflow:hidden}
+.gcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.gcol .gb{width:100%;max-width:34px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--brass),rgba(201,169,106,.3));min-height:4px}
 .gcol.now .gb{background:linear-gradient(180deg,var(--cash),rgba(110,136,176,.3))}
-.gcol .gl{font-family:var(--mono);font-size:10px;color:var(--muted)}.gcol .gv{font-family:var(--mono);font-size:10px}
+.gcol .gl{font-family:var(--mono);font-size:9px;color:var(--muted)}.gcol .gv{font-family:var(--mono);font-size:9px}
+@media(max-width:560px){.gbars{gap:3px}.gcol .gl,.gcol .gv{font-size:8px}}
 .src-note{margin-top:18px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;line-height:1.6}.src-note b{color:var(--text)}
 
 /* pots */
@@ -1474,7 +1476,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · reval+deploy60+sagrera</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · chart-fit+bars</span></p>
   </div>
 </div>
 
@@ -1846,13 +1848,13 @@ body.locked .gate{display:flex}
     if(rungs){rungs.innerHTML='';_plan.forEach(p=>{
       const parts=p.done?['VWCE '+(p.vwce/1000)+'k']:['VWCE 5k'];if(p.bond)parts.push('bonds 2k');if(p.gold)parts.push('gold 1k');
       const el=document.createElement('div');el.className='rung';
-      const bg=p.done?'var(--brass)':'var(--muted-2)';const txtcol=p.done?'var(--ink)':'var(--text)';
+      const fill=p.done?'rgba(201,169,106,.55)':'rgba(126,138,160,.35)';/* yellow = deployed, grey = to deploy */
       el.innerHTML='<div class="mo">'+_moN[p.d.getMonth()]+'<small>'+(p.done?'✓ done':String(p.d.getFullYear()).slice(2))+'</small></div>'+
-        '<div class="bar" style="width:'+Math.max(14,p.tot/_maxTot*100).toFixed(0)+'%;background:'+bg+';color:'+txtcol+'">'+parts.join(' · ')+'</div>'+
+        '<div class="bar"><span class="barfill" style="width:'+Math.max(10,p.tot/_maxTot*100).toFixed(0)+'%;background:'+fill+'"></span><span class="barlbl">'+parts.join(' · ')+'</span></div>'+
         '<div class="tot">'+eur0(p.cum)+'<small>'+(p.done?'deployed':'to deploy')+'</small></div>';rungs.appendChild(el);});}
 
     const gb=$('gbars');
-    if(gb){gb.innerHTML='';const usable=130;/* leave room for the value + month labels inside the 180px track */
+    if(gb){gb.innerHTML='';const usable=112;/* keep the tallest bar + its value/month labels comfortably inside the 180px track */
       _plan.forEach(p=>{const col=document.createElement('div');col.className='gcol';const hh=Math.max(4,p.cum/_maxCum*usable);
         const bg=p.done?'linear-gradient(180deg,var(--brass),rgba(201,169,106,.3))':'linear-gradient(180deg,var(--muted-2),rgba(126,138,160,.25))';
         col.innerHTML='<div class="gv">'+Math.round(p.cum/1000)+'k</div><div class="gb" style="height:'+hh.toFixed(0)+'px;background:'+bg+'"></div><div class="gl">'+_moN[p.d.getMonth()]+'</div>';gb.appendChild(col);});}
