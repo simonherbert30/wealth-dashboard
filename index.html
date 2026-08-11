@@ -632,14 +632,16 @@ body.locked .gate{display:flex}
     <div class="section-head anim"><h2>The deployment plan</h2><span class="hint">3 months done + 9 to go · €5k VWCE monthly, plus bonds &amp; gold for the first five</span></div>
     <div class="deploy">
       <div class="card ladder anim">
-        <p class="lead">The last <b>3 months</b> are already in (<b>€5k VWCE</b> each). Going forward, on the <b>1st of each month</b>: <b>€5.000 into VWCE</b> for 9 months (<b>€45k</b>), plus <b>€2.000 world bonds</b> and <b>€1.000 gold</b> for the <b>first 5</b> (€10k + €5k). <b>€60.000</b> still to deploy. Each rung is one set of buys on a fixed date.</p>
+        <p class="lead"><b>€60k already deployed</b> over the last 3 months (€30k, then €15k + €15k into VWCE). Going forward, on the <b>1st of each month</b>: <b>€5.000 into VWCE</b> for 9 months (<b>€45k</b>), plus <b>€2.000 world bonds</b> and <b>€1.000 gold</b> for the <b>first 5</b> (€10k + €5k) — <b>€60.000</b> still to deploy, €120k in all.</p>
+        <div class="inc-legend" style="display:flex;gap:16px;margin:0 0 12px;font-size:11.5px;color:var(--muted)"><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--brass);margin-right:5px"></i>Already deployed</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--muted-2);margin-right:5px"></i>Still to deploy</span></div>
         <div class="rungs" id="rungs"></div>
       </div>
       <div class="card growth anim" style="animation-delay:.05s">
         <h3>Cumulative deployed, month by month</h3>
         <p class="cap">Contributions only — market movement not shown</p>
         <div class="gbars" id="gbars"></div>
-        <div class="src-note"><b>Source:</b> the buys draw from Trade Republic savings (€75.987). The plan ends at <b>€60k deployed</b> — €45k VWCE, €10k world bonds, €5k gold.</div>
+        <div class="src-note"><b>Source:</b> the buys draw from your Trade Republic / Revolut savings. Cumulative runs to <b>€120k</b> — €60k already in, €60k still to go (€45k VWCE, €10k bonds, €5k gold).</div>
+        <div class="src-note" id="deployAfterNote" style="margin-top:8px"></div>
       </div>
     </div>
 
@@ -1472,7 +1474,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · deploy-12mo+mark380</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 24 Jul 2026 · reval+deploy60+sagrera</span></p>
   </div>
 </div>
 
@@ -1712,6 +1714,9 @@ body.locked .gate{display:flex}
     set('ledgerNet',eur(t.net));
     const vwce=state.accounts.find(a=>a.id==='vwce');if(vwce)set('kpiVwceNow',eur0(vwce.value));
     const dg=state.accounts.find(a=>a.id==='degiro');if(dg)set('kpiDegiro',eur0(dg.value));
+    /* cash + savings remaining after the €60k still-to-deploy is drawn down */
+    const cashSav=(t.cats['Savings']||0)+(t.cats['Cash']||0),afterDeploy=cashSav-60000;
+    const _dan=$('deployAfterNote');if(_dan)_dan.innerHTML='<b>After the remaining €60k is deployed:</b> cash + savings left ≈ <b style="color:'+(afterDeploy>=0?'var(--grow)':'var(--debt)')+'">'+eur0(afterDeploy)+'</b> (from '+eur0(cashSav)+' today).';
     set('kpiTotalInv',eur0(t.cats['Equity']||0));
     set('kpiInvAfter',eur0((t.cats['Equity']||0)+75000));
     const heldTot=['vwce','degiro','trade_republic','revolut_sav'].reduce((s,id)=>{const a=state.accounts.find(x=>x.id===id);return s+(a?a.value:0);},0);
@@ -1826,27 +1831,30 @@ body.locked .gate{display:flex}
 
   /* ============ STATIC RENDER (once) ============ */
   function initStatic(){
-    /* deployment: 3 months already done (€5k VWCE each) + 9 forward — €5k VWCE ×9, +€2k bonds & +€1k gold for the first 5 */
+    /* deployment: 3 months already done (€30k, €15k, €15k VWCE = €60k) + 9 forward — €5k VWCE ×9, +€2k bonds & +€1k gold for the first 5.
+       Yellow (brass) = already deployed; grey = still to deploy. */
     const _moN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const _pastAmt=[30000,15000,15000];/* the 3 done months, oldest first */
     const _now=new Date(),_f0=new Date(_now.getFullYear(),_now.getMonth()+1,1);/* first forward month */
     const _plan=[];
     for(let k=-3;k<9;k++){const d=new Date(_f0.getFullYear(),_f0.getMonth()+k,1);const done=k<0;
-      const bond=(!done&&k<5)?2000:0,gold=(!done&&k<5)?1000:0,tot=5000+bond+gold;
-      _plan.push({d,done,bond,gold,tot,first:k===0});}
-    let _cum=0;_plan.forEach(p=>{_cum+=p.tot;p.cum=_cum;});const _maxCum=_cum;
+      let vwce,bond=0,gold=0;
+      if(done){vwce=_pastAmt[k+3];}else{vwce=5000;bond=(k<5?2000:0);gold=(k<5?1000:0);}
+      _plan.push({d,done,vwce,bond,gold,tot:vwce+bond+gold,first:k===0});}
+    let _cum=0;_plan.forEach(p=>{_cum+=p.tot;p.cum=_cum;});const _maxCum=_cum,_maxTot=30000;
     const rungs=$('rungs');
     if(rungs){rungs.innerHTML='';_plan.forEach(p=>{
-      const parts=['VWCE 5k'];if(p.bond)parts.push('bonds 2k');if(p.gold)parts.push('gold 1k');
-      const el=document.createElement('div');el.className='rung'+(p.first?' now':'');
-      const bg=p.done?'var(--grow)':'linear-gradient(90deg,var(--brass),var(--cash))';
+      const parts=p.done?['VWCE '+(p.vwce/1000)+'k']:['VWCE 5k'];if(p.bond)parts.push('bonds 2k');if(p.gold)parts.push('gold 1k');
+      const el=document.createElement('div');el.className='rung';
+      const bg=p.done?'var(--brass)':'var(--muted-2)';const txtcol=p.done?'var(--ink)':'var(--text)';
       el.innerHTML='<div class="mo">'+_moN[p.d.getMonth()]+'<small>'+(p.done?'✓ done':String(p.d.getFullYear()).slice(2))+'</small></div>'+
-        '<div class="bar" style="width:'+(p.tot/8000*100).toFixed(0)+'%;background:'+bg+'">'+parts.join(' · ')+'</div>'+
-        '<div class="tot">'+eur0(p.cum)+'<small>deployed</small></div>';rungs.appendChild(el);});}
+        '<div class="bar" style="width:'+Math.max(14,p.tot/_maxTot*100).toFixed(0)+'%;background:'+bg+';color:'+txtcol+'">'+parts.join(' · ')+'</div>'+
+        '<div class="tot">'+eur0(p.cum)+'<small>'+(p.done?'deployed':'to deploy')+'</small></div>';rungs.appendChild(el);});}
 
     const gb=$('gbars');
     if(gb){gb.innerHTML='';const usable=130;/* leave room for the value + month labels inside the 180px track */
-      _plan.forEach(p=>{const col=document.createElement('div');col.className='gcol'+(p.first?' now':'');const hh=Math.max(4,p.cum/_maxCum*usable);
-        const bg=p.done?'linear-gradient(180deg,var(--grow),rgba(95,184,154,.3))':'linear-gradient(180deg,var(--brass),rgba(201,169,106,.3))';
+      _plan.forEach(p=>{const col=document.createElement('div');col.className='gcol';const hh=Math.max(4,p.cum/_maxCum*usable);
+        const bg=p.done?'linear-gradient(180deg,var(--brass),rgba(201,169,106,.3))':'linear-gradient(180deg,var(--muted-2),rgba(126,138,160,.25))';
         col.innerHTML='<div class="gv">'+Math.round(p.cum/1000)+'k</div><div class="gb" style="height:'+hh.toFixed(0)+'px;background:'+bg+'"></div><div class="gl">'+_moN[p.d.getMonth()]+'</div>';gb.appendChild(col);});}
 
     function pie(svgId,legId,data){const svg=$(svgId);if(!svg)return;svg.innerHTML='';const r=60,cc=2*Math.PI*r,w=26;
@@ -2471,8 +2479,9 @@ body.locked .gate{display:flex}
       {k:'clot', n:'el Clot',               c:'--grow',  w:1.6, d:[2223,1869,1985,2145,2443,2955,2964,3168,3235,3163,3619,3395,3641,4092,4787]},
       {k:'pn',   n:'el Poblenou',           c:'--alert', w:1.6, d:[2649,2493,2551,2718,2924,3620,3767,3755,3863,3940,4390,4052,4642,5448,5829]},
       {k:'dreta',n:"la Dreta de l'Eixample",c:'--estate',w:1.6, d:[3345,3411,3326,3623,4229,4738,5138,4994,5253,4785,5507,5523,5888,6224,6709]},
+      {k:'sag',  n:'la Sagrera',            c:'--debt',  w:1.6, d:[2633,2400,2460,2783,2898,3435,3730,3636,3623,3663,3807,3820,3955,4158,4315]},
     ];
-    const on={ps:true,bcn:true,clot:true,pn:true,dreta:true};
+    const on={ps:true,bcn:true,clot:true,pn:true,dreta:true,sag:true};
     const W=480,H=260,pad={l:42,r:14,t:14,b:26},y0=1500,y1=7000,N=14;
     const X=i=>pad.l+i/N*(W-pad.l-pad.r),Y=v=>pad.t+(1-(v-y0)/(y1-y0))*(H-pad.t-pad.b);
     const path=a=>a.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
@@ -2564,6 +2573,12 @@ body.locked .gate{display:flex}
     migrateUtilities();
     if(!Array.isArray(state.expenses))state.expenses=clone(EXPENSE_SEED);
     if(!state.incomeV2){state.income=clone(INCOME_SEED);state.incomeV2=true;} /* re-seed once with meal vouchers included */
+    /* one-time: mark the property to the TINSA appraisal across the whole net-worth history
+       (your 50% of €380.564 = €190.281,85). Adjust each snapshot by its own real-estate delta so it stays consistent with the live figure. */
+    if(!state.propRevalV1){
+      (state.history||[]).forEach(s=>{const old=(s.cats&&s.cats['Real estate'])||0;const _pd=propValue-old;
+        s.net=(s.net||0)+_pd;s.gross=(s.gross||0)+_pd;if(s.cats)s.cats['Real estate']=propValue;});
+      state.propRevalV1=true;}
     /* keep the Degiro account value in sync with the holdings (single source of truth) */
     const _dg=state.accounts.find(a=>a.id==='degiro');
     if(_dg){const _t=(state.degiro||[]).reduce((s,d)=>s+(+d.value||0),0)+(+state.degiroCash||0);
