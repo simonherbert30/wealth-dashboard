@@ -1510,7 +1510,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1 · plan-fix</span></p>
   </div>
 </div>
 
@@ -1870,8 +1870,8 @@ body.locked .gate{display:flex}
     /* deployment: 3 months already done (€30k, €15k, €15k VWCE = €60k) + 9 forward — €5k VWCE ×9, +€2k bonds & +€1k gold for the first 5.
        Yellow (brass) = already deployed; grey = still to deploy. */
     const _moN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const _pastAmt=[30000,15000,15000];/* the 3 done months, oldest first */
-    const _now=new Date(),_f0=new Date(_now.getFullYear(),_now.getMonth()+1,1);/* first forward month */
+    const _pastAmt=[30000,15000,15000];/* the 3 done months, oldest first: Jun/Jul/Aug 2026 */
+    const _f0=new Date(2026,8,1);/* Sep 2026 = first still-to-deploy month; fixed anchor so labels don't drift as time passes */
     const _plan=[];
     for(let k=-3;k<9;k++){const d=new Date(_f0.getFullYear(),_f0.getMonth()+k,1);const done=k<0;
       let vwce,bond=0,gold=0;
