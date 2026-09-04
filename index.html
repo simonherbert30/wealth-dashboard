@@ -1240,6 +1240,15 @@ body.locked .gate{display:flex}
     </div>
 
     <div class="section-head anim"><h2>The 4-year clock — when each gift becomes untouchable</h2><span class="hint">Live countdown · recalculates every time you open this page</span></div>
+    <div class="card anim" id="safeCountdown" style="text-align:center;background:linear-gradient(135deg,rgba(201,169,106,.16),rgba(201,169,106,.03));border:1px solid rgba(201,169,106,.45);box-shadow:0 0 0 1px rgba(201,169,106,.08),0 12px 30px rgba(0,0,0,.25);margin-bottom:16px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--brass);margin-bottom:10px">⏳ Countdown · until 155.000 € is safe</div>
+      <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap">
+        <span id="cdDays" style="font-family:var(--mono);font-weight:700;font-size:clamp(52px,11vw,88px);line-height:.9;color:var(--brass);letter-spacing:-2px">—</span>
+        <span style="font-family:var(--mono);font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:2px">days</span>
+      </div>
+      <div id="cdClock" style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:.5px">—</div>
+      <div id="cdSub" style="font-size:13px;color:var(--muted-2);margin-top:14px;line-height:1.6;max-width:640px;margin-left:auto;margin-right:auto">—</div>
+    </div>
     <div class="kpis k4 anim">
       <div class="kpi"><div class="k">Safe today</div><div class="v" id="gSafeNow">—</div><div class="n" id="gSafeNowSub">of 163.000 € prescribed</div></div>
       <div class="kpi"><div class="k">First gift safe</div><div class="v" id="gFirst">—</div><div class="n" id="gFirstSub">—</div></div>
@@ -1510,7 +1519,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1 · propeq-decimal</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1 · safe-countdown</span></p>
   </div>
 </div>
 
@@ -2441,6 +2450,23 @@ body.locked .gate{display:flex}
         '<span style="width:96px;text-align:right;font-family:var(--mono);font-size:11px;flex:none">'+status+'</span>';
       host.appendChild(row);
     });
+    // ── hero: live countdown to 155.000 € safe (all 2023–2024 gifts prescribed = bulkSafe; the lone 1.000 € Oct-2025 gift + 7.000 € cash/undated stay out) ──
+    (function(){
+      const el=$('cdDays');if(!el||!bulkSafe)return;
+      function tick(){
+        const ms=bulkSafe-new Date();
+        if(ms<=0){el.textContent='0';set('cdClock','all safe');return true;}
+        el.textContent=Math.floor(ms/DAY).toLocaleString('de-DE');
+        const h=Math.floor(ms%DAY/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);
+        set('cdClock',String(h).padStart(2,'0')+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s to go');
+        return false;
+      }
+      const yrs=((bulkSafe-new Date())/(365.25*DAY)).toFixed(1).replace('.',',');
+      set('cdSub', new Date()>=bulkSafe
+        ? '155.000 € has prescribed — only the 1.000 € (14 Oct 2025) gift and the 7.000 € cash/undated remain exposed.'
+        : 'All 2023–2024 gifts — 155.000 € of the 163.000 € — become untouchable on '+fmtD(bulkSafe)+', about '+yrs+' years out. After that only the 1.000 € Oct‑2025 gift and 7.000 € cash/undated stay exposed.');
+      if(!tick()){const iv=setInterval(()=>{if(tick())clearInterval(iv);},1000);}
+    })();
   })();
 
   /* gifts — cumulative "safe euros" over time chart (responsive px-true) */
