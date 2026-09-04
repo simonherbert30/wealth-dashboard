@@ -1510,7 +1510,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1 · sep-deployed</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1 · propeq-decimal</span></p>
   </div>
 </div>
 
@@ -1744,7 +1744,7 @@ body.locked .gate{display:flex}
     set('kpiFinAssets',eur0((t.cats['Equity']||0)+(t.cats['Savings']||0)+(t.cats['Cash']||0)));
     set('kpiInvested',eur0(t.cats['Equity']||0));
     set('kpiPropEq',eur0((t.cats['Real estate']||0)-simonMort));
-    set('kpiPropSub',Math.round((t.cats['Real estate']||0)/1000)+'k − '+(simonMort/1000).toFixed(1).replace('.',',')+'k mortgage');
+    set('kpiPropSub',((t.cats['Real estate']||0)/1000).toFixed(1).replace('.',',')+'k − '+(simonMort/1000).toFixed(1).replace('.',',')+'k mortgage');
     set('kpiRecv',eur0(t.cats['Receivables']||0));
     set('kpiMort',eur0(t.liab));
     set('ledgerNet',eur(t.net));
