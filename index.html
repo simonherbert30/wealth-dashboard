@@ -1543,7 +1543,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1 · countdown-v2</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1 · costs-editable</span></p>
   </div>
 </div>
 
@@ -2158,10 +2158,11 @@ body.locked .gate{display:flex}
         const when=u.when?'<span class="when-tag">'+esc(u.when)+'</span>':'<span class="when-tag">—</span>';
         tr.innerHTML='<td>'+when+'</td><td style="font-weight:500">'+esc(UT_LABEL[u.type]||u.type||'')+'</td>'+
           '<td class="r val">'+eur(+u.amount||0)+'</td>'+
-          '<td class="r"><button class="cost-row-del" data-del-util="'+u.id+'" title="Remove">✕</button></td>';
+          '<td class="r" style="white-space:nowrap"><button class="cost-row-del" data-edit-util="'+u.id+'" title="Edit" style="color:var(--muted)">✎</button> <button class="cost-row-del" data-del-util="'+u.id+'" title="Remove">✕</button></td>';
         ub.appendChild(tr);});
       if(!utils.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="4"><div class="cost-empty">No utility bills yet — use ＋ Add bill.</div></td>';ub.appendChild(tr);}
-      ub.querySelectorAll('[data-del-util]').forEach(b=>b.addEventListener('click',()=>delUtil(b.getAttribute('data-del-util'))));}
+      ub.querySelectorAll('[data-del-util]').forEach(b=>b.addEventListener('click',()=>delUtil(b.getAttribute('data-del-util'))));
+      ub.querySelectorAll('[data-edit-util]').forEach(b=>b.addEventListener('click',()=>openUtil(b.getAttribute('data-edit-util'))));}
     set('utilFootTotal',eur(utilSum));
     set('costOneoffTotal',eur0(total));set('costFootTotal',eur0(total));
     set('costRecurMonth',rec.length?eur0(annual/12):'0 €');
@@ -2179,10 +2180,11 @@ body.locked .gate{display:flex}
           '<td style="color:var(--muted);font-size:12.5px">'+esc(c.brand||'')+'</td>'+
           '<td>'+esc(c.who||'')+'</td>'+
           '<td class="r val">'+eur(+c.amount||0)+'</td>'+
-          '<td class="r"><button class="cost-row-del" data-del-cost="'+c.id+'" title="Remove">✕</button></td>';
+          '<td class="r" style="white-space:nowrap"><button class="cost-row-del" data-edit-cost="'+c.id+'" title="Edit" style="color:var(--muted)">✎</button> <button class="cost-row-del" data-del-cost="'+c.id+'" title="Remove">✕</button></td>';
         cb.appendChild(tr);});
       if(!one.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="6"><div class="cost-empty">No one‑off costs yet — use ＋ Add cost.</div></td>';cb.appendChild(tr);}
       cb.querySelectorAll('[data-del-cost]').forEach(b=>b.addEventListener('click',()=>delCost(b.getAttribute('data-del-cost'))));
+      cb.querySelectorAll('[data-edit-cost]').forEach(b=>b.addEventListener('click',()=>openCost(b.getAttribute('data-edit-cost'))));
     }
     const rb=$('recurBody');
     if(rb){rb.innerHTML='';
@@ -2192,10 +2194,11 @@ body.locked .gate{display:flex}
           '<td><span class="freq-badge">'+freqLabel(c.freq)+'</span></td>'+
           '<td class="r val">'+eur(+c.amount||0)+'</td>'+
           '<td class="r val">'+eur0(annualise(c))+'</td>'+
-          '<td class="r"><button class="cost-row-del" data-del-recur="'+c.id+'" title="Remove">✕</button></td>';
+          '<td class="r" style="white-space:nowrap"><button class="cost-row-del" data-edit-recur="'+c.id+'" title="Edit" style="color:var(--muted)">✎</button> <button class="cost-row-del" data-del-recur="'+c.id+'" title="Remove">✕</button></td>';
         rb.appendChild(tr);});
       if(!rec.length){const tr=document.createElement('tr');tr.innerHTML='<td colspan="6"><div class="cost-empty">No recurring costs yet — add community fees, IBI, home insurance, utilities…<br>Use ＋ Add recurring above.</div></td>';rb.appendChild(tr);}
       rb.querySelectorAll('[data-del-recur]').forEach(b=>b.addEventListener('click',()=>delRecur(b.getAttribute('data-del-recur'))));
+      rb.querySelectorAll('[data-edit-recur]').forEach(b=>b.addEventListener('click',()=>openRecur(b.getAttribute('data-edit-recur'))));
     }
   }
 
@@ -2312,15 +2315,16 @@ body.locked .gate{display:flex}
   /* ---------- Utilities: add a dated bill (like one-off costs) ---------- */
   if($('addUtilBtn')){
     const um=$('utilModal');
-    $('addUtilBtn').addEventListener('click',()=>{$('uType').selectedIndex=0;$('uWhen').value='';$('uAmount').value='';um.hidden=false;$('uAmount').dispatchEvent(new Event('input'));});
+    $('addUtilBtn').addEventListener('click',()=>openUtil());
     $('utilModalClose').addEventListener('click',()=>um.hidden=true);
     um.addEventListener('click',e=>{if(e.target===um)um.hidden=true;});
     dgWirePreview($('uAmount'),$('uAmountPrev'),false);
     $('utilCommit').addEventListener('click',()=>{const amt=normNum($('uAmount').value);
       if(amt==null||amt<0){toast('Enter an amount');return;}
       pushUndo();if(!Array.isArray(state.utilities))state.utilities=[];
-      state.utilities.push({id:'util_'+Date.now(),type:$('uType').value,when:($('uWhen').value||'').trim(),amount:amt});
-      persist();renderCosts();toast('Utility bill added',{fn:doUndo});um.hidden=true;});
+      if(utilEditId){const u=state.utilities.find(x=>x.id===utilEditId);if(u)Object.assign(u,{type:$('uType').value,when:($('uWhen').value||'').trim(),amount:amt});}
+      else{state.utilities.push({id:'util_'+Date.now(),type:$('uType').value,when:($('uWhen').value||'').trim(),amount:amt});}
+      persist();renderCosts();toast(utilEditId?'Utility bill saved':'Utility bill added',{fn:doUndo});um.hidden=true;});
   }
 
   /* ---------- Expenses: add / edit / remove + monthly/yearly toggle ---------- */
@@ -2633,27 +2637,60 @@ body.locked .gate{display:flex}
 
   /* cost modals */
   const costModal=$('costModal'),recurModal=$('recurModal');
-  function openCost(){['cItem','cRoom','cWhen','cBrand','cAmount'].forEach(id=>{if($(id))$(id).value='';});costModal.hidden=false;}
-  function openRecur(){['rLabel','rAmount'].forEach(id=>{if($(id))$(id).value='';});recurModal.hidden=false;}
-  $('addCostBtn').addEventListener('click',openCost);
+  const _d2=v=>v!=null&&v!==''?String(v).replace('.',','):'';
+  let costEditId=null,recurEditId=null,utilEditId=null;
+  function openCost(id){
+    costEditId=(typeof id==='string')?id:null;
+    const c=costEditId?(state.propertyCosts||[]).find(x=>x.id===costEditId):null;
+    $('cItem').value=c?(c.item||''):'';$('cRoom').value=c?(c.room||''):'';$('cWhen').value=c?(c.when||''):'';
+    $('cBrand').value=c?(c.brand||''):'';if($('cWho'))$('cWho').value=c?(c.who||'Simon'):'Simon';
+    if($('cCond'))$('cCond').value=c?(c.cond||'New'):'New';$('cAmount').value=c?_d2(c.amount):'';
+    const t=costModal.querySelector('.modal-head h3');if(t)t.textContent=c?'Edit one‑off cost':'Add a one‑off cost';
+    $('costCommit').textContent=c?'Save cost':'Add cost';costModal.hidden=false;
+  }
+  function openRecur(id){
+    recurEditId=(typeof id==='string')?id:null;
+    const c=recurEditId?(state.recurringCosts||[]).find(x=>x.id===recurEditId):null;
+    $('rLabel').value=c?(c.label||''):'';$('rAmount').value=c?_d2(c.amount):'';
+    if($('rFreq'))$('rFreq').value=c?(c.freq||'monthly'):'monthly';if($('rWho'))$('rWho').value=c?(c.who||'Both'):'Both';
+    const t=recurModal.querySelector('.modal-head h3');if(t)t.textContent=c?'Edit recurring cost':'Add a recurring cost';
+    $('recurCommit').textContent=c?'Save recurring cost':'Add recurring cost';recurModal.hidden=false;
+  }
+  function openUtil(id){
+    const um=$('utilModal');if(!um)return;
+    utilEditId=(typeof id==='string')?id:null;
+    const u=utilEditId?(state.utilities||[]).find(x=>x.id===utilEditId):null;
+    if($('uType'))$('uType').value=u?u.type:$('uType').options[0].value;
+    $('uWhen').value=u?(u.when||''):'';$('uAmount').value=u?_d2(u.amount):'';
+    const t=um.querySelector('.modal-head h3');if(t)t.textContent=u?'Edit utility bill':'Add a utility bill';
+    if($('utilCommit'))$('utilCommit').textContent=u?'Save bill':'Add bill';
+    um.hidden=false;$('uAmount').dispatchEvent(new Event('input'));
+  }
+  $('addCostBtn').addEventListener('click',()=>openCost());
   $('costModalClose').addEventListener('click',()=>costModal.hidden=true);
   costModal.addEventListener('click',e=>{if(e.target===costModal)costModal.hidden=true;});
   $('costCommit').addEventListener('click',()=>{
     const item=($('cItem').value||'').trim(),amt=normNum($('cAmount').value);
     if(!item){toast('What did you buy?');return;}
     if(amt==null||amt<0){toast('Enter an amount');return;}
-    state.propertyCosts.push({id:'cost_'+Date.now(),when:($('cWhen').value||'').trim(),item,room:($('cRoom').value||'').trim(),brand:($('cBrand').value||'').trim(),who:$('cWho').value,cond:$('cCond').value,amount:amt});
-    persist();renderCosts();toast('Cost added');costModal.hidden=true;
+    pushUndo();if(!Array.isArray(state.propertyCosts))state.propertyCosts=[];
+    const rec={when:($('cWhen').value||'').trim(),item,room:($('cRoom').value||'').trim(),brand:($('cBrand').value||'').trim(),who:$('cWho').value,cond:$('cCond').value,amount:amt};
+    if(costEditId){const c=state.propertyCosts.find(x=>x.id===costEditId);if(c)Object.assign(c,rec);}
+    else{rec.id='cost_'+Date.now();state.propertyCosts.push(rec);}
+    persist();renderCosts();toast(costEditId?'Cost saved':'Cost added',{fn:doUndo});costModal.hidden=true;
   });
-  $('addRecurBtn').addEventListener('click',openRecur);
+  $('addRecurBtn').addEventListener('click',()=>openRecur());
   $('recurModalClose').addEventListener('click',()=>recurModal.hidden=true);
   recurModal.addEventListener('click',e=>{if(e.target===recurModal)recurModal.hidden=true;});
   $('recurCommit').addEventListener('click',()=>{
     const label=($('rLabel').value||'').trim(),amt=normNum($('rAmount').value);
     if(!label){toast('Name the cost');return;}
     if(amt==null||amt<0){toast('Enter an amount');return;}
-    state.recurringCosts.push({id:'recur_'+Date.now(),label,amount:amt,freq:$('rFreq').value,who:$('rWho').value});
-    persist();renderCosts();toast('Recurring cost added');recurModal.hidden=true;
+    pushUndo();if(!Array.isArray(state.recurringCosts))state.recurringCosts=[];
+    const rec={label,amount:amt,freq:$('rFreq').value,who:$('rWho').value};
+    if(recurEditId){const c=state.recurringCosts.find(x=>x.id===recurEditId);if(c)Object.assign(c,rec);}
+    else{rec.id='recur_'+Date.now();state.recurringCosts.push(rec);}
+    persist();renderCosts();toast(recurEditId?'Recurring cost saved':'Recurring cost added',{fn:doUndo});recurModal.hidden=true;
   });
 
   /* ---------- boot (runs after unlock) ---------- */
