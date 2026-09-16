@@ -328,7 +328,7 @@ body{margin:0;background:
 .modal-body{padding:20px 24px 24px}
 .modal-body label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:16px 0 7px}
 .modal-body label:first-child{margin-top:0}
-.fld,.modal-body select,.modal-body input[type=text]{width:100%;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--body);font-size:14px;padding:11px 13px}
+.fld,.modal-body select,.modal-body input[type=text]{width:100%;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--body);font-size:16px;padding:11px 13px}
 .modal-body input[type=text]{font-family:var(--mono)}
 .modal-body select{appearance:none;cursor:pointer}
 .dz-row{display:flex;gap:10px}.dz-row>div{flex:1}
@@ -431,7 +431,7 @@ body.locked .gate{display:flex}
 .gate-logo .dot{width:9px;height:9px;border-radius:50%;background:var(--brass);box-shadow:0 0 12px var(--brass)}
 .gate-card h2{font-family:var(--disp);font-weight:600;font-size:22px;margin:0 0 8px}
 .gate-sub{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 20px}
-.gate-card input{width:100%;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:14px;padding:12px 14px;margin-bottom:10px}
+.gate-card input{width:100%;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:16px;padding:12px 14px;margin-bottom:10px}
 .gate-card input:focus{outline:none;border-color:var(--brass)}
 .gate-card .btn-primary{width:100%;justify-content:center;padding:12px;margin-top:6px}
 .gate-err{color:var(--debt);font-size:12.5px;min-height:18px;margin-top:10px}
@@ -831,10 +831,9 @@ body.locked .gate{display:flex}
     </div><!-- /salva-sub-property -->
 
     <div id="salva-sub-costs" class="subpanel">
-      <div class="kpis k4 anim">
+      <div class="kpis k3 anim">
         <div class="kpi brass-kpi"><div class="k">One‑off costs</div><div class="v" id="costOneoffTotal">—</div><div class="n">furniture &amp; setup so far</div></div>
-        <div class="kpi"><div class="k">Recurring / month</div><div class="v" id="costRecurMonth">—</div><div class="n">community + insurance</div></div>
-        <div class="kpi"><div class="k">Recurring / year</div><div class="v" id="costRecurYear">—</div><div class="n" id="costRecurCount">2 recurring costs</div></div>
+        <div class="kpi"><div class="k">Recurring / year</div><div class="v" id="costRecurYear">—</div><div class="n" id="costRecurCount">recurring + utilities</div></div>
         <div class="kpi pos"><div class="k">First‑year all‑in</div><div class="v" id="costFirstYear">—</div><div class="n">setup + recurring + utilities</div></div>
       </div>
 
@@ -1538,12 +1537,11 @@ body.locked .gate{display:flex}
     <div class="gate-logo"><span class="dot"></span> Wealth Dashboard</div>
     <h2 id="gateTitle">Unlock</h2>
     <p class="gate-sub" id="gateSub">Enter your password to decrypt your data.</p>
-    <input type="text" id="gateUser" placeholder="Username (friends only — leave blank if it's your dashboard)" autocomplete="username">
     <input type="password" id="gatePass" placeholder="Password" autocomplete="current-password">
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 01 Sep 2026 · rental-v1 · costs-editable</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 16 Sep 2026 · password-only · no-zoom · costs-yearly</span></p>
   </div>
 </div>
 
@@ -1698,7 +1696,7 @@ body.locked .gate{display:flex}
     state.updatedAt=Date.now();
     if(!pass)return; /* no password session — nothing is written in plaintext */
     encState(pass,state).then(pkg=>{try{localStorage.setItem(LS2,JSON.stringify(pkg));}catch(e){}schedulePush(pkg);}).catch(()=>{});
-    publishFriendMirror();}
+  }
   /* owner publishes a friend-readable mirror (encrypted under FRIEND_PW) so guests can load it */
   function publishFriendMirror(){if(!SYNC.enabled||friendMode||!state)return;
     clearTimeout(friendPushTimer);
@@ -2165,9 +2163,9 @@ body.locked .gate{display:flex}
       ub.querySelectorAll('[data-edit-util]').forEach(b=>b.addEventListener('click',()=>openUtil(b.getAttribute('data-edit-util'))));}
     set('utilFootTotal',eur(utilSum));
     set('costOneoffTotal',eur0(total));set('costFootTotal',eur0(total));
-    set('costRecurMonth',rec.length?eur0(annual/12):'0 €');
-    set('costRecurYear',eur0(annual));
-    set('costRecurCount',rec.length?(rec.length+' recurring cost'+(rec.length>1?'s':'')):'none yet');
+    /* recurring on a yearly basis (monthly×12, quarterly×4, yearly×1) + utilities logged */
+    set('costRecurYear',eur0(annual+utilSum));
+    set('costRecurCount',(rec.length?(rec.length+' recurring cost'+(rec.length>1?'s':'')):'no recurring')+(utilSum?' + utilities':''));
     /* utilities count as the actual bills received (raw sum, not annualised) */
     set('costFirstYear',eur0(total+annual+utilSum));
     set('recurFootTotal',eur0(annual));
@@ -2749,12 +2747,10 @@ body.locked .gate{display:flex}
     }catch(e){gateError('Wrong friend credentials.');}}
   async function unlock(){
     const p=(gatePass&&gatePass.value)||'';
-    const u=((gateUser&&gateUser.value)||'').trim().toLowerCase();
     if(!p){gateError('Enter a password');return;}
     if(!(window.crypto&&crypto.subtle)){gateError('This browser blocks encryption on this page (needs https or a local file).');return;}
     if(gateGo){gateGo.disabled=true;gateGo.textContent='Unlocking…';}
     if(gateErr)gateErr.textContent='';
-    if(u===FRIEND_PW&&p===FRIEND_PW){await unlockFriend();if(gateGo){gateGo.disabled=false;gateGo.textContent='Unlock';}return;}
     try{
       if(SYNC.enabled){try{SYNC.key=await kdfHex(p);}catch(e){SYNC.key=null;}}
       let localPkg=null;try{const raw=localStorage.getItem(LS2);if(raw)localPkg=JSON.parse(raw);}catch(e){}
@@ -2785,8 +2781,6 @@ body.locked .gate{display:flex}
   }
   if(gateGo)gateGo.addEventListener('click',unlock);
   if(gatePass)gatePass.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
-  if(gateUser)gateUser.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
-  if(gateUser)gateUser.addEventListener('input',()=>{if(gatePass2&&gateUser.value.trim())gatePass2.hidden=true;});
   if(gatePass2)gatePass2.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
   const lockBtn=$('lockBtn');
   if(lockBtn)lockBtn.addEventListener('click',()=>{pass=null;state=null;location.reload();});
