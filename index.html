@@ -1579,7 +1579,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 21 Sep 2026 · password-only · no-zoom · costs-donut-2</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 21 Sep 2026 · password-only · no-zoom · costs-donut-top12</span></p>
   </div>
 </div>
 
@@ -2183,9 +2183,12 @@ body.locked .gate{display:flex}
   function delCost(id){state.propertyCosts=state.propertyCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Cost removed');}
   function delRecur(id){state.recurringCosts=state.recurringCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Recurring cost removed');}
   /* ---------- One-off costs: donut breakdown (top 8 + Others) ---------- */
-  /* house palette, ordered so touching slices stay apart; grey is reserved for Others */
-  const COST_PAL=['#C9A96A','#6E88B0','#5FB89A','#9C82BC','#D8925C','#8FB0C9','#C56B5A','#7FA88F'];
-  const COST_OTHER='#616B80',COST_TOP=8;
+  /* House palette (all 11 hues) plus one muted teal, ordered so touching slices stay
+     apart; grey is reserved for Others. At 12 categories the hues are close: the legend
+     name, amount, % and bar length are what identify a slice, colour only pairs it. */
+  const COST_PAL=['#C9A96A','#6E88B0','#8FB0C9','#B0906E','#5FA3B0','#D8925C',
+                  '#A88FB0','#C56B5A','#7E8AA0','#5FB89A','#9C82BC','#7FA88F'];
+  const COST_OTHER='#616B80',COST_TOP=12;
   let costSplit='item';
   /* roll the cost log up by item / room / who, biggest first */
   function costGroups(one,split){
