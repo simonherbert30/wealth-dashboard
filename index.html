@@ -415,6 +415,27 @@ body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend
 .section-head.with-action{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .btn-add{appearance:none;border:1px solid var(--brass);background:rgba(201,169,106,.12);color:var(--brass);font-family:var(--body);font-weight:600;font-size:12.5px;padding:7px 13px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
 .btn-add:hover{background:var(--brass);color:var(--ink)}
+/* one-off cost breakdown (donut + ranked legend) */
+.costpie-card{padding:22px 24px}
+.costpie{display:grid;grid-template-columns:212px minmax(0,760px);gap:28px;align-items:center;justify-content:center}
+.costpie .donut{width:196px;height:196px;margin:0 auto}
+.costpie .donut .cl{font-size:9px;letter-spacing:1.2px}
+.costpie .donut .cv{font-size:20px;margin-top:2px}
+.cp-cap{text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted-2);margin-top:10px}
+.cp-rows{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cp-row{display:grid;grid-template-columns:9px minmax(0,1fr) 84px 52px;gap:10px;align-items:center;font-size:12.5px}
+.cp-row i{width:9px;height:9px;border-radius:2px}
+/* the tinted fill behind the label is the bar — its track is the label column */
+.cp-name{position:relative;min-width:0;border-radius:6px;padding:6px 9px;overflow:hidden}
+.cp-name .cp-fill{position:absolute;left:0;top:0;bottom:0;opacity:.18;border-radius:6px;transition:opacity .12s}
+.cp-row:hover .cp-fill{opacity:.3}
+.cp-name .cpn{position:relative;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.cp-name .cpn small{color:var(--muted-2);font-size:11px;margin-left:6px}
+.cp-row .cpv{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.cp-row .cpp{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;color:var(--muted)}
+.cp-empty{color:var(--muted);font-size:13px;text-align:center;padding:24px 0}
+@media(max-width:860px){.costpie{grid-template-columns:1fr;gap:16px;justify-content:stretch}
+  .cp-row{grid-template-columns:9px minmax(0,1fr) 76px 46px;gap:8px;font-size:12px}}
 .cost-row-del{appearance:none;background:none;border:none;color:var(--muted-2);cursor:pointer;font-size:13px;padding:2px 7px;border-radius:6px;transition:.12s;line-height:1}
 .cost-row-del:hover{color:var(--debt);background:rgba(197,107,90,.14)}
 .freq-badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--cash);border:1px solid rgba(110,136,176,.4);border-radius:5px;padding:2px 8px}
@@ -837,7 +858,24 @@ body.locked .gate{display:flex}
         <div class="kpi pos"><div class="k">First‑year all‑in</div><div class="v" id="costFirstYear">—</div><div class="n">setup + recurring + utilities</div></div>
       </div>
 
-      <div class="section-head with-action anim"><h2>One‑off costs</h2><button class="btn-add" id="addCostBtn">＋ Add cost</button></div>
+      <div class="section-head with-action anim"><h2>One‑off costs</h2>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="seg" id="costPieToggle" style="margin-right:0"><button class="seg-btn active" data-split="item">By item</button><button class="seg-btn" data-split="room">By room</button><button class="seg-btn" data-split="who">By who</button></div>
+          <button class="btn-add" id="addCostBtn">＋ Add cost</button>
+        </div>
+      </div>
+      <div class="card costpie-card anim">
+        <div class="costpie">
+          <div>
+            <div class="donut">
+              <svg width="196" height="196" viewBox="0 0 200 200" id="costPie" role="img" aria-labelledby="costPieDesc"><title id="costPieDesc">Share of one‑off costs by category</title></svg>
+              <div class="center"><div class="cl">Total</div><div class="cv" id="costPieCenter">—</div></div>
+            </div>
+            <div class="cp-cap" id="costPieCount">—</div>
+          </div>
+          <div class="cp-rows" id="costPieRows"></div>
+        </div>
+      </div>
       <div class="card holdings anim">
         <table class="wide">
           <thead><tr><th>When</th><th>Item</th><th>Where</th><th>Who</th><th class="r">Amount</th><th></th></tr></thead>
@@ -1541,7 +1579,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 16 Sep 2026 · password-only · no-zoom · costs-yearly</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 21 Sep 2026 · password-only · no-zoom · costs-donut</span></p>
   </div>
 </div>
 
@@ -2144,6 +2182,57 @@ body.locked .gate{display:flex}
     svg.innerHTML=bars+xl;}
   function delCost(id){state.propertyCosts=state.propertyCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Cost removed');}
   function delRecur(id){state.recurringCosts=state.recurringCosts.filter(c=>c.id!==id);persist();renderCosts();toast('Recurring cost removed');}
+  /* ---------- One-off costs: donut breakdown (top 8 + Others) ---------- */
+  /* house palette, ordered so touching slices stay apart; grey is reserved for Others */
+  const COST_PAL=['#C9A96A','#6E88B0','#5FB89A','#9C82BC','#D8925C','#8FB0C9','#C56B5A','#7FA88F'];
+  const COST_OTHER='#616B80',COST_TOP=8;
+  let costSplit='item';
+  /* roll the cost log up by item / room / who, biggest first */
+  function costGroups(one,split){
+    const by={},keys=[];
+    one.forEach(c=>{const v=+c.amount||0;if(!(v>0))return;
+      let k=String((split==='room'?c.room:split==='who'?c.who:c.item)||'').trim();
+      if(!k)k=split==='room'?'No room set':split==='who'?'Unattributed':'Untitled';
+      if(!by[k]){by[k]={n:k,v:0,c:0};keys.push(k);}
+      by[k].v+=v;by[k].c++;});
+    return keys.map(k=>by[k]).sort((a,b)=>b.v-a.v);
+  }
+  function drawCostPie(one){
+    const svg=$('costPie'),rows=$('costPieRows');if(!svg||!rows)return;
+    const groups=costGroups(one,costSplit),total=groups.reduce((s,g)=>s+g.v,0);
+    const desc='<title id="costPieDesc">Share of one\u2011off costs by '+costSplit+'</title>';
+    if(!total){svg.innerHTML=desc;rows.innerHTML='<div class="cp-empty">Nothing to chart yet \u2014 add a cost and the split appears here.</div>';
+      set('costPieCenter','0 \u20ac');set('costPieCount','\u2014');return;}
+    /* top 8 by amount; everything past that collapses into one Others slice.
+       With exactly 9 groups there is nothing to collapse \u2014 name the 9th instead. */
+    const rest=groups.slice(COST_TOP),lone=rest.length===1;
+    const slices=[];
+    groups.slice(0,COST_TOP).forEach((g,i)=>slices.push({n:g.n,v:g.v,c:g.c,col:COST_PAL[i]}));
+    if(lone)slices.push({n:rest[0].n,v:rest[0].v,c:rest[0].c,col:COST_OTHER});
+    else if(rest.length)slices.push({n:'Others',v:rest.reduce((s,g)=>s+g.v,0),c:rest.reduce((s,g)=>s+g.c,0),col:COST_OTHER,rest:rest.length});
+    const r=74,cc=2*Math.PI*r,w=24,gap=slices.length>1?2:0,maxV=slices[0].v||1;
+    const fmtPct=v=>(v/total*100).toFixed(1).replace('.',',')+'%';
+    let svgH=desc+'<circle cx="100" cy="100" r="'+r+'" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="'+w+'"/>',o=0;
+    slices.forEach(d=>{const arc=d.v/total*cc,len=Math.max(0.6,arc-gap);
+      svgH+='<g><title>'+esc(d.n)+' \u00b7 '+eur(d.v)+' \u00b7 '+fmtPct(d.v)+(d.c>1?' \u00b7 '+d.c+' entries':'')+'</title>'+
+        '<circle cx="100" cy="100" r="'+r+'" fill="none" stroke="'+d.col+'" stroke-width="'+w+'" stroke-linecap="butt"'+
+        ' stroke-dashoffset="'+o.toFixed(2)+'" stroke-dasharray="'+len.toFixed(2)+' '+(cc-len).toFixed(2)+'"/></g>';
+      o-=arc;});
+    svg.innerHTML=svgH;
+    rows.innerHTML='';
+    slices.forEach(d=>{const el=document.createElement('div');el.className='cp-row';
+      const note=d.rest?d.rest+' more':(d.c>1?d.c+'\u00d7':'');
+      el.title=d.n+' \u00b7 '+eur(d.v)+' \u00b7 '+fmtPct(d.v);
+      /* the tinted fill is the bar: width is the share of the biggest slice */
+      el.innerHTML='<i style="background:'+d.col+'"></i>'+
+        '<span class="cp-name"><span class="cp-fill" style="width:'+Math.max(2,d.v/maxV*100).toFixed(1)+'%;background:'+d.col+'"></span>'+
+        '<span class="cpn">'+esc(d.n)+(note?' <small>'+note+'</small>':'')+'</span></span>'+
+        '<span class="cpv">'+eur(d.v)+'</span><span class="cpp">'+fmtPct(d.v)+'</span>';
+      rows.appendChild(el);});
+    set('costPieCenter',eur0(total));
+    set('costPieCount',groups.length+' '+(costSplit==='item'?'item':costSplit==='room'?'room':'payer')+(groups.length>1?'s':'')+
+      (rest.length>1?' \u00b7 top '+COST_TOP+' shown':''));
+  }
   function renderCosts(){
     const one=state.propertyCosts||[],rec=state.recurringCosts||[];
     const total=one.reduce((s,c)=>s+(+c.amount||0),0);
@@ -2163,6 +2252,7 @@ body.locked .gate{display:flex}
       ub.querySelectorAll('[data-edit-util]').forEach(b=>b.addEventListener('click',()=>openUtil(b.getAttribute('data-edit-util'))));}
     set('utilFootTotal',eur(utilSum));
     set('costOneoffTotal',eur0(total));set('costFootTotal',eur0(total));
+    drawCostPie(one);
     /* recurring on a yearly basis (monthly×12, quarterly×4, yearly×1) + utilities logged */
     set('costRecurYear',eur0(annual+utilSum));
     set('costRecurCount',(rec.length?(rec.length+' recurring cost'+(rec.length>1?'s':'')):'no recurring')+(utilSum?' + utilities':''));
@@ -2328,6 +2418,9 @@ body.locked .gate{display:flex}
   /* ---------- Expenses: add / edit / remove + monthly/yearly toggle ---------- */
   if($('expToggle')){[...$('expToggle').querySelectorAll('.seg-btn')].forEach(b=>b.addEventListener('click',()=>{
     expMode=b.dataset.mode;$('expToggle').querySelectorAll('.seg-btn').forEach(x=>x.classList.toggle('active',x===b));renderExpenses();}));}
+  if($('costPieToggle')){[...$('costPieToggle').querySelectorAll('.seg-btn')].forEach(b=>b.addEventListener('click',()=>{
+    costSplit=b.dataset.split;$('costPieToggle').querySelectorAll('.seg-btn').forEach(x=>x.classList.toggle('active',x===b));
+    drawCostPie(state.propertyCosts||[]);}));}
   if($('addExpBtn')){
     const em=$('expModal');
     $('addExpBtn').addEventListener('click',()=>openExp(null));
