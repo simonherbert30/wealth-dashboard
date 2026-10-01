@@ -662,10 +662,10 @@ body.locked .gate{display:flex}
       </table>
     </div>
 
-    <div class="section-head anim"><h2>The deployment plan</h2><span class="hint">3 months done + 9 to go · €5k VWCE monthly, plus bonds &amp; gold for the first five</span></div>
+    <div class="section-head anim"><h2>The deployment plan</h2><span class="hint" id="depHint">—</span></div>
     <div class="deploy">
       <div class="card ladder anim">
-        <p class="lead"><b>€60k already deployed</b> over the last 3 months (€30k, then €15k + €15k into VWCE). Going forward, on the <b>1st of each month</b>: <b>€5.000 into VWCE</b> for 9 months (<b>€45k</b>), plus <b>€2.000 world bonds</b> and <b>€1.000 gold</b> for the <b>first 5</b> (€10k + €5k) — <b>€60.000</b> still to deploy, €120k in all.</p>
+        <p class="lead"><b><span id="depDone">—</span> deployed so far</b> — the €30k / €15k / €15k VWCE lump sums, then <b>€5.000 into VWCE</b> on the <b>1st of each month</b> for 9 months (<b>€45k</b>), plus <b>€2.000 world bonds</b> and <b>€1.000 gold</b> for the <b>first 5</b> (€10k + €5k). <b><span id="depLeft">—</span></b> still to deploy, €120k in all.</p>
         <div class="inc-legend" style="display:flex;gap:16px;margin:0 0 12px;font-size:11.5px;color:var(--muted)"><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--brass);margin-right:5px"></i>Already deployed</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--muted-2);margin-right:5px"></i>Still to deploy</span></div>
         <div class="rungs" id="rungs"></div>
       </div>
@@ -673,7 +673,7 @@ body.locked .gate{display:flex}
         <h3>Cumulative deployed, month by month</h3>
         <p class="cap">Contributions only — market movement not shown</p>
         <div class="gbars" id="gbars"></div>
-        <div class="src-note"><b>Source:</b> the buys draw from your Trade Republic / Revolut savings. Cumulative runs to <b>€120k</b> — €60k already in, €60k still to go (€45k VWCE, €10k bonds, €5k gold).</div>
+        <div class="src-note"><b>Source:</b> the buys draw from your Trade Republic / Revolut savings. Cumulative runs to <b>€120k</b> — <span id="depDone2">—</span> already in, <span id="depLeft2">—</span> still to go (<span id="depLeftSplit">—</span>).</div>
         <div class="src-note" id="deployAfterNote" style="margin-top:8px"></div>
       </div>
     </div>
@@ -1579,7 +1579,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 21 Sep 2026 · password-only · no-zoom · costs-donut-top12</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 1 Oct 2026 · password-only · no-zoom · deploy-oct-done</span></p>
   </div>
 </div>
 
@@ -1819,9 +1819,10 @@ body.locked .gate{display:flex}
     set('ledgerNet',eur(t.net));
     const vwce=state.accounts.find(a=>a.id==='vwce');if(vwce)set('kpiVwceNow',eur0(vwce.value));
     const dg=state.accounts.find(a=>a.id==='degiro');if(dg)set('kpiDegiro',eur0(dg.value));
-    /* cash + savings remaining after the €60k still-to-deploy is drawn down */
-    const cashSav=(t.cats['Savings']||0)+(t.cats['Cash']||0),afterDeploy=cashSav-60000;
-    const _dan=$('deployAfterNote');if(_dan)_dan.innerHTML='<b>After the remaining €60k is deployed:</b> cash + savings left ≈ <b style="color:'+(afterDeploy>=0?'var(--grow)':'var(--debt)')+'">'+eur0(afterDeploy)+'</b> (from '+eur0(cashSav)+' today).';
+    /* cash + savings remaining after what is STILL to deploy is drawn down */
+    const _dp=buildDeploy();
+    const cashSav=(t.cats['Savings']||0)+(t.cats['Cash']||0),afterDeploy=cashSav-_dp.left;
+    const _dan=$('deployAfterNote');if(_dan)_dan.innerHTML='<b>After the remaining '+eur0(_dp.left)+' is deployed:</b> cash + savings left ≈ <b style="color:'+(afterDeploy>=0?'var(--grow)':'var(--debt)')+'">'+eur0(afterDeploy)+'</b> (from '+eur0(cashSav)+' today).';
     set('kpiTotalInv',eur0(t.cats['Equity']||0));
     set('kpiInvAfter',eur0((t.cats['Equity']||0)+75000));
     const heldTot=['vwce','degiro','trade_republic','revolut_sav'].reduce((s,id)=>{const a=state.accounts.find(x=>x.id===id);return s+(a?a.value:0);},0);
@@ -1935,21 +1936,39 @@ body.locked .gate{display:flex}
   function doUndo(){if(!undoSnap)return;state=undoSnap;undoSnap=null;persist();renderDynamic();toast('Restored');}
 
   /* ============ STATIC RENDER (once) ============ */
+  /* ---------- the deployment ladder, in one place ----------
+     3 lump-sum VWCE months (€30k/€15k/€15k) then 9 forward months of €5k VWCE,
+     with €2k bonds + €1k gold on the first 5. _f0 is a fixed anchor so the
+     month labels never drift; _doneThru is THE ONLY thing to bump as each
+     month is deployed — every "deployed / still to deploy" figure on the tab
+     is derived from it, so none of them can fall out of step again. */
+  function buildDeploy(){
+    const f0=new Date(2026,8,1);      /* Sep 2026 = first month of the recurring 5k plan */
+    const doneThru=new Date(2026,9,1);/* deployed through & including Oct 2026 */
+    const pastAmt=[30000,15000,15000];/* Jun / Jul / Aug 2026, oldest first */
+    const plan=[];
+    for(let k=-3;k<9;k++){const d=new Date(f0.getFullYear(),f0.getMonth()+k,1);
+      const past=k<0; let vwce,bond=0,gold=0;
+      if(past){vwce=pastAmt[k+3];}else{vwce=5000;bond=(k<5?2000:0);gold=(k<5?1000:0);}
+      plan.push({d,done:d<=doneThru,vwce,bond,gold,tot:vwce+bond+gold,first:false});}
+    const f=plan.find(p=>!p.done);if(f)f.first=true;
+    let cum=0;plan.forEach(p=>{cum+=p.tot;p.cum=cum;});
+    const sum=(f2,k)=>plan.filter(f2).reduce((a,p)=>a+p[k],0);
+    const notDone=p=>!p.done;
+    return {plan:plan,total:cum,
+      done:sum(p=>p.done,'tot'), left:sum(notDone,'tot'),
+      leftV:sum(notDone,'vwce'), leftB:sum(notDone,'bond'), leftG:sum(notDone,'gold'),
+      nDone:plan.filter(p=>p.done).length, nLeft:plan.filter(notDone).length};
+  }
   function initStatic(){
-    /* deployment: 3 months already done (€30k, €15k, €15k VWCE = €60k) + 9 forward — €5k VWCE ×9, +€2k bonds & +€1k gold for the first 5.
-       Yellow (brass) = already deployed; grey = still to deploy. */
     const _moN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const _pastAmt=[30000,15000,15000];/* the 3 lump-sum VWCE months, oldest first: Jun/Jul/Aug 2026 */
-    const _f0=new Date(2026,8,1);/* Sep 2026 = first month of the recurring 5k plan; fixed anchor so labels don't drift */
-    const _doneThru=new Date(2026,8,1);/* deployed through & including this month (Sep 2026) — bump one month as each is deployed */
-    const _plan=[];
-    for(let k=-3;k<9;k++){const d=new Date(_f0.getFullYear(),_f0.getMonth()+k,1);
-      const past=k<0;/* lump-sum VWCE months before the recurring plan */
-      let vwce,bond=0,gold=0;
-      if(past){vwce=_pastAmt[k+3];}else{vwce=5000;bond=(k<5?2000:0);gold=(k<5?1000:0);}
-      _plan.push({d,done:d<=_doneThru,vwce,bond,gold,tot:vwce+bond+gold,first:false});}
-    {const _f=_plan.find(p=>!p.done);if(_f)_f.first=true;}
-    let _cum=0;_plan.forEach(p=>{_cum+=p.tot;p.cum=_cum;});const _maxCum=_cum,_maxTot=30000;
+    const D=buildDeploy(),_plan=D.plan,_maxCum=D.total,_maxTot=30000;
+    /* the copy around the ladder reads off the same object, so bumping
+       _doneThru moves every figure at once */
+    set('depHint',D.nDone+' month'+(D.nDone===1?'':'s')+' done + '+D.nLeft+' to go \u00b7 \u20ac5k VWCE monthly, plus bonds & gold for the first five');
+    set('depDone',eur0(D.done)); set('depDone2',eur0(D.done));
+    set('depLeft',eur0(D.left)); set('depLeft2',eur0(D.left));
+    set('depLeftSplit',[D.leftV&&eur0(D.leftV)+' VWCE',D.leftB&&eur0(D.leftB)+' bonds',D.leftG&&eur0(D.leftG)+' gold'].filter(Boolean).join(', ')||'nothing left');
     const rungs=$('rungs');
     if(rungs){rungs.innerHTML='';_plan.forEach(p=>{
       const parts=p.done?['VWCE '+(p.vwce/1000)+'k']:['VWCE 5k'];if(p.bond)parts.push('bonds 2k');if(p.gold)parts.push('gold 1k');
