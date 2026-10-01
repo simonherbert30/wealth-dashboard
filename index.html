@@ -534,7 +534,7 @@ body.locked .gate{display:flex}
 
     <div class="kpis k5 anim" style="animation-delay:.05s">
       <div class="kpi"><div class="k">Equity + savings + cash</div><div class="v" id="kpiFinAssets">—</div><div class="n">financial assets</div></div>
-      <div class="kpi"><div class="k">Invested equity</div><div class="v" id="kpiInvested">—</div><div class="n">VWCE + Degiro</div></div>
+      <div class="kpi"><div class="k">Invested</div><div class="v" id="kpiInvested">—</div><div class="n">VWCE + bonds + gold + Degiro</div></div>
       <div class="kpi pos"><div class="k">Property equity</div><div class="v" id="kpiPropEq">—</div><div class="n" id="kpiPropSub">—</div></div>
       <div class="kpi"><div class="k">Receivables</div><div class="v" id="kpiRecv">—</div><div class="n">Owed back to you</div></div>
       <div class="kpi debt-kpi"><div class="k">Mortgage</div><div class="v" id="kpiMort">—</div><div class="n">Your 50% · Caixa</div></div>
@@ -565,8 +565,8 @@ body.locked .gate{display:flex}
     <div class="kpis k5 anim">
       <div class="kpi brass-kpi"><div class="k">VWCE now</div><div class="v" id="kpiVwceNow">—</div><div class="n">FTSE All‑World (Acc)</div></div>
       <div class="kpi"><div class="k">Degiro now</div><div class="v" id="kpiDegiro">—</div><div class="n">Stocks + EM trackers</div></div>
-      <div class="kpi pos"><div class="k">Total invested</div><div class="v" id="kpiTotalInv">—</div><div class="n">VWCE + Degiro, at market</div></div>
-      <div class="kpi"><div class="k">Left to deploy</div><div class="v">60.000 €</div><div class="n">€45k VWCE + €10k bonds + €5k gold</div></div>
+      <div class="kpi pos"><div class="k">Total invested</div><div class="v" id="kpiTotalInv">—</div><div class="n">VWCE + bonds + gold + Degiro, at market</div></div>
+      <div class="kpi"><div class="k">Left to deploy</div><div class="v" id="kpiLeftDeploy">—</div><div class="n" id="kpiLeftDeploySub">—</div></div>
       <div class="kpi"><div class="k">Target mix</div><div class="v">85 / 7 / 3 / 5</div><div class="n">Equity / bonds / gold / cash</div></div>
     </div>
 
@@ -665,7 +665,7 @@ body.locked .gate{display:flex}
     <div class="section-head anim"><h2>The deployment plan</h2><span class="hint" id="depHint">—</span></div>
     <div class="deploy">
       <div class="card ladder anim">
-        <p class="lead"><b><span id="depDone">—</span> deployed so far</b> — the €30k / €15k / €15k VWCE lump sums, then <b>€5.000 into VWCE</b> on the <b>1st of each month</b> for 9 months (<b>€45k</b>), plus <b>€2.000 world bonds</b> and <b>€1.000 gold</b> for the <b>first 5</b> (€10k + €5k). <b><span id="depLeft">—</span></b> still to deploy, €120k in all.</p>
+        <p class="lead"><b><span id="depDone">—</span> deployed so far</b> — the €30k / €15k / €15k VWCE lump sums, then <b>€5.000 into VWCE</b> on the <b>1st of each month</b>, plus <b>€2.000 world bonds</b> and <b>€1.000 gold</b> for the <b>first 5</b>. <b><span id="depLeft">—</span></b> still to deploy (<span id="depLeftSplit2">—</span>), €120k in all.</p>
         <div class="inc-legend" style="display:flex;gap:16px;margin:0 0 12px;font-size:11.5px;color:var(--muted)"><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--brass);margin-right:5px"></i>Already deployed</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--muted-2);margin-right:5px"></i>Still to deploy</span></div>
         <div class="rungs" id="rungs"></div>
       </div>
@@ -1579,7 +1579,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 1 Oct 2026 · password-only · no-zoom · revolut-split</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 1 Oct 2026 · password-only · no-zoom · cats-by-value</span></p>
   </div>
 </div>
 
@@ -1613,7 +1613,11 @@ body.locked .gate{display:flex}
   const simonMort=obFull/2, propValue=190281.85;/* your 50% of the TINSA appraisal €380.563,69 (marked to appraisal, was cost 170.000) */
 
   /* ---------- categories ---------- */
-  const catMeta={'Equity':V('--brass'),'Bonds':V('--cash'),'Gold':V('--alert'),'Real estate':V('--estate'),'Savings':V('--grow'),'Receivables':V('--recv'),'Cash':V('--cash')};
+  /* Bonds needs its own hue — it first shipped sharing --cash with Cash, which
+     made two legend swatches identical. #8FB0C9 is the house pale blue: the
+     widest separation available from the other six against the card surface
+     (normal ΔE 9.8, CVD 6.2) without touching --debt, which is reserved. */
+  const catMeta={'Equity':V('--brass'),'Bonds':'#8FB0C9','Gold':V('--alert'),'Real estate':V('--estate'),'Savings':V('--grow'),'Receivables':V('--recv'),'Cash':V('--cash')};
   const order=['Equity','Bonds','Gold','Real estate','Savings','Receivables','Cash'];
   /* the three investment categories, wherever "invested" is meant as a whole */
   const INV_CATS=['Equity','Bonds','Gold'];
@@ -1836,20 +1840,23 @@ body.locked .gate{display:flex}
     set('bsEq',eur0(propValue-simonMort));
     set('bsStake',eur0(propValue-simonMort+22175));
 
+    /* every category list reads biggest-first; `order` itself stays fixed so
+       totalsOf and the category dropdown keep a stable shape */
+    const byVal=order.slice().sort((x,y)=>(t.cats[y]||0)-(t.cats[x]||0));
     const beam=$('beam'),bl=$('beamLegend');
     if(beam){beam.innerHTML='';bl.innerHTML='';
-      order.forEach(c=>{const w=t.gross?t.cats[c]/t.gross*100:0;
+      byVal.forEach(c=>{const w=t.gross?t.cats[c]/t.gross*100:0;
         const s=document.createElement('span');s.style.width=w+'%';s.style.background=catMeta[c];s.title=c+' '+eur0(t.cats[c]);beam.appendChild(s);
         const d=document.createElement('div');d.className='lg';d.innerHTML='<i style="background:'+catMeta[c]+'"></i>'+c+' <b>'+eur0(t.cats[c])+'</b>';bl.appendChild(d);});}
 
     const donut=$('donut');
     if(donut){donut.innerHTML='';const R=78,C=2*Math.PI*R;
       const tr=document.createElementNS(NS,'circle');tr.setAttribute('cx',100);tr.setAttribute('cy',100);tr.setAttribute('r',R);tr.setAttribute('fill','none');tr.setAttribute('stroke','rgba(255,255,255,.05)');tr.setAttribute('stroke-width',22);donut.appendChild(tr);
-      let off=0;order.forEach(c=>{const len=t.gross?t.cats[c]/t.gross*C:0;const el=document.createElementNS(NS,'circle');
+      let off=0;byVal.forEach(c=>{const len=t.gross?t.cats[c]/t.gross*C:0;const el=document.createElementNS(NS,'circle');
         el.setAttribute('cx',100);el.setAttribute('cy',100);el.setAttribute('r',R);el.setAttribute('fill','none');el.setAttribute('stroke',catMeta[c]);el.setAttribute('stroke-width',22);el.setAttribute('stroke-dashoffset',off);el.setAttribute('stroke-dasharray',len+' '+(C-len));donut.appendChild(el);off-=len;});}
 
     const al=$('allocLegend');
-    if(al){al.innerHTML='';order.forEach(c=>{const row=document.createElement('div');row.className='alloc-row';
+    if(al){al.innerHTML='';byVal.forEach(c=>{const row=document.createElement('div');row.className='alloc-row';
       row.innerHTML='<i style="background:'+catMeta[c]+'"></i><span class="nm">'+c+'</span><span class="vl">'+eur0(t.cats[c])+'</span><span class="pc">'+(t.gross?(t.cats[c]/t.gross*100).toFixed(1):'0')+'%</span>';al.appendChild(row);});}
 
     const lb=$('ledgerBody');
@@ -1973,7 +1980,10 @@ body.locked .gate{display:flex}
     set('depHint',D.nDone+' month'+(D.nDone===1?'':'s')+' done + '+D.nLeft+' to go \u00b7 \u20ac5k VWCE monthly, plus bonds & gold for the first five');
     set('depDone',eur0(D.done)); set('depDone2',eur0(D.done));
     set('depLeft',eur0(D.left)); set('depLeft2',eur0(D.left));
-    set('depLeftSplit',[D.leftV&&eur0(D.leftV)+' VWCE',D.leftB&&eur0(D.leftB)+' bonds',D.leftG&&eur0(D.leftG)+' gold'].filter(Boolean).join(', ')||'nothing left');
+    const _split=[D.leftV&&eur0(D.leftV)+' VWCE',D.leftB&&eur0(D.leftB)+' bonds',D.leftG&&eur0(D.leftG)+' gold'].filter(Boolean).join(' + ')||'nothing left';
+    set('depLeftSplit',_split); set('depLeftSplit2',_split);
+    /* the Investments KPI card, same source as the ladder */
+    set('kpiLeftDeploy',eur0(D.left)); set('kpiLeftDeploySub',_split);
     const rungs=$('rungs');
     if(rungs){rungs.innerHTML='';_plan.forEach(p=>{
       const parts=p.done?['VWCE '+(p.vwce/1000)+'k']:['VWCE 5k'];if(p.bond)parts.push('bonds 2k');if(p.gold)parts.push('gold 1k');
