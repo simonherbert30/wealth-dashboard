@@ -779,7 +779,7 @@ body.locked .gate{display:flex}
     <div class="kpis k4 anim" style="animation-delay:.05s">
       <div class="kpi"><div class="k">Monthly payment</div><div class="v">1.041,74 €</div><div class="n">Full mortgage</div></div>
       <div class="kpi brass-kpi"><div class="k">Your share / month</div><div class="v">520,87 €</div><div class="n">50% · you &amp; Lu split</div></div>
-      <div class="kpi debt-kpi"><div class="k">Outstanding (full)</div><div class="v" id="kpiOut">270.942 €</div><div class="n" id="kpiOutSub">3 payments made</div></div>
+      <div class="kpi debt-kpi"><div class="k">Outstanding (full)</div><div class="v" id="kpiOut">—</div><div class="n" id="kpiOutSub">—</div></div>
       <div class="kpi pos"><div class="k">Total taxes paid</div><div class="v">17.000 €</div><div class="n">ITP · 5% of price</div></div>
     </div>
 
@@ -792,7 +792,7 @@ body.locked .gate{display:flex}
           <div class="mb"><div class="mk">Outstanding now</div><div class="mv debt" id="outBig">270.942 €</div></div>
         </div>
         <div class="paybar"><span class="paid" id="payPaid" style="width:0.4%"></span><span class="left" id="payLeft" style="width:99.6%"></span></div>
-        <div class="mrow"><span class="mk">Total paid so far (3 payments)</span><span class="mv" id="totPaid">2.240,85 €</span></div>
+        <div class="mrow"><span class="mk" id="totPaidLbl">Total paid so far</span><span class="mv" id="totPaid">—</span></div>
         <div class="mrow"><span class="mk" style="padding-left:10px">→ interest (cost of the loan)</span><span class="mv" id="intPaidRow" style="color:var(--muted)">1.183,01 €</span></div>
         <div class="mrow"><span class="mk" style="padding-left:10px">→ principal (reduces the debt)</span><span class="mv" id="paidDown" style="color:var(--grow)">1.057,84 €</span></div>
         <div class="mrow"><span class="mk">Interest rate</span><span class="mv">≈ 2,26 % / yr</span></div>
@@ -1579,7 +1579,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 1 Oct 2026 · password-only · no-zoom · cats-by-value</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 2 Oct 2026 · password-only · no-zoom · mort-count</span></p>
   </div>
 </div>
 
@@ -2018,7 +2018,12 @@ body.locked .gate{display:flex}
     renderDegiro();
 
     const ob=obFull,paidDown=M.init-ob,paidPct=paidDown/M.init*100;
-    set('kpiOut',eur0(ob));set('kpiOutSub',payLog.length+' payments · '+eur0(totalPaid)+' paid');set('outBig',eur0(ob));
+    /* count the MONTHLY payments and name the stub separately - payLog.length
+       counted the interest-only stub as a payment, so this row and the "total
+       paid" row disagreed, and the latter had its count hardcoded at 3. */
+    const _stub=payLog.some(p=>p.stub),_pl=fullN+' payment'+(fullN===1?'':'s')+(_stub?' + first stub':'');
+    set('kpiOut',eur0(ob));set('kpiOutSub',_pl+' · '+eur0(totalPaid)+' paid');set('outBig',eur0(ob));
+    set('totPaidLbl','Total paid so far ('+_pl+')');
     set('paidDown',eur(paidDown));set('totPaid',eur(totalPaid));set('intPaidRow',eur(intPaid));
     const pp=$('payPaid'),pl=$('payLeft');if(pp){pp.style.width=Math.max(0.4,paidPct)+'%';pl.style.width=(100-Math.max(0.4,paidPct))+'%';}
     const plog=$('payLog');if(plog){plog.innerHTML='';payLog.forEach(p=>{const r=document.createElement('div');r.className='mrow';r.innerHTML='<span class="mk">'+p.d+(p.stub?' · first stub':'')+'</span><span class="mv">'+eur(p.a)+'</span>';plog.appendChild(r);});const r2=document.createElement('div');r2.className='mrow';r2.innerHTML='<span class="mk" style="color:var(--text)">Ongoing · every month</span><span class="mv" style="color:var(--brass)">'+eur(M.pay)+'</span>';plog.appendChild(r2);}
