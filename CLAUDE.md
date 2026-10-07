@@ -79,7 +79,9 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   live countdown card to that date.
 - **Demo login (7 Oct 2026)** — rebuilt from the friend‑mode code that was removed on
   16 Sep and left dead; the identifiers are now `demoMode` / `DEMO_PW` /
-  `publishDemoMirror`. Entering **`salva40demo`** at the gate loads a read‑only view
+  `publishDemoMirror`. A **View the demo** button sits under Unlock on the gate
+  (`#gateDemo` → `unlockDemo()`); typing **`salva40demo`** as the password does the
+  same thing. Either loads a read‑only view
   where every tab is browsable but all amounts are blurred **except the Salva 40 tab**.
   - The blur is cosmetic. The privacy is `demoScramble()`: the mirror the owner
     publishes is scrambled *before* encryption, so the real figures never leave the

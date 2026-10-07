@@ -457,6 +457,11 @@ body.locked .gate{display:flex}
 .gate-card input{width:100%;background:var(--ink-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:16px;padding:12px 14px;margin-bottom:10px}
 .gate-card input:focus{outline:none;border-color:var(--brass)}
 .gate-card .btn-primary{width:100%;justify-content:center;padding:12px;margin-top:6px}
+.btn-demo{appearance:none;width:100%;cursor:pointer;background:none;border:1px solid var(--line-strong);
+  color:var(--muted);font-family:var(--body);font-weight:500;font-size:13px;padding:11px;border-radius:9px;
+  margin-top:8px;transition:.15s}
+.btn-demo:hover{color:var(--text);border-color:var(--brass)}
+.btn-demo:disabled{opacity:.6;cursor:default}
 .gate-err{color:var(--debt);font-size:12.5px;min-height:18px;margin-top:10px}
 .gate-note{color:var(--muted-2);font-size:11px;line-height:1.6;margin:14px 0 0}
 
@@ -1579,8 +1584,9 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass" placeholder="Password" autocomplete="current-password">
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
+    <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 7 Oct 2026 · demo-login · no-zoom · demo-blur</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 7 Oct 2026 · demo-button · no-zoom · demo-blur</span></p>
   </div>
 </div>
 
@@ -3013,6 +3019,12 @@ body.locked .gate{display:flex}
       if(SYNC.enabled&&!SYNC.key)toast('Sync key unavailable — device‑only mode');
     }catch(e){gateError('Could not unlock: '+(e&&e.message?e.message:'unknown error'));}
   }
+  const gateDemo=$('gateDemo');
+  if(gateDemo)gateDemo.addEventListener('click',async()=>{
+    gateDemo.disabled=true;gateDemo.textContent='Loading the demo\u2026';
+    if(gateErr)gateErr.textContent='';
+    await unlockDemo();
+    gateDemo.disabled=false;gateDemo.textContent='View the demo';});
   if(gateGo)gateGo.addEventListener('click',unlock);
   if(gatePass)gatePass.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
   if(gatePass2)gatePass2.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
