@@ -400,6 +400,13 @@ body{margin:0;background:
 body.demo .demo-num{filter:blur(7px);user-select:none}
 body.demo .demo-badge{display:inline-block}
 .demo-badge{display:none}
+/* sections the demo does not show at all, marked in the markup so the list
+   stays next to what it hides */
+body.demo [data-demo-hide]{display:none!important}
+/* the deployment grid is 1fr 380px; with the ladder gone the chart takes it */
+body.demo .deploy{grid-template-columns:1fr}
+/* account names give away where the money is kept, so they frost too */
+body.demo #ledgerBody .acct{filter:blur(7px);user-select:none}
 /* friend (read-only, restricted) mode */
 body.demo #updateBtn,body.demo #exportBtn,body.demo #importBtn,body.demo #degiroEditBtn,body.demo #addCostBtn,body.demo #addRecurBtn,body.demo #addUtilBtn,body.demo #addExpBtn,body.demo .cost-row-del,body.demo .dg-del,body.demo [data-del-snap],body.demo [data-del-recur],body.demo [data-del-util],body.demo [data-del-exp],body.demo [data-edit-exp]{display:none!important}
 .tab.tab-locked .tl::after{content:" 🔒";font-size:10px;opacity:.7}
@@ -515,9 +522,9 @@ body.locked .gate{display:flex}
     <button class="tab active" role="tab" aria-selected="true" data-tab="net"><span class="ti">01</span> <span class="tl">Net worth</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="inv"><span class="ti">02</span> <span class="tl">Investments</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="salva"><span class="ti">03</span> <span class="tl">Salva 40</span></button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="gifts"><span class="ti">04</span> <span class="tl">Gifts</span></button>
+    <button class="tab" data-demo-hide role="tab" aria-selected="false" data-tab="gifts"><span class="ti">04</span> <span class="tl">Gifts</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="wealth"><span class="ti">05</span> <span class="tl">Wealth</span></button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="cashflow"><span class="ti">06</span> <span class="tl">Cash flow</span></button>
+    <button class="tab" data-demo-hide role="tab" aria-selected="false" data-tab="cashflow"><span class="ti">06</span> <span class="tl">Cash flow</span></button>
   </nav>
 
   <!-- ============ TAB 1 · NET WORTH ============ -->
@@ -599,8 +606,8 @@ body.locked .gate{display:flex}
       <p style="margin:16px 0 0;color:var(--muted-2);font-size:11px;line-height:1.5">Fund sleeves (VWCE, Greece, Brazil trackers) split by their published index weights, so sector figures are approximate. Base excludes €600,60 idle cash in Degiro.</p>
     </div>
 
-    <div class="section-head with-action anim"><h2>Inside your Degiro account</h2><span class="hint" id="degiroHint" style="flex:1">—</span><button class="btn-add" id="degiroEditBtn">🖼️ Update from screenshot</button></div>
-    <div class="card holdings anim">
+    <div class="section-head with-action anim" data-demo-hide><h2>Inside your Degiro account</h2><span class="hint" id="degiroHint" style="flex:1">—</span><button class="btn-add" id="degiroEditBtn">🖼️ Update from screenshot</button></div>
+    <div class="card holdings anim" data-demo-hide>
       <table class="wide">
         <thead><tr><th>Holding</th><th>Type / market</th><th class="r">Value</th><th class="r">Unrealised</th></tr></thead>
         <tbody id="degiroBody"></tbody>
@@ -671,7 +678,7 @@ body.locked .gate{display:flex}
 
     <div class="section-head anim"><h2>The deployment plan</h2><span class="hint" id="depHint">—</span></div>
     <div class="deploy">
-      <div class="card ladder anim">
+      <div class="card ladder anim" data-demo-hide>
         <p class="lead"><b><span id="depDone">—</span> deployed so far</b> — the €30k / €15k / €15k VWCE lump sums, then <b>€5.000 into VWCE</b> on the <b>1st of each month</b>, plus <b>€2.000 world bonds</b> and <b>€1.000 gold</b> for the <b>first 5</b>. <b><span id="depLeft">—</span></b> still to deploy (<span id="depLeftSplit2">—</span>), €120k in all.</p>
         <div class="inc-legend" style="display:flex;gap:16px;margin:0 0 12px;font-size:11.5px;color:var(--muted)"><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--brass);margin-right:5px"></i>Already deployed</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--muted-2);margin-right:5px"></i>Still to deploy</span></div>
         <div class="rungs" id="rungs"></div>
@@ -742,8 +749,8 @@ body.locked .gate{display:flex}
       </div>
     </div>
 
-    <div class="section-head anim"><h2>The discipline</h2><span class="hint">The rule that makes everything above work</span></div>
-    <div class="card nosell anim">
+    <div class="section-head anim" data-demo-hide><h2>The discipline</h2><span class="hint">The rule that makes everything above work</span></div>
+    <div class="card nosell anim" data-demo-hide>
       <div class="lock"><span class="ic">⊘</span><h2>No selling</h2></div>
       <p class="tl">Not on a −30% drop, not on a scary headline, not to "lock in gains." The only exit is a real life need years out.</p>
       <div class="rules">
@@ -1129,7 +1136,7 @@ body.locked .gate{display:flex}
   </section>
 
   <!-- ============ TAB 4 · GIFTS & INHERITANCE ============ -->
-  <section class="panel" id="tab-gifts" role="tabpanel">
+  <section class="panel" data-demo-hide id="tab-gifts" role="tabpanel">
     <div class="kpis k4 anim">
       <div class="kpi brass-kpi"><div class="k">Family gifts received</div><div class="v">163.000 €</div><div class="n">146.000 € dad · 17.000 € grandmother</div></div>
       <div class="kpi debt-kpi"><div class="k">Declared to Hacienda</div><div class="v">0 €</div><div class="n">no deed, no escritura — bank records only</div></div>
@@ -1385,7 +1392,7 @@ body.locked .gate{display:flex}
   </section>
 
   <!-- ============ TAB 6 · CASH FLOW ============ -->
-  <section class="panel" id="tab-cashflow" role="tabpanel">
+  <section class="panel" data-demo-hide id="tab-cashflow" role="tabpanel">
     <div class="subtabs" role="tablist">
       <button class="subtab active" data-sub="cf-income" role="tab">Income</button>
       <button class="subtab" data-sub="cf-expenses" role="tab">Expenses</button>
@@ -1586,7 +1593,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 7 Oct 2026 · demo-button · no-zoom · demo-blur</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 7 Oct 2026 · demo-trim · no-zoom · demo-blur</span></p>
   </div>
 </div>
 

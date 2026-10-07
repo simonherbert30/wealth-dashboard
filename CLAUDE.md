@@ -98,4 +98,12 @@ cloud, then before working locally again copy git's `index.html` back onto the O
     list — values live in ids, table cells and unclassed SVG text, and an enumerated
     rule missed 185 of them including the net‑worth headline. It re‑runs after every
     `renderDynamic()`.
+  - Sections the demo does not show carry **`data-demo-hide`** in the markup, hidden by
+    one CSS rule, so the list lives next to what it hides: tabs **04 Gifts** and
+    **06 Cash flow** (buttons + panels), *Inside your Degiro account*, the deployment
+    **ladder** card (the cumulative chart stays, and `.deploy` goes single-column),
+    and *The discipline*. Account **names** in the ledger are blurred too — they say
+    where the money is kept, which the amounts alone would not.
+  - The demo tab strip therefore reads 01 · 02 · 03 · 05; the numbers are the owner's,
+    not renumbered.
   - `DEMO_PW` is committed to a **public** repo, so treat it as public.
