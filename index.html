@@ -391,18 +391,20 @@ body{margin:0;background:
 .seg-btn+.seg-btn{border-left:1px solid var(--line)}
 .seg-btn.active{background:var(--brass);color:var(--ink)}
 .seg-btn:not(.active):hover{color:var(--text)}
+/* demo mode: amounts are frosted everywhere except the Salva 40 tab. The
+   blur is applied by marking nodes in JS (applyDemoBlur) rather than by a list
+   of selectors - the values live in ids, table cells, bare spans and SVG text,
+   and an enumerated rule kept missing some, the net-worth headline included.
+   The numbers behind the blur are already scrambled (demoScramble); this is
+   the look, not the protection. */
+body.demo .demo-num{filter:blur(7px);user-select:none}
+body.demo .demo-badge{display:inline-block}
+.demo-badge{display:none}
 /* friend (read-only, restricted) mode */
-body.friend #updateBtn,body.friend #exportBtn,body.friend #importBtn,body.friend #degiroEditBtn,body.friend #addCostBtn,body.friend #addRecurBtn,body.friend #addUtilBtn,body.friend #addExpBtn,body.friend .cost-row-del,body.friend .dg-del,body.friend [data-del-snap],body.friend [data-del-recur],body.friend [data-del-util],body.friend [data-del-exp],body.friend [data-edit-exp]{display:none!important}
+body.demo #updateBtn,body.demo #exportBtn,body.demo #importBtn,body.demo #degiroEditBtn,body.demo #addCostBtn,body.demo #addRecurBtn,body.demo #addUtilBtn,body.demo #addExpBtn,body.demo .cost-row-del,body.demo .dg-del,body.demo [data-del-snap],body.demo [data-del-recur],body.demo [data-del-util],body.demo [data-del-exp],body.demo [data-edit-exp]{display:none!important}
 .tab.tab-locked .tl::after{content:" 🔒";font-size:10px;opacity:.7}
 .tab.tab-locked{opacity:.5}
-.panel.blurred{filter:blur(9px);pointer-events:none;user-select:none;transition:filter .2s}
-.friend-veil{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:60;pointer-events:none}
-.friend-veil[hidden]{display:none}
-.friend-veil .fv-card{background:var(--ink-2);border:1px solid var(--line-strong);border-radius:16px;padding:26px 34px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;gap:6px}
-.friend-veil .fv-card .fv-ic{font-size:30px}
-.friend-veil .fv-card span{font-family:var(--body);font-weight:600;font-size:15px;color:var(--text)}
-.friend-veil .fv-card small{font-family:var(--mono);font-size:11px;letter-spacing:.4px;color:var(--muted-2)}
-.friend-badge{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--brass);border:1px solid rgba(201,169,106,.4);border-radius:5px;padding:3px 8px}
+.demo-badge{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--brass);border:1px solid rgba(201,169,106,.4);border-radius:5px;padding:3px 8px}
 
 /* Salva sub-tabs */
 .subtabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--line)}
@@ -1567,7 +1569,6 @@ body.locked .gate{display:flex}
   </div>
 </div>
 
-<div class="friend-veil" id="friendVeil" hidden><div class="fv-card"><span class="fv-ic">🔒</span><span>Private section</span><small>Visible to the owner only</small></div></div>
 
 <!-- ===== PASSWORD GATE ===== -->
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Unlock dashboard">
@@ -1579,7 +1580,7 @@ body.locked .gate{display:flex}
     <input type="password" id="gatePass2" placeholder="Repeat password" autocomplete="new-password" hidden>
     <button class="btn-primary" id="gateGo">Unlock</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 2 Oct 2026 · password-only · no-zoom · mort-count</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 7 Oct 2026 · demo-login · no-zoom · demo-blur</span></p>
   </div>
 </div>
 
@@ -1681,12 +1682,18 @@ body.locked .gate{display:flex}
   const LS='wealthDash_v1';        /* legacy plaintext (migrated, then removed) */
   const LS2='wealthDash_v2enc';    /* encrypted envelope */
   let state=null, pass=null;
-  /* read-only guest access: friends log in with this fixed credential and see
-     only the Investments + Salva tabs. Their copy is a mirror the owner
-     publishes, encrypted under FRIEND_PW at a friend-specific sync path. */
-  const FRIEND_PW='olisimijar';
-  const FRIEND_ALLOWED=['inv','salva'];
-  let friendMode=false, friendSyncKey=null, friendPushTimer=null;
+  /* ---- DEMO ACCESS ----
+     A read-only login for showing the dashboard to friends. Every tab is
+     browsable, but the figures are not the owner's: the mirror the owner
+     publishes is scrambled before it is encrypted (see demoScramble), so the
+     real numbers never leave the owner's browser. Salva 40 is the exception,
+     and deliberately so - its figures come from constants in this file (the
+     272.000 loan, the TINSA appraisal) which are public in this repo anyway,
+     and the flat is the thing being shown off.
+     The blur is presentation only. The privacy is demoScramble. Treat
+     DEMO_PW as public: it is committed to a public repository. */
+  const DEMO_PW='salva40demo';
+  let demoMode=false, demoSyncKey=null, demoPushTimer=null;
   const SYNC={enabled:(location.protocol==='http:'||location.protocol==='https:'),key:null,warned:false};
   const seedCosts=[];      /* personal data no longer ships in code */
   const seedRecurring=[];
@@ -1739,20 +1746,57 @@ body.locked .gate{display:flex}
   function syncMort(){const m=state.accounts.find(a=>a.id==='mortgage');if(m)m.value=simonMort;}
   function syncSalva(){const s=state.accounts.find(a=>a.id==='salva');if(s)s.value=propValue;}
   function persist(){if(!state)return;
-    if(friendMode)return; /* guests are read-only — never write or push */
+    if(demoMode)return; /* guests are read-only — never write or push */
     state.updatedAt=Date.now();
     if(!pass)return; /* no password session — nothing is written in plaintext */
     encState(pass,state).then(pkg=>{try{localStorage.setItem(LS2,JSON.stringify(pkg));}catch(e){}schedulePush(pkg);}).catch(()=>{});
+    publishDemoMirror();   /* refresh the scrambled demo copy alongside */
   }
-  /* owner publishes a friend-readable mirror (encrypted under FRIEND_PW) so guests can load it */
-  function publishFriendMirror(){if(!SYNC.enabled||friendMode||!state)return;
-    clearTimeout(friendPushTimer);
-    friendPushTimer=setTimeout(async()=>{
-      try{if(!friendSyncKey)friendSyncKey=await kdfHex(FRIEND_PW);
-        /* friends only get Investments + Salva data — strip the private tabs entirely */
-        const fv=clone(state);delete fv.income;delete fv.expenses;
-        const pkg=await encState(FRIEND_PW,fv);
-        await fetch('/api/state?k='+friendSyncKey,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(pkg)});
+  /* What a demo visitor downloads is NOT the real state. Every amount is
+     multiplied by one factor, drawn fresh on each publish and never stored, so
+     the dashboard keeps its shape - same bars, same donut proportions - while
+     no figure is the owner's. Salva 40 still reads true because its tab is
+     driven by constants in this file, not by state; its cost tables are
+     mirrored as they are, since those are what the demo is for.
+     Income and expenses are not mirrored at all.
+     Degiro's holdings get their own random factors rather than the shared one:
+     DEGIRO_SEED sits in this public repo, so scaling them uniformly would hand
+     an observer the factor and unravel every other number. */
+  function demoScramble(st){
+    /* Two factors, both drawn fresh per publish and never stored.
+       f scales what is private. g scales what anyone could already work out
+       from this file - the flat's appraised value and the mortgage balance.
+       Keeping them apart is the whole point: with a single factor, dividing
+       the mirrored Salva value by the constant printed above recovers it, and
+       every other number falls out. Nothing scaled by f is public, so f stays
+       unknown. Degiro's holdings get a factor each, since DEGIRO_SEED is in
+       this repo too. */
+    const f=0.55+Math.random()*1.2, g=0.55+Math.random()*1.2;
+    const r2=v=>Math.round(v*100)/100, sc=v=>r2((+v||0)*f), scg=v=>r2((+v||0)*g);
+    const PUB={salva:1,mortgage:1};
+    const d=clone(st);
+    delete d.income; delete d.expenses;
+    (d.accounts||[]).forEach(a=>{a.value=PUB[a.id]?scg(a.value):sc(a.value);});
+    (d.degiro||[]).forEach(h=>{const r=0.4+Math.random()*1.5;
+      h.value=r2((+h.value||0)*r);
+      if(h.cost!=null)h.cost=r2((+h.cost||0)*r);});
+    d.degiroCash=sc(d.degiroCash);
+    (d.history||[]).forEach(h=>{
+      if(h.cats){Object.keys(h.cats).forEach(c=>{h.cats[c]=(c==='Real estate')?scg(h.cats[c]):sc(h.cats[c]);});
+        h.gross=r2(Object.keys(h.cats).reduce((a,c)=>a+h.cats[c],0));}
+      else h.gross=sc(h.gross);
+      h.liab=scg(h.liab);
+      h.net=r2(h.gross-h.liab);   /* recomputed, so the mirror still reconciles */
+      /* notes quote real amounts in plain text ("VWCE \u2192 72.102 \u20ac") */
+      if(h.note)h.note=String(h.note).replace(/[0-9][0-9.,\s]*\u20ac/g,'\u2022\u2022\u2022');});
+    return d;
+  }
+  function publishDemoMirror(){if(!SYNC.enabled||demoMode||!state)return;
+    clearTimeout(demoPushTimer);
+    demoPushTimer=setTimeout(async()=>{
+      try{if(!demoSyncKey)demoSyncKey=await kdfHex(DEMO_PW);
+        const pkg=await encState(DEMO_PW,demoScramble(state));
+        await fetch('/api/state?k='+demoSyncKey,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(pkg)});
       }catch(e){}
     },1500);}
   function snapEntry(note){const t=totalsOf(state.accounts);return {ts:Date.now(),net:t.net,gross:t.gross,cats:clone(t.cats),liab:t.liab,note};}
@@ -1780,21 +1824,32 @@ body.locked .gate{display:flex}
     t.classList.add('active');t.setAttribute('aria-selected','true');
     Object.values(panels).forEach(p=>p&&p.classList.remove('active'));
     const p=panels[t.dataset.tab];if(p)p.classList.add('active');
-    if(friendMode)updateFriendVeil(t.dataset.tab);
     window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
   }));
-  function updateFriendVeil(tab){const veil=$('friendVeil');
-    Object.values(panels).forEach(p=>p&&p.classList.remove('blurred'));
-    const allowed=FRIEND_ALLOWED.includes(tab);
-    if(!allowed){const p=panels[tab];if(p)p.classList.add('blurred');}
-    if(veil)veil.hidden=allowed;}
-  function applyFriendRestrictions(){
-    document.body.classList.add('friend');
-    tabs.forEach(t=>t.classList.toggle('tab-locked',!FRIEND_ALLOWED.includes(t.dataset.tab)));
+  /* Mark every short, number-bearing leaf outside Salva 40 so CSS can frost it.
+     Long text is left alone so explanatory prose does not turn into a smear;
+     the tab bar and header sit outside .panel and keep their numbering. */
+  function applyDemoBlur(){
+    if(!demoMode)return;
+    document.querySelectorAll('.demo-num').forEach(e=>e.classList.remove('demo-num'));
+    document.querySelectorAll('.panel:not(#tab-salva)').forEach(root=>{
+      root.querySelectorAll('*').forEach(e=>{
+        if(e.children.length)return;                 /* leaves only */
+        const t=(e.textContent||'').trim();
+        if(t.length>30||!/[0-9]/.test(t))return;
+        e.classList.add('demo-num');
+      });
+    });
+  }
+  /* every tab is browsable in demo mode - the amounts, not the sections, are
+     what is withheld, so there is nothing left to veil */
+  function applyDemoRestrictions(){
+    document.body.classList.add('demo');
     const lb=$('lockBtn');if(lb){lb.textContent='Log out';lb.title='Log out';}
-    const sub=$('brandSub')||document.querySelector('.brandmark .sub');if(sub)sub.textContent='Shared view · Investments & Salva 40';
-    const st=$('syncTxt');if(st)st.textContent='Shared · read-only';const sd=$('syncDot');if(sd)sd.style.background='var(--brass)';
-    const invTab=tabs.find(t=>t.dataset.tab==='inv');if(invTab)invTab.click();else updateFriendVeil('net');}
+    const sub=$('brandSub')||document.querySelector('.brandmark .sub');if(sub)sub.textContent='Demo · amounts hidden except Salva 40';
+    const st=$('syncTxt');if(st)st.textContent='Demo · read-only';const sd=$('syncDot');if(sd)sd.style.background='var(--brass)';
+    const sv=tabs.find(t=>t.dataset.tab==='salva');if(sv)sv.click();
+    applyDemoBlur();}
 
   /* ---------- date helpers ---------- */
   function fmtDate(ts){return new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
@@ -1881,6 +1936,7 @@ body.locked .gate{display:flex}
     renderDegiro();
     renderExpenses();
     renderIncome();
+      applyDemoBlur();   /* re-mark: this render replaced the value nodes */
   }
 
   /* ============ WEALTH TAB ============ */
@@ -2905,24 +2961,27 @@ body.locked .gate{display:flex}
     if(!hasV2&&gatePass2){gatePass2.hidden=false;
       if(gateSub)gateSub.textContent='First time on this device: choose a password (or enter your existing one twice to pull your synced data).';}
   })();
-  async function unlockFriend(){
+  async function unlockDemo(){
     if(!SYNC.enabled){gateError('Friend access only works on the online dashboard.');return;}
     try{
-      friendSyncKey=await kdfHex(FRIEND_PW);
-      const r=await fetch('/api/state?k='+friendSyncKey,{cache:'no-store'});
+      demoSyncKey=await kdfHex(DEMO_PW);
+      const r=await fetch('/api/state?k='+demoSyncKey,{cache:'no-store'});
       if(r.status===404){gateError('No shared data yet — ask the owner to open their dashboard once, then try again.');return;}
       if(!r.ok){gateError('Could not load the shared data. Try again in a moment.');return;}
       const pkg=await r.json();
-      const st=await decState(FRIEND_PW,pkg);
-      friendMode=true;pass=null;SYNC.key=null;state=st;
+      const st=await decState(DEMO_PW,pkg);
+      demoMode=true;pass=null;SYNC.key=null;state=st;
       boot();
-      applyFriendRestrictions();
+      applyDemoRestrictions();
       document.body.classList.remove('locked');
       if(gatePass)gatePass.value='';if(gateUser)gateUser.value='';
     }catch(e){gateError('Wrong friend credentials.');}}
   async function unlock(){
     const p=(gatePass&&gatePass.value)||'';
     if(!p){gateError('Enter a password');return;}
+    /* the demo credential never touches the owner's data: it pulls the
+       scrambled mirror from its own sync path instead */
+    if(p===DEMO_PW){await unlockDemo();return;}
     if(!(window.crypto&&crypto.subtle)){gateError('This browser blocks encryption on this page (needs https or a local file).');return;}
     if(gateGo){gateGo.disabled=true;gateGo.textContent='Unlocking…';}
     if(gateErr)gateErr.textContent='';
