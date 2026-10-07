@@ -94,9 +94,13 @@ cloud, then before working locally again copy git's `index.html` back onto the O
     **Keep it that way if you touch `demoScramble`.**
   - Salva 40 reads true because that tab is driven by constants (`M`, `propValue`),
     not by state; its cost tables are mirrored as-is, which is the point of the demo.
-  - `applyDemoBlur()` marks number‑bearing leaves in JS rather than by a CSS selector
+  - `applyDemoBlur()` marks number‑bearing elements in JS rather than by a CSS selector
     list — values live in ids, table cells and unclassed SVG text, and an enumerated
-    rule missed 185 of them including the net‑worth headline. It re‑runs after every
+    rule missed 185 of them including the net‑worth headline. It judges an element by
+    its **own text nodes**, not its descendants': the ledger's value cells wrap a
+    “last updated” `.tipbox`, so they are not leaves, and an earlier leaf‑only pass left
+    the whole VALUE column sharp. A 120‑char subtree cap stops a short numeric label on
+    a big container frosting everything inside it. It re‑runs after every
     `renderDynamic()`.
   - Sections the demo does not show carry **`data-demo-hide`** in the markup, hidden by
     one CSS rule, so the list lives next to what it hides: tabs **04 Gifts** and

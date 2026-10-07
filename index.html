@@ -1593,7 +1593,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 7 Oct 2026 · demo-trim · no-zoom · demo-blur</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 7 Oct 2026 · demo-trim · no-zoom · demo-blur2</span></p>
   </div>
 </div>
 
@@ -1839,17 +1839,24 @@ body.locked .gate{display:flex}
     const p=panels[t.dataset.tab];if(p)p.classList.add('active');
     window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
   }));
-  /* Mark every short, number-bearing leaf outside Salva 40 so CSS can frost it.
-     Long text is left alone so explanatory prose does not turn into a smear;
-     the tab bar and header sit outside .panel and keep their numbering. */
+  /* Mark every short, number-bearing element outside Salva 40 so CSS can frost
+     it. Judged on the element's OWN text nodes, not its descendants': the
+     ledger's value cells carry a "last updated" tooltip inside them, so they
+     are not leaves, and a leaf-only pass left the whole VALUE column sharp.
+     The full-subtree cap stops a short numeric label on a big container from
+     frosting everything under it. Long text is left alone so explanatory prose
+     does not turn into a smear; the tab bar and header sit outside .panel and
+     keep their numbering. */
   function applyDemoBlur(){
     if(!demoMode)return;
     document.querySelectorAll('.demo-num').forEach(e=>e.classList.remove('demo-num'));
     document.querySelectorAll('.panel:not(#tab-salva)').forEach(root=>{
       root.querySelectorAll('*').forEach(e=>{
-        if(e.children.length)return;                 /* leaves only */
-        const t=(e.textContent||'').trim();
-        if(t.length>30||!/[0-9]/.test(t))return;
+        let own='';
+        for(let n=e.firstChild;n;n=n.nextSibling) if(n.nodeType===3) own+=n.nodeValue;
+        own=own.trim();
+        if(!own||own.length>30||!/[0-9]/.test(own))return;
+        if((e.textContent||'').trim().length>120)return;
         e.classList.add('demo-num');
       });
     });
