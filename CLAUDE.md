@@ -77,5 +77,23 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   prescribes. ISD prescription = gift date + 30 business days + 4 years (STS 30‑11‑2020).
   **€155k is "safe" ≈ 6 Nov 2028** (all 2023–2024 gifts prescribed) — the Gifts tab has a
   live countdown card to that date.
-- **Friends login was REMOVED (16 Sep 2026)** — the unlock screen is password‑only. Dead
-  `friendMode` / `FRIEND_PW` / `publishFriendMirror` code remains but is unreachable.
+- **Demo login (7 Oct 2026)** — rebuilt from the friend‑mode code that was removed on
+  16 Sep and left dead; the identifiers are now `demoMode` / `DEMO_PW` /
+  `publishDemoMirror`. Entering **`salva40demo`** at the gate loads a read‑only view
+  where every tab is browsable but all amounts are blurred **except the Salva 40 tab**.
+  - The blur is cosmetic. The privacy is `demoScramble()`: the mirror the owner
+    publishes is scrambled *before* encryption, so the real figures never leave the
+    owner's browser. Income and expenses are not mirrored at all.
+  - **Two scaling factors, drawn fresh per publish.** `f` scales the private values;
+    `g` scales what is already public in `index.html` (the Salva account, the
+    mortgage, history's Real estate). With one factor, dividing the mirrored Salva
+    value by the constant printed in this file recovers it and unravels everything.
+    Degiro holdings get a factor each, because `DEGIRO_SEED` is in this repo too.
+    **Keep it that way if you touch `demoScramble`.**
+  - Salva 40 reads true because that tab is driven by constants (`M`, `propValue`),
+    not by state; its cost tables are mirrored as-is, which is the point of the demo.
+  - `applyDemoBlur()` marks number‑bearing leaves in JS rather than by a CSS selector
+    list — values live in ids, table cells and unclassed SVG text, and an enumerated
+    rule missed 185 of them including the net‑worth headline. It re‑runs after every
+    `renderDynamic()`.
+  - `DEMO_PW` is committed to a **public** repo, so treat it as public.
