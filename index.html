@@ -849,13 +849,13 @@ body.locked .gate{display:flex}
       <div class="card own-card anim" style="animation-delay:.05s">
         <h3>On your balance sheet</h3>
         <div class="own-list">
-          <div class="mrow"><span class="mk">Property value (your 50%)<span class="itip" tabindex="0">i<span class="itip-box">Marked to the TINSA bank appraisal of 24 Feb 2026: €380.564 total → your 50% ≈ €190.282. You paid €340.000 (€170.000/half), so this reflects €40.564 of appraised upside. See the Market &amp; value sub‑tab.</span></span></span><span class="mv">190.282 €</span></div>
+          <div class="mrow"><span class="mk">Property value (your 50%)<span class="itip" tabindex="0">i<span class="itip-box">The average of the two appraisals: TINSA €380.564 (Feb 2026) and Tecnocasa €295.000, the midpoint of their €280–310k asking range (Oct 2026). Average €337.782 → your 50% ≈ €168.891. You paid €340.000 (€170.000/half), so the two together land almost exactly on cost. See the Market &amp; value sub‑tab.</span></span></span><span class="mv">168.891 €</span></div>
           <div class="mrow"><span class="mk">Mortgage (your 50%)</span><span class="mv" id="bsMort" style="color:var(--debt)">− 135.471 €</span></div>
           <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Property equity</span><span class="mv" id="bsEq" style="color:var(--grow);font-weight:600">34.529 €</span></div>
           <div class="mrow"><span class="mk">+ Receivable from Luciana</span><span class="mv">22.175 €</span></div>
           <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Your total stake in Salva 40</span><span class="mv" id="bsStake" style="font-weight:600">56.704 €</span></div>
         </div>
-        <div class="recon" style="background:rgba(95,184,154,.08);border-color:rgba(95,184,154,.28)"><span class="ic" style="color:var(--grow)">✓</span><p><b style="color:var(--grow)">Confirmed 50/50.</b> Half the payment (€520,87) = half the loan = half the flat — at purchase €170.000 / €135.000 / €35.000. The flat is now <b>marked to the TINSA appraisal (€380.564)</b>, so your 50% shows ≈ €190.282 above. The 75/25 is only who <em>fronted the cash</em> — squared off by Luciana's €22.175 debt to you.</p></div>
+        <div class="recon" style="background:rgba(95,184,154,.08);border-color:rgba(95,184,154,.28)"><span class="ic" style="color:var(--grow)">✓</span><p><b style="color:var(--grow)">Confirmed 50/50.</b> Half the payment (€520,87) = half the loan = half the flat — at purchase €170.000 / €135.000 / €35.000. The flat is now <b>marked to the average of the two appraisals (€337.782)</b>, so your 50% shows ≈ €168.891 above. The 75/25 is only who <em>fronted the cash</em> — squared off by Luciana's €22.175 debt to you.</p></div>
       </div>
     </div>
 
@@ -942,7 +942,7 @@ body.locked .gate{display:flex}
           <div class="mrow"><span class="mk" style="padding-left:10px">→ on 76 m² registry basis</span><span class="mv" style="color:var(--muted)">≈ 5.008 €/m²</span></div>
           <div class="mrow"><span class="mk">Land value · repercusión suelo</span><span class="mv">229.759 €</span></div>
           <div class="mrow"><span class="mk">Reconstruction / insurance value</span><span class="mv">150.804 €</span></div>
-          <div class="loan-badge">TINSA (Bank of Spain reg. nº 4313) valued the flat at <b>380.564 €</b> — <b>€40.564 above</b> the price you paid two months later. The dashboard still carries the property at <b>cost (340.000 €)</b>, so this is unrealised upside not yet on your net‑worth balance sheet.</div>
+          <div class="loan-badge">TINSA (Bank of Spain reg. nº 4313) valued the flat at <b>380.564 €</b> — <b>€40.564 above</b> the price you paid two months later. The dashboard does not carry this figure on its own: since the Tecnocasa valuation it carries the <b>average of the two (337.782 €)</b>, so only part of this appraised upside reaches your balance sheet.</div>
         </div>
         <div class="card mort-panel anim" style="animation-delay:.05s">
           <h3>Appraisal details</h3>
@@ -957,11 +957,39 @@ body.locked .gate{display:flex}
         </div>
       </div>
 
+      <div class="section-head anim"><h2>Agency valuation · Tecnocasa</h2><span class="hint">What an estate agent would put it on the market for · 30 Oct 2026</span></div>
+      <div class="mort-grid">
+        <div class="card mort-panel anim">
+          <h3>Recommended asking price</h3>
+          <div style="font-size:34px;font-weight:700;color:var(--alert);line-height:1;margin:6px 0 2px">280.000 – 310.000 €</div>
+          <div style="color:var(--muted);font-size:12.5px;margin-bottom:14px">Opening price → maximum · 3.500 – 3.875 €/m² on 80 m²</div>
+          <div class="mrow"><span class="mk">vs TINSA appraisal · 380.564 €</span><span class="mv" style="color:var(--debt)">− 100.564 to − 70.564 €</span></div>
+          <div class="mrow"><span class="mk">vs what you paid · 340.000 €</span><span class="mv" style="color:var(--debt)">− 60.000 to − 30.000 €</span></div>
+          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Your 50% at this range</span><span class="mv" style="font-weight:600">140.000 – 155.000 €</span></div>
+          <div class="mrow"><span class="mk" style="padding-left:10px">→ carried on the dashboard at</span><span class="mv" style="color:var(--muted)">168.891 € (avg of both)</span></div>
+          <div class="loan-badge" style="background:rgba(216,146,92,.1);border-color:rgba(216,146,92,.3)">This is an <b>agency selling estimate</b>, not a tasación. Tecnocasa states it is <b>non‑binding</b>, valid about <b>30 days</b>, has <b>no legal standing</b>, and <b>may not match an official appraisal</b>. The dashboard does not carry this range on its own — it carries the average of this and TINSA. See the note below.</div>
+        </div>
+        <div class="card mort-panel anim" style="animation-delay:.05s">
+          <h3>The barrio, by their own numbers</h3>
+          <div class="mrow"><span class="mk">Poble‑Sec average sale</span><span class="mv">277.208 €</span></div>
+          <div class="mrow"><span class="mk">Poble‑Sec average €/m²</span><span class="mv">4.383 €/m²</span></div>
+          <div class="mrow"><span class="mk">Most common range</span><span class="mv">3.919 – 4.846 €/m²</span></div>
+          <div class="mrow"><span class="mk" style="color:var(--text);font-weight:500">Their price for your flat</span><span class="mv" style="color:var(--alert);font-weight:600">3.500 – 3.875 €/m²</span></div>
+          <div class="mrow"><span class="mk">Local asking vs market<span class="itip" tabindex="0">i<span class="itip-box">Tecnocasa reports sellers in the barrio asking 342.875 € on average against a market value of 288.438 €, and calls that “16% overvalued” — 16% being the gap as a share of the asking price. Measured the other way, as a premium over market value, the same two numbers are +19%.</span></span></span><span class="mv">342.875 € vs 288.438 €</span></div>
+          <div class="mrow"><span class="mk">Barrio prices, last 12 months</span><span class="mv" style="color:var(--grow)">+9,13%</span></div>
+          <div class="mrow"><span class="mk">Their surfaces</span><span class="mv">66,40 útil · 80 reg. · 80 built</span></div>
+          <div class="mrow"><span class="mk">Office · report date</span><span class="mv">Pisos Poblesec Mar · 30 Oct 2026</span></div>
+          <div class="loan-badge" style="margin-top:14px">Worth noticing: <b>both</b> their recommended prices sit <b>below the 3.919 €/m² floor of their own “most common” band</b>, and well under the 4.383 €/m² barrio average they quote on the same page. An agent pitching for the listing has an interest in a price that sells quickly — read it as a <b>fast‑sale floor</b>, not as the flat’s market value.</div>
+        </div>
+      </div>
+
+      <div class="recon anim" style="background:rgba(216,146,92,.08);border-color:rgba(216,146,92,.28);margin:16px 0 0"><span class="ic" style="color:var(--alert)">!</span><p><b style="color:var(--text)">Three numbers, three purposes.</b> <b>TINSA 380.564 €</b> is a regulated mortgage appraisal (Feb 2026). <b>You paid 340.000 €</b> (Apr 2026). <b>Tecnocasa says 280–310k</b> (Oct 2026) as an opening asking price. They answer different questions — what a bank will lend against, what the flat actually changed hands for, and what an agent thinks would sell fast. The dashboard now carries the <b>average of the two appraisals</b>: TINSA 380.564 € and the 295.000 € midpoint of the agency range → <b>337.782 €</b>, your half <b>168.891 €</b>. That is <b>21.391 € less</b> per half than the TINSA‑only figure it replaced, and it lands within <b>2.218 €</b> of what you actually paid — the two valuations, averaged, come out almost exactly at cost. The whole net‑worth history was re‑marked with it, so the line does not step down on the day this report arrived.</p></div>
+
       <div class="section-head anim"><h2>Rental market · Poble‑Sec</h2><span class="hint">What the flat could rent for · new‑contract €/m²/month · Generalitat (INCASÒL)</span></div>
       <div class="kpis k4 anim">
         <div class="kpi brass-kpi"><div class="k">Rent · €/m²/mo</div><div class="v">17,70 €</div><div class="n">new contracts · Q1 2026 · +23,3% vs 2019</div></div>
         <div class="kpi"><div class="k">Implied rent · 76 m²</div><div class="v">≈ 1.345 €/mo</div><div class="n">17,70 × 76 m² registry basis</div></div>
-        <div class="kpi pos"><div class="k">Gross rental yield</div><div class="v">≈ 4,2%</div><div class="n">annual rent ÷ €380.564 appraisal</div></div>
+        <div class="kpi pos"><div class="k">Gross rental yield</div><div class="v">≈ 4,8%</div><div class="n">annual rent ÷ €337.782 carried value</div></div>
         <div class="kpi"><div class="k">vs the city</div><div class="v">+0,81 €</div><div class="n">BCN 16,89 · Sants‑Montjuïc 16,69</div></div>
       </div>
       <div class="mort-grid">
@@ -979,7 +1007,7 @@ body.locked .gate{display:flex}
           <div class="loan-badge" style="margin-top:14px">Over <b>42%</b> of listings are seasonal or tourist — the tourism pressure the article flags as pushing Poble‑Sec rents above the Barcelona average.</div>
         </div>
       </div>
-      <p class="foot-note">Rental data: <b>«El metre quadrat de lloguer ja és un 23% més car que abans de la pandèmia»</b> (Zona Sec, Sept 2026) — Generalitat de Catalunya (fiances dipositades a l'INCASÒL, new contracts) &amp; Observatori Metropolità de l'Habitatge de BCN. Figures are €/m²/month for <b>new contracts</b>; the implied rent and yield use the €380.564 appraisal and the 76 m² registry surface — indicative, not a listing.</p>
+      <p class="foot-note">Rental data: <b>«El metre quadrat de lloguer ja és un 23% més car que abans de la pandèmia»</b> (Zona Sec, Sept 2026) — Generalitat de Catalunya (fiances dipositades a l'INCASÒL, new contracts) &amp; Observatori Metropolità de l'Habitatge de BCN. Figures are €/m²/month for <b>new contracts</b>; the implied rent uses the 76 m² registry surface and the yield divides by the €337.782 carried value (the average of the two appraisals) — indicative, not a listing.</p>
 
       <div class="section-head anim"><h2>Poble Sec vs the city</h2><span class="hint">Average €/m² of homes sold · registered transactions 2012–2026</span></div>
       <div class="mort-grid">
@@ -1593,7 +1621,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 7 Oct 2026 · demo-trim · no-zoom · demo-blur2</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 30 Oct 2026 · prop-avg · no-zoom · demo-blur2</span></p>
   </div>
 </div>
 
@@ -1624,7 +1652,11 @@ body.locked .gate{display:flex}
       payLog.push({d:d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),a:M.pay});}})();
   let obFull=M.init,totalPaid=0,fullN=0,intPaid=0;
   payLog.forEach(p=>{totalPaid+=p.a;if(p.stub){intPaid+=p.a;}else{const i=obFull*M.rate;intPaid+=i;obFull-=(p.a-i);fullN++;}});
-  const simonMort=obFull/2, propValue=190281.85;/* your 50% of the TINSA appraisal €380.563,69 (marked to appraisal, was cost 170.000) */
+  /* Your 50% of the AVERAGE of the two appraisals: TINSA €380.563,69 (Feb 2026) and
+     Tecnocasa €295.000, the midpoint of their €280–310k asking range (Oct 2026).
+     (380.563,69 + 295.000) / 2 = €337.781,85 → half = €168.890,92. Was €190.281,85
+     when the flat was marked to TINSA alone; €170.000 before that, at cost. */
+  const simonMort=obFull/2, propValue=168890.92;
 
   /* ---------- categories ---------- */
   /* Bonds needs its own hue — it first shipped sharing --cash with Cash, which
@@ -2961,6 +2993,14 @@ body.locked .gate{display:flex}
       (state.history||[]).forEach(s=>{const old=(s.cats&&s.cats['Real estate'])||0;const _pd=propValue-old;
         s.net=(s.net||0)+_pd;s.gross=(s.gross||0)+_pd;if(s.cats)s.cats['Real estate']=propValue;});
       state.propRevalV1=true;}
+    /* one-time: the property line moves off the TINSA appraisal alone and onto the
+       average of the two appraisals, so your 50% goes 190.281,85 → 168.890,92. Re-marked
+       across the whole history the same way, so the net-worth line stays consistent with
+       the live figure instead of stepping down on the day the second valuation arrived. */
+    if(!state.propRevalV2){
+      (state.history||[]).forEach(s=>{const old=(s.cats&&s.cats['Real estate'])||0;const _pd=propValue-old;
+        s.net=(s.net||0)+_pd;s.gross=(s.gross||0)+_pd;if(s.cats)s.cats['Real estate']=propValue;});
+      state.propRevalV2=true;}
     migrateRevolutSplit();
     /* keep the Degiro account value in sync with the holdings (single source of truth) */
     const _dg=state.accounts.find(a=>a.id==='degiro');

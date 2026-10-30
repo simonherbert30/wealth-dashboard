@@ -67,8 +67,9 @@ cloud, then before working locally again copy git's `index.html` back onto the O
 ## Key domain facts
 - **Salva 40** = flat at Carrer de Salvà 40, Poble‑sec, Barcelona. Bought 24 Apr 2026 for
   €340k, 50/50 with Luciana, €272k CaixaBank mortgage. Surfaces: 67,45 m² útil / 75–76 m²
-  registry / ~86 m² built. TINSA appraisal **€380.564** (24 Feb 2026); Simon's 50% =
-  **€190.281,85**, marked across the whole net‑worth history (`propRevalV1` migration).
+  registry / ~86 m² built. Carried at the **average of the two appraisals, €337.781,85**;
+  Simon's 50% = **€168.890,92**, marked across the whole net‑worth history
+  (`propRevalV1` marked it to TINSA alone, `propRevalV2` to the average).
 - **Deployment plan** (Investments): €30k (Jun 2026), €15k (Jul), €15k (Aug) done, then €5k
   VWCE/month + €2k bonds + €1k gold for the first 5 forward months. Anchored to a fixed
   `_doneThru` date (Sep 2026 deployed) so month labels don't drift; bump `_doneThru` as each
@@ -77,6 +78,22 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   prescribes. ISD prescription = gift date + 30 business days + 4 years (STS 30‑11‑2020).
   **€155k is "safe" ≈ 6 Nov 2028** (all 2023–2024 gifts prescribed) — the Gifts tab has a
   live countdown card to that date.
+- **Valuations — three numbers, do not conflate them.** TINSA **€380.564** (24 Feb 2026) is
+  the regulated mortgage appraisal. He **paid €340.000** (24 Apr 2026). **Tecnocasa**, an
+  estate agent, valued it at **€280.000–310.000** (3.500–3.875 €/m² on 80 m²) on
+  **30 Oct 2026** as a recommended *asking* range — non‑binding, ~30‑day validity, no legal
+  standing. Both their figures sit below the 3.919 €/m² floor of their own “most common”
+  band and under the 4.383 €/m² barrio average they quote on the same page, so read it as
+  a fast‑sale floor rather than the flat's value. Shown on Salva 40 → Market & value.
+  **Simon chose (30 Oct 2026) to carry the flat at the AVERAGE of the two**:
+  (380.563,69 + 295.000) / 2 = **€337.781,85**, his half **€168.890,92** — €21.390,93 less
+  per half than TINSA alone, and within €2.218 of what he paid. Tecnocasa's single figure
+  is the **midpoint** of its range. `propRevalV2` re‑marked the whole history, so the
+  net‑worth line does not step down on the day the report arrived. Anything quoting the
+  carried value (the balance‑sheet row and its tooltip, the 50/50 recon note, the TINSA
+  badge, the Tecnocasa card, the gross rental yield — now ≈4,8% — and the rental
+  footnote) was updated with it; **grep for the old 190.282 / 190281 before assuming
+  otherwise.**
 - **Demo login (7 Oct 2026)** — rebuilt from the friend‑mode code that was removed on
   16 Sep and left dead; the identifiers are now `demoMode` / `DEMO_PW` /
   `publishDemoMirror`. A **View the demo** button sits under Unlock on the gate
