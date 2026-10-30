@@ -492,6 +492,9 @@ body.locked .gate{display:flex}
   .hist th,.hist td{padding:10px 9px}
   .holdings td{font-size:12.5px}.hist td{font-size:12.5px}
   .holdings .sub{font-size:10.5px}
+  /* six columns will not fit a phone; the years column is the one the
+     reader can infer from the date, so it goes first. */
+  #tab-selfmade .holdings .yrs{display:none}
   .tier{grid-template-columns:76px 1fr;grid-template-rows:auto auto}
   .tier .act{grid-column:1/3;text-align:left;padding-top:4px}
   .tab{font-size:13px;padding:11px 8px}
@@ -525,6 +528,7 @@ body.locked .gate{display:flex}
     <button class="tab" data-demo-hide role="tab" aria-selected="false" data-tab="gifts"><span class="ti">04</span> <span class="tl">Gifts</span></button>
     <button class="tab" role="tab" aria-selected="false" data-tab="wealth"><span class="ti">05</span> <span class="tl">Wealth</span></button>
     <button class="tab" data-demo-hide role="tab" aria-selected="false" data-tab="cashflow"><span class="ti">06</span> <span class="tl">Cash flow</span></button>
+    <button class="tab" data-demo-hide role="tab" aria-selected="false" data-tab="selfmade"><span class="ti">07</span> <span class="tl">Self‑made</span></button>
   </nav>
 
   <!-- ============ TAB 1 · NET WORTH ============ -->
@@ -1474,6 +1478,45 @@ body.locked .gate{display:flex}
     </div><!-- /cf-income -->
   </section>
 
+  <!-- ============ TAB 7 · SELF‑MADE ============ -->
+  <section class="panel" data-demo-hide id="tab-selfmade" role="tabpanel">
+    <div class="section-head anim"><h2>What you built yourself</h2><span class="hint">Your net worth with the family money — and everything it would have earned since — taken back out</span></div>
+
+    <div class="kpis k4 anim">
+      <div class="kpi brass-kpi"><div class="k">Self‑made net worth</div><div class="v" id="smNet">—</div><div class="n" id="smNetSub">—</div></div>
+      <div class="kpi"><div class="k">Share you built</div><div class="v" id="smPct">—</div><div class="n">of your net worth today</div></div>
+      <div class="kpi"><div class="k">The gifts, today</div><div class="v" id="smGiftNow">—</div><div class="n" id="smGiftSub">—</div></div>
+      <div class="kpi"><div class="k">Received, face value</div><div class="v" id="smNominal">—</div><div class="n" id="smNominalSub">—</div></div>
+    </div>
+
+    <div class="section-head with-action anim"><h2>The subtraction</h2>
+      <div class="seg" id="smRateSel" style="margin-right:0">
+        <button class="seg-btn" data-r="0.05">5%</button>
+        <button class="seg-btn active" data-r="0.07">7%</button>
+        <button class="seg-btn" data-r="0.09">9%</button>
+        <button class="seg-btn" data-r="0.11">11%</button>
+      </div>
+    </div>
+    <div class="card mort-panel anim">
+      <div class="mrow"><span class="mk">Your net worth today</span><span class="mv" id="smRowNet">—</span></div>
+      <div class="mrow"><span class="mk">− family money received</span><span class="mv" id="smRowNom" style="color:var(--debt)">—</span></div>
+      <div class="mrow"><span class="mk">− what that money would have earned<span class="itip" tabindex="0">i<span class="itip-box">Each gift compounded from the day it arrived to today at the rate selected above. The two undated gifts (€7.000) are subtracted at face value only, since there is no date to grow them from.</span></span></span><span class="mv" id="smRowGrowth" style="color:var(--debt)">—</span></div>
+      <div class="mrow"><span class="mk" style="color:var(--text);font-weight:600">= what you built yourself</span><span class="mv" id="smRowSelf" style="font-weight:700;font-size:15px">—</span></div>
+      <div class="loan-badge" id="smBadge">—</div>
+    </div>
+
+    <div class="section-head anim"><h2>Every gift, grown to today</h2><span class="hint" id="smTableHint">—</span></div>
+    <div class="card holdings anim">
+      <table class="wide">
+        <thead><tr><th>When</th><th>From</th><th class="r">Received</th><th class="r yrs">Years held</th><th class="r">Worth today</th><th class="r">Growth</th></tr></thead>
+        <tbody id="smBody"></tbody>
+        <tfoot><tr><td colspan="2">Total</td><td class="r" id="smFootNom" style="font-family:var(--mono);font-weight:600">—</td><td class="yrs"></td><td class="r" id="smFootNow" style="font-family:var(--mono);font-weight:600">—</td><td class="r" id="smFootGrow" style="font-family:var(--mono);font-weight:600">—</td></tr></tfoot>
+      </table>
+    </div>
+
+    <div class="recon anim" style="background:rgba(110,136,176,.08);border-color:rgba(110,136,176,.28);margin-top:16px"><span class="ic" style="color:var(--cash)">i</span><p><b style="color:var(--text)">What this number is, and what it is not.</b> It answers one question literally: take today’s net worth, remove the €163.000 the family gave you, and remove the return that money would have thrown off if it had been invested from the day it arrived. What is left is attributable to your own saving.<br><br><b>The rate is an assumption, not a measurement.</b> It is not VWCE’s actual 2023–2026 return — switch between 5% and 11% above and watch the answer move by tens of thousands. Treat the spread as the honest answer, not any single figure.<br><br><b>It also assumes the money was invested.</b> Much of it went into the flat, which is carried near what you paid, and some sat in cash earning nothing — both of which earn less than the market rate here, so this subtraction is harsher than reality. And in a world without the gifts you may not have bought the flat at all, which would change everything downstream. This is a clean counterfactual, not a forecast of an alternate life.</p></div>
+  </section>
+
 </div>
 
 <!-- ===== UPDATE MODAL ===== -->
@@ -1621,7 +1664,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 30 Oct 2026 · prop-avg · no-zoom · demo-blur2</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 30 Oct 2026 · self-made · prop-avg · no-zoom · demo-blur2</span></p>
   </div>
 </div>
 
@@ -1768,6 +1811,66 @@ body.locked .gate{display:flex}
   let syncStatus=SYNC.enabled?'idle':'local';
   function agoTxt(ts){if(!ts)return'';const s=Math.floor((Date.now()-ts)/1000);
     if(s<45)return'just now';const m=Math.floor(s/60);if(m<60)return m+' min ago';const h=Math.floor(m/60);if(h<24)return h+' h ago';return Math.floor(h/24)+' d ago';}
+  /* ---------- tab 07 · self-made ----------
+     Today's net worth minus the family money and minus the return that money
+     would have produced had it been invested from the day each gift landed.
+     The rate is an assumption the user picks, not a measured index return, so
+     the UI leads with the spread rather than one figure. The two undated gifts
+     are subtracted at face value - there is no date to compound them from. */
+  let smRate=0.07;
+  const SM_YR=365.2425*864e5;
+  /* es-ES leaves four-digit numbers ungrouped (1000 €, not 1.000 €), which reads
+     ragged in a column next to 25.000 €. Group them, here only. */
+  const smEur=n=>{const a=Math.abs(Math.round(n)),st=String(a);
+    return (a>=1000&&a<10000)?eur0(n).replace(st,st[0]+'.'+st.slice(1)):eur0(n);};
+  function renderSelfMade(){
+    if(!$('smNet')||!state)return;
+    const t=totalsOf(state.accounts), now=Date.now();
+    let nominal=0, undated=0, fv=0, wYrs=0, dated=0;
+    const rows=GIFTS.map(g=>{
+      nominal+=g.a;
+      if(!g.d){undated+=g.a;fv+=g.a;return {g:g,yrs:null,now:g.a};}
+      const yrs=(now-new Date(g.d+'T00:00:00').getTime())/SM_YR;
+      const v=g.a*Math.pow(1+smRate,yrs);
+      fv+=v; wYrs+=yrs*g.a; dated+=g.a;
+      return {g:g,yrs:yrs,now:v};
+    }).sort((a,b)=>(b.now-a.now));
+    const growth=fv-nominal, self=t.net-fv, pct=t.net?self/t.net*100:0;
+    const avgYrs=dated?wYrs/dated:0;
+
+    set('smNet',smEur(self));
+    set('smNetSub','net worth '+smEur(t.net)+' \u2212 gifts grown at '+(smRate*100).toFixed(0)+'%');
+    const pe=$('smPct');
+    if(pe){pe.textContent=pct.toFixed(1).replace('.',',')+'%';pe.style.color=pct>=0?'':'var(--debt)';}
+    set('smGiftNow',smEur(fv));
+    set('smGiftSub',smEur(nominal)+' received + '+smEur(growth)+' it would have earned');
+    set('smNominal',smEur(nominal));
+    set('smNominalSub','dad '+smEur(146000)+' \u00b7 grandmother '+smEur(17000));
+
+    set('smRowNet',smEur(t.net));
+    set('smRowNom','\u2212 '+smEur(nominal));
+    set('smRowGrowth','\u2212 '+smEur(growth));
+    const se=$('smRowSelf');
+    if(se){se.textContent=smEur(self);se.style.color=self>=0?'var(--grow)':'var(--debt)';}
+    const bd=$('smBadge');
+    if(bd)bd.innerHTML=self>=0
+      ? 'Of the '+smEur(t.net)+' you are worth today, <b>'+smEur(self)+'</b> is yours \u2014 <b>'+pct.toFixed(0)+'%</b>. The rest traces back to '+smEur(nominal)+' of family money and the '+smEur(growth)+' it would have compounded into over '+avgYrs.toFixed(1).replace('.',',')+' years on average, at '+(smRate*100).toFixed(0)+'%.'
+      : 'At '+(smRate*100).toFixed(0)+'% the family money would be worth <b>'+smEur(fv)+'</b> today \u2014 <b>more than your whole net worth</b>. On this assumption you have spent some of it rather than added to it. Try a lower rate to see how sensitive that conclusion is.';
+    set('smTableHint',smEur(nominal)+' received across '+GIFTS.length+' transfers \u00b7 compounded at '+(smRate*100).toFixed(0)+'% to today');
+
+    const tb=$('smBody');
+    if(tb){tb.innerHTML='';
+      rows.forEach(r=>{const tr=document.createElement('tr');
+        const when=r.g.d?fmtDate(new Date(r.g.d+'T00:00:00')):'<span style="color:var(--muted-2)">no date</span>';
+        tr.innerHTML='<td>'+when+'</td>'+
+          '<td>'+(r.g.who==='dad'?'Dad':'Grandmother')+'</td>'+
+          '<td class="r val">'+smEur(r.g.a)+'</td>'+
+          '<td class="r val yrs" style="color:var(--muted)">'+(r.yrs==null?'\u2014':r.yrs.toFixed(1).replace('.',','))+'</td>'+
+          '<td class="r val">'+smEur(r.now)+'</td>'+
+          '<td class="r val" style="color:'+(r.yrs==null?'var(--muted-2)':'var(--grow)')+'">'+(r.yrs==null?'\u2014':'+'+smEur(r.now-r.g.a))+'</td>';
+        tb.appendChild(tr);});}
+    set('smFootNom',smEur(nominal)); set('smFootNow',smEur(fv)); set('smFootGrow','+'+smEur(growth));
+  }
   function renderSync(){const dot=$('syncDot'),txt=$('syncTxt');if(!dot||!txt)return;
     const map={synced:['var(--grow)','Synced'+(lastSyncTs?' · '+agoTxt(lastSyncTs):'')],
       saving:['var(--brass)','Saving…'],idle:['var(--muted-2)','Sync ready'],
@@ -1863,7 +1966,7 @@ body.locked .gate{display:flex}
 
   /* ---------- tabs ---------- */
   const tabs=[...document.querySelectorAll('.tab')];
-  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),gifts:$('tab-gifts'),wealth:$('tab-wealth'),cashflow:$('tab-cashflow')};
+  const panels={net:$('tab-net'),inv:$('tab-inv'),salva:$('tab-salva'),gifts:$('tab-gifts'),wealth:$('tab-wealth'),cashflow:$('tab-cashflow'),selfmade:$('tab-selfmade')};
   tabs.forEach(t=>t.addEventListener('click',()=>{
     tabs.forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false');});
     t.classList.add('active');t.setAttribute('aria-selected','true');
@@ -1988,7 +2091,8 @@ body.locked .gate{display:flex}
     renderDegiro();
     renderExpenses();
     renderIncome();
-      applyDemoBlur();   /* re-mark: this render replaced the value nodes */
+      renderSelfMade();
+    applyDemoBlur();   /* re-mark: this render replaced the value nodes */
   }
 
   /* ============ WEALTH TAB ============ */
@@ -2607,6 +2711,9 @@ body.locked .gate{display:flex}
   /* ---------- Expenses: add / edit / remove + monthly/yearly toggle ---------- */
   if($('expToggle')){[...$('expToggle').querySelectorAll('.seg-btn')].forEach(b=>b.addEventListener('click',()=>{
     expMode=b.dataset.mode;$('expToggle').querySelectorAll('.seg-btn').forEach(x=>x.classList.toggle('active',x===b));renderExpenses();}));}
+  if($('smRateSel')){[...$('smRateSel').querySelectorAll('.seg-btn')].forEach(b=>b.addEventListener('click',()=>{
+    smRate=+b.dataset.r;$('smRateSel').querySelectorAll('.seg-btn').forEach(x=>x.classList.toggle('active',x===b));
+    renderSelfMade();applyDemoBlur();}));}
   if($('costPieToggle')){[...$('costPieToggle').querySelectorAll('.seg-btn')].forEach(b=>b.addEventListener('click',()=>{
     costSplit=b.dataset.split;$('costPieToggle').querySelectorAll('.seg-btn').forEach(x=>x.classList.toggle('active',x===b));
     drawCostPie(state.propertyCosts||[]);}));}
@@ -2701,21 +2808,23 @@ body.locked .gate{display:flex}
     if(wtab)wtab.addEventListener('click',()=>setTimeout(drawWealthChart,30));
   })();
 
+  /* Every gift from the family, with its date. Shared by the prescription
+     countdown on the Gifts tab and the self-made calculation on tab 07. */
+  const GIFTS=[
+    {d:'2023-04-25',a:1000,who:'dad'},{d:'2023-07-13',a:4000,who:'dad'},
+    {d:'2024-03-28',a:20000,who:'dad'},{d:'2024-04-26',a:20000,who:'dad'},
+    {d:'2024-05-29',a:25000,who:'dad'},{d:'2024-06-17',a:20000,who:'dad'},
+    {d:'2024-07-25',a:20000,who:'dad'},{d:'2024-08-16',a:20000,who:'dad'},
+    {d:'2024-09-25',a:15000,who:'dad'},{d:'2025-10-14',a:1000,who:'dad'},
+    {d:'2023-07-20',a:500,who:'gm'},{d:'2024-01-15',a:500,who:'gm'},
+    {d:'2024-01-23',a:1500,who:'gm'},{d:'2024-02-13',a:1000,who:'gm'},
+    {d:'2024-02-22',a:1000,who:'gm'},{d:'2024-02-23',a:1500,who:'gm'},
+    {d:'2024-04-09',a:4000,who:'gm'},
+    {d:null,a:3000,who:'gm',note:'cash · no own date'},{d:null,a:4000,who:'gm',note:'date unknown'}
+  ];
   /* gifts — live 4-year prescription countdown (STS 30-11-2020: transfer + 30 business days + 4 years) */
   (function(){
     const host=$('giftBars');if(!host)return;
-    const GIFTS=[
-      {d:'2023-04-25',a:1000,who:'dad'},{d:'2023-07-13',a:4000,who:'dad'},
-      {d:'2024-03-28',a:20000,who:'dad'},{d:'2024-04-26',a:20000,who:'dad'},
-      {d:'2024-05-29',a:25000,who:'dad'},{d:'2024-06-17',a:20000,who:'dad'},
-      {d:'2024-07-25',a:20000,who:'dad'},{d:'2024-08-16',a:20000,who:'dad'},
-      {d:'2024-09-25',a:15000,who:'dad'},{d:'2025-10-14',a:1000,who:'dad'},
-      {d:'2023-07-20',a:500,who:'gm'},{d:'2024-01-15',a:500,who:'gm'},
-      {d:'2024-01-23',a:1500,who:'gm'},{d:'2024-02-13',a:1000,who:'gm'},
-      {d:'2024-02-22',a:1000,who:'gm'},{d:'2024-02-23',a:1500,who:'gm'},
-      {d:'2024-04-09',a:4000,who:'gm'},
-      {d:null,a:3000,who:'gm',note:'cash · no own date'},{d:null,a:4000,who:'gm',note:'date unknown'}
-    ];
     const DAY=86400000;
     function addBusinessDays(dt,n){let d=new Date(dt),added=0;while(added<n){d=new Date(d.getTime()+DAY);const wd=d.getDay();if(wd!==0&&wd!==6)added++;}return d;}
     function prescDate(iso){const start=addBusinessDays(new Date(iso+'T00:00:00'),30);const p=new Date(start);p.setFullYear(p.getFullYear()+4);return p;}

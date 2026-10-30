@@ -13,9 +13,9 @@ behind it, see [`docs/CONTEXT.md`](docs/CONTEXT.md).
   browser before it is stored or synced — it never leaves the browser readable.
 - **Sync**: serverless `api/state.js` ⇄ Vercel Blob (`wealthdash/<key>.json`). The sync key
   is `kdfHex(password)`. Code pushes never touch user data.
-- Tabs: **01 Net worth · 02 Investments · 03 Salva 40 · 04 Gifts · 05 Wealth · 06 Expenses
-  · 07 Income**. "Salva 40" is Simon's flat and has sub‑tabs: Property & mortgage / Costs &
-  upkeep / Market & value.
+- Tabs: **01 Net worth · 02 Investments · 03 Salva 40 · 04 Gifts · 05 Wealth · 06 Cash flow
+  · 07 Self‑made**. "Salva 40" is Simon's flat and has sub‑tabs: Property & mortgage / Costs &
+  upkeep / Market & value. 06 Cash flow holds both income and expenses.
 
 ## Repo layout
 - `index.html` — the app (the only thing you normally edit).
@@ -128,3 +128,20 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   - The demo tab strip therefore reads 01 · 02 · 03 · 05; the numbers are the owner's,
     not renumbered.
   - `DEMO_PW` is committed to a **public** repo, so treat it as public.
+- **Self‑made (tab 07, 30 Oct 2026)** answers one question: what would the net worth be
+  without the family money? It subtracts the €163.000 received **and** the return that
+  money would have compounded into since the day each gift landed.
+  - Both the prescription countdown on **04 Gifts** and this tab read one module‑scope
+    `GIFTS` array (date, amount, who) — it was hoisted out of the gifts‑bars IIFE for
+    this. One list, two consumers; add a gift there and both update.
+  - The rate is a **user‑chosen assumption**, not a measured index return, so the UI
+    leads with the 5–11% spread (`smRate`, default 7%) rather than one figure. At 7%
+    the gifts are worth ≈€190.6k today; the answer swings by tens of thousands across
+    the range, and the caveat note on the tab says so.
+  - The two **undated** gifts (€7.000) are subtracted at face value — no date to
+    compound from. `smEur()` is a local formatter that groups four‑digit numbers,
+    which es‑ES otherwise leaves as `1000 €` and reads ragged in a column.
+  - The tab carries **`data-demo-hide`** (like 04 Gifts): the demo strip stays
+    01 · 02 · 03 · 05.
+  - It is a clean counterfactual, not a forecast: much of the money went into the flat
+    (carried near cost) or sat in cash, so the subtraction is **harsher than reality**.
