@@ -77,6 +77,16 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   prescribes. ISD prescription = gift date + 30 business days + 4 years (STS 30‑11‑2020).
   **€155k is "safe" ≈ 6 Nov 2028** (all 2023–2024 gifts prescribed) — the Gifts tab has a
   live countdown card to that date.
+- **Valuations — three numbers, do not conflate them.** TINSA **€380.564** (24 Feb 2026) is
+  the regulated mortgage appraisal and is what the dashboard **carries** (Simon's 50% =
+  €190.281,85, via `propRevalV1`). He **paid €340.000** (24 Apr 2026). **Tecnocasa**, an
+  estate agent, valued it at **€280.000–310.000** (3.500–3.875 €/m² on 80 m²) on
+  **30 Oct 2026** as a recommended *asking* range — non‑binding, ~30‑day validity, no legal
+  standing. Both their figures sit below the 3.919 €/m² floor of their own “most common”
+  band and under the 4.383 €/m² barrio average they quote on the same page, so read it as
+  a fast‑sale floor rather than the flat's value. Shown on Salva 40 → Market & value;
+  **`propValue` was NOT changed** — changing it re‑marks the whole net‑worth history and
+  is Simon's call.
 - **Demo login (7 Oct 2026)** — rebuilt from the friend‑mode code that was removed on
   16 Sep and left dead; the identifiers are now `demoMode` / `DEMO_PW` /
   `publishDemoMirror`. A **View the demo** button sits under Unlock on the gate
