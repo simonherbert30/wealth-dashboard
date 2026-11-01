@@ -1491,10 +1491,9 @@ body.locked .gate{display:flex}
 
     <div class="section-head with-action anim"><h2>The subtraction</h2>
       <div class="seg" id="smRateSel" style="margin-right:0">
-        <button class="seg-btn" data-r="0.05">5%</button>
-        <button class="seg-btn active" data-r="0.07">7%</button>
-        <button class="seg-btn" data-r="0.09">9%</button>
-        <button class="seg-btn" data-r="0.11">11%</button>
+        <button class="seg-btn" data-r="0.03">3%</button>
+        <button class="seg-btn active" data-r="0.05">5%</button>
+        <button class="seg-btn" data-r="0.07">7%</button>
       </div>
     </div>
     <div class="card mort-panel anim">
@@ -1503,6 +1502,16 @@ body.locked .gate{display:flex}
       <div class="mrow"><span class="mk">− what that money would have earned<span class="itip" tabindex="0">i<span class="itip-box">Each gift compounded from the day it arrived to today at the rate selected above. The two undated gifts (€7.000) are subtracted at face value only, since there is no date to grow them from.</span></span></span><span class="mv" id="smRowGrowth" style="color:var(--debt)">—</span></div>
       <div class="mrow"><span class="mk" style="color:var(--text);font-weight:600">= what you built yourself</span><span class="mv" id="smRowSelf" style="font-weight:700;font-size:15px">—</span></div>
       <div class="loan-badge" id="smBadge">—</div>
+    </div>
+
+    <div class="section-head anim"><h2>What that is, per month</h2><span class="hint" id="smPmHint">—</span></div>
+    <div class="card mort-panel anim">
+      <div class="mrow"><span class="mk">Saving since</span><span class="mv" id="smPmSince">—</span></div>
+      <div class="mrow"><span class="mk">Months of saving</span><span class="mv" id="smPmMonths" style="white-space:nowrap">—</span></div>
+      <div class="mrow"><span class="mk">What you built yourself</span><span class="mv" id="smPmSelf">—</span></div>
+      <div class="mrow"><span class="mk" style="color:var(--text);font-weight:600">= saved per month, on average<span class="itip" tabindex="0">i<span class="itip-box">The level monthly amount that, invested at the rate above from the month it was put aside, compounds to the figure above. Money saved in 2020 has had six years to grow, so it counts for far more than the same amount saved this year — which is why this is lower than simply dividing by the number of months.</span></span></span><span class="mv" id="smPmAvg" style="font-weight:700;font-size:15px;white-space:nowrap">—</span></div>
+      <div class="mrow"><span class="mk" style="color:var(--muted)">the same, with no growth at all</span><span class="mv" id="smPmFlat" style="color:var(--muted);white-space:nowrap">—</span></div>
+      <div class="loan-badge" id="smPmBadge">—</div>
     </div>
 
     <div class="section-head anim"><h2>Every gift, grown to today</h2><span class="hint" id="smTableHint">—</span></div>
@@ -1514,7 +1523,7 @@ body.locked .gate{display:flex}
       </table>
     </div>
 
-    <div class="recon anim" style="background:rgba(110,136,176,.08);border-color:rgba(110,136,176,.28);margin-top:16px"><span class="ic" style="color:var(--cash)">i</span><p><b style="color:var(--text)">What this number is, and what it is not.</b> It answers one question literally: take today’s net worth, remove the €163.000 the family gave you, and remove the return that money would have thrown off if it had been invested from the day it arrived. What is left is attributable to your own saving.<br><br><b>The rate is an assumption, not a measurement.</b> It is not VWCE’s actual 2023–2026 return — switch between 5% and 11% above and watch the answer move by tens of thousands. Treat the spread as the honest answer, not any single figure.<br><br><b>It also assumes the money was invested.</b> Much of it went into the flat, which is carried near what you paid, and some sat in cash earning nothing — both of which earn less than the market rate here, so this subtraction is harsher than reality. And in a world without the gifts you may not have bought the flat at all, which would change everything downstream. This is a clean counterfactual, not a forecast of an alternate life.</p></div>
+    <div class="recon anim" style="background:rgba(110,136,176,.08);border-color:rgba(110,136,176,.28);margin-top:16px"><span class="ic" style="color:var(--cash)">i</span><p><b style="color:var(--text)">What this number is, and what it is not.</b> It answers one question literally: take today’s net worth, remove the €163.000 the family gave you, and remove the return that money would have thrown off if it had been invested from the day it arrived. What is left is attributable to your own saving.<br><br><b>The rate is an assumption, not a measurement.</b> It is not VWCE’s actual 2023–2026 return — switch between 3% and 7% above and watch how far the answer moves — and with it the monthly figure, which is derived from it and inherits every caveat here. Treat the spread as the honest answer, not any single figure.<br><br><b>It also assumes the money was invested.</b> Much of it went into the flat, which is carried near what you paid, and some sat in cash earning nothing — both of which earn less than the market rate here, so this subtraction is harsher than reality. And in a world without the gifts you may not have bought the flat at all, which would change everything downstream. This is a clean counterfactual, not a forecast of an alternate life.</p></div>
   </section>
 
 </div>
@@ -1664,7 +1673,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 30 Oct 2026 · self-made · prop-avg · no-zoom · demo-blur2</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 1 Nov 2026 · self-made-pm · prop-avg · no-zoom · demo-blur2</span></p>
   </div>
 </div>
 
@@ -1817,8 +1826,12 @@ body.locked .gate{display:flex}
      The rate is an assumption the user picks, not a measured index return, so
      the UI leads with the spread rather than one figure. The two undated gifts
      are subtracted at face value - there is no date to compound them from. */
-  let smRate=0.07;
+  let smRate=0.05;
   const SM_YR=365.2425*864e5;
+  /* Simon started saving in May 2020. A fixed anchor, not a rolling "6,5 years
+     ago": the start of saving is a point in the past, so the window has to grow
+     with time rather than slide forward. Change this one date if it was earlier. */
+  const SM_START='2020-05-01';
   /* es-ES leaves four-digit numbers ungrouped (1000 €, not 1.000 €), which reads
      ragged in a column next to 25.000 €. Group them, here only. */
   const smEur=n=>{const a=Math.abs(Math.round(n)),st=String(a);
@@ -1870,6 +1883,28 @@ body.locked .gate{display:flex}
           '<td class="r val" style="color:'+(r.yrs==null?'var(--muted-2)':'var(--grow)')+'">'+(r.yrs==null?'\u2014':'+'+smEur(r.now-r.g.a))+'</td>';
         tb.appendChild(tr);});}
     set('smFootNom',smEur(nominal)); set('smFootNow',smEur(fv)); set('smFootGrow','+'+smEur(growth));
+
+    /* What the self-made figure works out to per month. Not a division: each
+       month's saving compounds from the month it was made, so this is the level
+       contribution of an ordinary annuity whose future value is `self`. */
+    const sd=new Date(SM_START+'T00:00:00'), nd=new Date();
+    const mo=Math.max(1,(nd.getFullYear()-sd.getFullYear())*12+(nd.getMonth()-sd.getMonth()));
+    const i=Math.pow(1+smRate,1/12)-1;
+    const perMo=self*i/(Math.pow(1+i,mo)-1), flatMo=self/mo;
+    set('smPmHint',self>=0?('the level monthly amount that compounds to '+smEur(self)+' at '+(smRate*100).toFixed(0)+'%'):'nothing left to divide at this rate');
+    set('smPmSince',sd.toLocaleDateString('en-GB',{month:'long',year:'numeric'}));
+    set('smPmMonths',String(mo)+' months \u00b7 '+(mo/12).toFixed(1).replace('.',',')+' years');
+    const pse=$('smPmSelf');
+    if(pse){pse.textContent=smEur(self);pse.style.color=self>=0?'':'var(--debt)';}
+    /* A negative self-made figure has no monthly reading - printing one would
+       contradict the badge, so both rows go blank instead. */
+    const pae=$('smPmAvg');
+    if(pae){pae.textContent=self>=0?smEur(perMo):'\u2014';pae.style.color=self>=0?'var(--grow)':'var(--muted-2)';}
+    set('smPmFlat',self>=0?smEur(flatMo):'\u2014');
+    const pb=$('smPmBadge');
+    if(pb)pb.innerHTML=self>=0
+      ? 'Putting aside <b>'+smEur(perMo)+' a month</b> for '+mo+' months, at '+(smRate*100).toFixed(0)+'%, gets you to '+smEur(self)+' \u2014 the compounding supplies the rest. Saving the same total with no growth would have taken '+smEur(flatMo)+' a month, so growth is doing '+smEur(flatMo-perMo)+' of the monthly work for you.'
+      : 'With the family money and its growth taken out there is nothing left to divide, so there is no meaningful monthly figure at this rate. Try a lower one.';
   }
   function renderSync(){const dot=$('syncDot'),txt=$('syncTxt');if(!dot||!txt)return;
     const map={synced:['var(--grow)','Synced'+(lastSyncTs?' · '+agoTxt(lastSyncTs):'')],
