@@ -135,9 +135,11 @@ cloud, then before working locally again copy git's `index.html` back onto the O
     `GIFTS` array (date, amount, who) — it was hoisted out of the gifts‑bars IIFE for
     this. One list, two consumers; add a gift there and both update.
   - The rate is a **user‑chosen assumption**, not a measured index return, so the UI
-    leads with the 5–11% spread (`smRate`, default 7%) rather than one figure. At 7%
-    the gifts are worth ≈€190.6k today; the answer swings by tens of thousands across
-    the range, and the caveat note on the tab says so.
+    leads with the **3/5/7% spread** (`smRate`, default **5%**) rather than one figure.
+    At 5% the gifts are worth ≈€182.5k today and the self‑made figure is ≈€41.8k;
+    3% gives ≈€49.7k and 7% ≈€33.6k, so the answer swings by ≈€16k across the range
+    and the caveat note on the tab says so. Changing the buttons means changing the
+    `3% and 7%` wording in that note too.
   - The two **undated** gifts (€7.000) are subtracted at face value — no date to
     compound from. `smEur()` is a local formatter that groups four‑digit numbers,
     which es‑ES otherwise leaves as `1000 €` and reads ragged in a column.
@@ -145,3 +147,11 @@ cloud, then before working locally again copy git's `index.html` back onto the O
     01 · 02 · 03 · 05.
   - It is a clean counterfactual, not a forecast: much of the money went into the flat
     (carried near cost) or sat in cash, so the subtraction is **harsher than reality**.
+  - **Per‑month card**: the level monthly contribution whose future value, compounded
+    monthly at the selected rate, equals the self‑made figure — an ordinary‑annuity
+    payment, *not* a division, because a euro saved in 2020 has had six years to grow.
+    At 5% it reads ≈€456/month against ≈€535 with no growth at all. Saving started
+    **May 2020** (`SM_START`), a **fixed** anchor rather than a rolling “6,5 years ago”,
+    so the window grows with time; 78 months as of Nov 2026. Correct that one date if
+    the real start was earlier. A negative self‑made figure blanks the monthly rows
+    rather than printing a nonsense negative.
