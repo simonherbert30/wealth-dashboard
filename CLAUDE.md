@@ -71,9 +71,20 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   Simon's 50% = **€168.890,92**, marked across the whole net‑worth history
   (`propRevalV1` marked it to TINSA alone, `propRevalV2` to the average).
 - **Deployment plan** (Investments): €30k (Jun 2026), €15k (Jul), €15k (Aug) done, then €5k
-  VWCE/month + €2k bonds + €1k gold for the first 5 forward months. Anchored to a fixed
-  `_doneThru` date (Sep 2026 deployed) so month labels don't drift; bump `_doneThru` as each
-  month is deployed.
+  VWCE/month + €2k bonds + €1k gold for the first 5 forward months — Sep 2026 through
+  **May 2027**, €120k in all. Anchored to a fixed `_f0` so month labels don't drift;
+  **`_doneThru` in `buildDeploy()` is the only thing to bump** as each month is deployed
+  (Oct 2026 as of Nov 2026), and every “deployed / still to deploy” figure derives from it.
+- **Dip‑buy card** (Investments, reworked 5 Nov 2026). Phase 1 now reads off `buildDeploy()`
+  too — last month, months left and € left are all derived, after its hardcoded “through
+  November / Buy €20k / €30k” went stale against the €5k rungs. A tier pulls **1 or 2
+  later VWCE rungs forward** (€10k / €15k at a €5k rung); bonds and gold keep their
+  schedule, and the total never changes. `.dip-phase h3` is **`display:flex`**, so an
+  inline `<span>` in a phase heading becomes its own column and shatters the title on a
+  phone — the derived dates live in the lead `<p class="pl">` for that reason.
+  The card carries a footnote saying plainly that the tiers are a **discipline, not an
+  edge**: Phase 1 is ~free (money already committed), Phase 2 costs the drag on cash held
+  back. Keep that honesty if the card is rewritten.
 - **Gifts** total €163k (dad €146k + grandmother €17k); €7k (cash + undated) never
   prescribes. ISD prescription = gift date + 30 business days + 4 years (STS 30‑11‑2020).
   **€155k is "safe" ≈ 6 Nov 2028** (all 2023–2024 gifts prescribed) — the Gifts tab has a
