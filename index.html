@@ -1552,7 +1552,12 @@ body.locked .gate{display:flex}
         <button class="cost-row-del" id="mDeleteBtn" style="margin-top:8px;font-size:12.5px">✕ Delete this account</button>
       </details>
 
-      <label>Screenshot of the balance (optional)</label>
+      <div id="mDegiroBlock" hidden>
+        <p class="hintline" style="margin:16px 0 0">Degiro’s total is the sum of its positions plus free cash, so it is updated position by position and the total follows. That keeps the breakdown on the Investments tab adding up to the same number as here.</p>
+        <div class="modal-actions"><button class="btn-primary" id="mDegiroGo">Update Degiro positions →</button></div>
+      </div>
+      <div id="mValueBlock">
+      <label style="margin-top:16px">Screenshot of the balance (optional)</label>
       <div class="dropzone" id="dropzone"><span class="di">🖼️</span>Drop a screenshot here, or tap to choose<input type="file" id="mFile" accept="image/*" hidden></div>
       <img id="thumb" class="thumb" hidden alt="preview">
       <div class="ocr-status" id="ocrStatus"></div>
@@ -1564,6 +1569,7 @@ body.locked .gate{display:flex}
 
       <div class="modal-actions"><button class="btn-primary" id="mCommit">Update &amp; take snapshot</button></div>
       <p class="hintline">The screenshot is read on your device to suggest the number — always glance at it and correct if needed before saving. Each save recalculates your net worth and logs a point on the Wealth tab.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -1675,7 +1681,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 5 Nov 2026 · inv-table · dip-trim · nov-deployed · self-made-pm</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 5 Nov 2026 · upd-degiro · inv-table · dip-trim · nov-deployed</span></p>
   </div>
 </div>
 
@@ -2313,16 +2319,19 @@ body.locked .gate{display:flex}
   /* ============ UPDATE MODAL + OCR ============ */
   const modal=$('modal'),mAccount=$('mAccount'),mValue=$('mValue'),mFile=$('mFile'),dropzone=$('dropzone'),thumb=$('thumb'),ocrStatus=$('ocrStatus'),cands=$('cands'),newFields=$('newAcctFields'),mNewName=$('mNewName'),mNewCat=$('mNewCat'),mEditFields=$('mEditFields'),mEditName=$('mEditName'),mEditCat=$('mEditCat'),mDeleteBtn=$('mDeleteBtn');
   function fillAccountSelect(){mAccount.innerHTML='';
-    /* Degiro is derived from the holdings editor, so it isn't manually editable here */
-    state.accounts.filter(a=>!a.locked&&a.id!=='degiro').forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' — '+eur0(a.value);mAccount.appendChild(o);});
+    /* Degiro is listed, but its total is derived from the holdings editor, so
+       picking it swaps the value field for a button into that editor */
+    state.accounts.filter(a=>!a.locked).forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' — '+eur0(a.value);mAccount.appendChild(o);});
     const o=document.createElement('option');o.value='__new';o.textContent='＋ New account…';mAccount.appendChild(o);
     [mNewCat,mEditCat].forEach(sel=>{if(sel&&!sel.childElementCount)order.forEach(c=>{const oo=document.createElement('option');oo.value=c;oo.textContent=c;sel.appendChild(oo);});});}
-  function syncSelectValue(){const isNew=mAccount.value==='__new';newFields.hidden=!isNew;
-    if(mEditFields){mEditFields.hidden=isNew;mEditFields.open=false;}
+  function syncSelectValue(){const isNew=mAccount.value==='__new',isDg=mAccount.value==='degiro';newFields.hidden=!isNew;
+    if(mEditFields){mEditFields.hidden=isNew||isDg;mEditFields.open=false;}
+    $('mDegiroBlock').hidden=!isDg;$('mValueBlock').hidden=isDg;
     if(!isNew){const a=state.accounts.find(x=>x.id===mAccount.value);if(a){mValue.placeholder='current: '+eur0(a.value);if(mEditName)mEditName.value=a.name;if(mEditCat)mEditCat.value=a.cat;}}}
   function openModal(){fillAccountSelect();mValue.value='';cands.innerHTML='';ocrStatus.textContent='';thumb.hidden=true;newFields.hidden=true;modal.hidden=false;syncSelectValue();mValue.dispatchEvent(new Event('input'));}
   function closeModal(){modal.hidden=true;}
   $('updateBtn').addEventListener('click',openModal);
+  $('mDegiroGo').addEventListener('click',()=>{closeModal();openDegiro();});
   $('modalClose').addEventListener('click',closeModal);
   modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
   mAccount.addEventListener('change',syncSelectValue);
