@@ -96,6 +96,12 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   €10k/€5k sleeves after three months had been bought. The PLAN rows now show only what
   is **still to buy**, read off `buildDeploy()`, and vanish once bonds and gold finish (Jan
   2027). If you add a held account to one list, add it to the other.
+- **Degiro in the Update modal** (5 Nov 2026). The top **Update** button lists Degiro, but
+  its account value is *derived* (`saveDegiro()` sets it to positions + free cash), so
+  picking it hides the value field and shows **Update Degiro positions →**, which opens
+  the holdings editor (`openDegiro()`). Never let a raw total be typed for Degiro: the
+  *Inside your Degiro account* breakdown would stop summing to the account. The rename /
+  delete fields are hidden for it too.
 - **Gifts** total €163k (dad €146k + grandmother €17k); €7k (cash + undated) never
   prescribes. ISD prescription = gift date + 30 business days + 4 years (STS 30‑11‑2020).
   **€155k is "safe" ≈ 6 Nov 2028** (all 2023–2024 gifts prescribed) — the Gifts tab has a
