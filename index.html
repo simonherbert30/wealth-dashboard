@@ -1678,7 +1678,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 5 Nov 2026 · dip-v2 · self-made-pm · prop-avg · no-zoom</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 5 Nov 2026 · nov-deployed · dip-v2 · self-made-pm · prop-avg</span></p>
   </div>
 </div>
 
@@ -1689,6 +1689,10 @@ body.locked .gate{display:flex}
   /* ---------- helpers ---------- */
   const eur=(n,dec=2)=>n.toLocaleString('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:dec,maximumFractionDigits:dec});
   const eur0=n=>eur(n,0);
+  /* es-ES leaves four-digit numbers ungrouped (1000 €, not 1.000 €), which reads
+     ragged beside 25.000 € in a column or a list. eurG groups them. */
+  const eurG=n=>{const a=Math.abs(Math.round(n)),st=String(a);
+    return (a>=1000&&a<10000)?eur0(n).replace(st,st[0]+'.'+st.slice(1)):eur0(n);};
   const grp=n=>Math.round(n).toLocaleString('es-ES');
   const V=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1837,10 +1841,6 @@ body.locked .gate{display:flex}
      ago": the start of saving is a point in the past, so the window has to grow
      with time rather than slide forward. Change this one date if it was earlier. */
   const SM_START='2020-05-01';
-  /* es-ES leaves four-digit numbers ungrouped (1000 €, not 1.000 €), which reads
-     ragged in a column next to 25.000 €. Group them, here only. */
-  const smEur=n=>{const a=Math.abs(Math.round(n)),st=String(a);
-    return (a>=1000&&a<10000)?eur0(n).replace(st,st[0]+'.'+st.slice(1)):eur0(n);};
   function renderSelfMade(){
     if(!$('smNet')||!state)return;
     const t=totalsOf(state.accounts), now=Date.now();
@@ -1856,25 +1856,25 @@ body.locked .gate{display:flex}
     const growth=fv-nominal, self=t.net-fv, pct=t.net?self/t.net*100:0;
     const avgYrs=dated?wYrs/dated:0;
 
-    set('smNet',smEur(self));
-    set('smNetSub','net worth '+smEur(t.net)+' \u2212 gifts grown at '+(smRate*100).toFixed(0)+'%');
+    set('smNet',eurG(self));
+    set('smNetSub','net worth '+eurG(t.net)+' \u2212 gifts grown at '+(smRate*100).toFixed(0)+'%');
     const pe=$('smPct');
     if(pe){pe.textContent=pct.toFixed(1).replace('.',',')+'%';pe.style.color=pct>=0?'':'var(--debt)';}
-    set('smGiftNow',smEur(fv));
-    set('smGiftSub',smEur(nominal)+' received + '+smEur(growth)+' it would have earned');
-    set('smNominal',smEur(nominal));
-    set('smNominalSub','dad '+smEur(146000)+' \u00b7 grandmother '+smEur(17000));
+    set('smGiftNow',eurG(fv));
+    set('smGiftSub',eurG(nominal)+' received + '+eurG(growth)+' it would have earned');
+    set('smNominal',eurG(nominal));
+    set('smNominalSub','dad '+eurG(146000)+' \u00b7 grandmother '+eurG(17000));
 
-    set('smRowNet',smEur(t.net));
-    set('smRowNom','\u2212 '+smEur(nominal));
-    set('smRowGrowth','\u2212 '+smEur(growth));
+    set('smRowNet',eurG(t.net));
+    set('smRowNom','\u2212 '+eurG(nominal));
+    set('smRowGrowth','\u2212 '+eurG(growth));
     const se=$('smRowSelf');
-    if(se){se.textContent=smEur(self);se.style.color=self>=0?'var(--grow)':'var(--debt)';}
+    if(se){se.textContent=eurG(self);se.style.color=self>=0?'var(--grow)':'var(--debt)';}
     const bd=$('smBadge');
     if(bd)bd.innerHTML=self>=0
-      ? 'Of the '+smEur(t.net)+' you are worth today, <b>'+smEur(self)+'</b> is yours \u2014 <b>'+pct.toFixed(0)+'%</b>. The rest traces back to '+smEur(nominal)+' of family money and the '+smEur(growth)+' it would have compounded into over '+avgYrs.toFixed(1).replace('.',',')+' years on average, at '+(smRate*100).toFixed(0)+'%.'
-      : 'At '+(smRate*100).toFixed(0)+'% the family money would be worth <b>'+smEur(fv)+'</b> today \u2014 <b>more than your whole net worth</b>. On this assumption you have spent some of it rather than added to it. Try a lower rate to see how sensitive that conclusion is.';
-    set('smTableHint',smEur(nominal)+' received across '+GIFTS.length+' transfers \u00b7 compounded at '+(smRate*100).toFixed(0)+'% to today');
+      ? 'Of the '+eurG(t.net)+' you are worth today, <b>'+eurG(self)+'</b> is yours \u2014 <b>'+pct.toFixed(0)+'%</b>. The rest traces back to '+eurG(nominal)+' of family money and the '+eurG(growth)+' it would have compounded into over '+avgYrs.toFixed(1).replace('.',',')+' years on average, at '+(smRate*100).toFixed(0)+'%.'
+      : 'At '+(smRate*100).toFixed(0)+'% the family money would be worth <b>'+eurG(fv)+'</b> today \u2014 <b>more than your whole net worth</b>. On this assumption you have spent some of it rather than added to it. Try a lower rate to see how sensitive that conclusion is.';
+    set('smTableHint',eurG(nominal)+' received across '+GIFTS.length+' transfers \u00b7 compounded at '+(smRate*100).toFixed(0)+'% to today');
 
     const tb=$('smBody');
     if(tb){tb.innerHTML='';
@@ -1882,12 +1882,12 @@ body.locked .gate{display:flex}
         const when=r.g.d?fmtDate(new Date(r.g.d+'T00:00:00')):'<span style="color:var(--muted-2)">no date</span>';
         tr.innerHTML='<td>'+when+'</td>'+
           '<td>'+(r.g.who==='dad'?'Dad':'Grandmother')+'</td>'+
-          '<td class="r val">'+smEur(r.g.a)+'</td>'+
+          '<td class="r val">'+eurG(r.g.a)+'</td>'+
           '<td class="r val yrs" style="color:var(--muted)">'+(r.yrs==null?'\u2014':r.yrs.toFixed(1).replace('.',','))+'</td>'+
-          '<td class="r val">'+smEur(r.now)+'</td>'+
-          '<td class="r val" style="color:'+(r.yrs==null?'var(--muted-2)':'var(--grow)')+'">'+(r.yrs==null?'\u2014':'+'+smEur(r.now-r.g.a))+'</td>';
+          '<td class="r val">'+eurG(r.now)+'</td>'+
+          '<td class="r val" style="color:'+(r.yrs==null?'var(--muted-2)':'var(--grow)')+'">'+(r.yrs==null?'\u2014':'+'+eurG(r.now-r.g.a))+'</td>';
         tb.appendChild(tr);});}
-    set('smFootNom',smEur(nominal)); set('smFootNow',smEur(fv)); set('smFootGrow','+'+smEur(growth));
+    set('smFootNom',eurG(nominal)); set('smFootNow',eurG(fv)); set('smFootGrow','+'+eurG(growth));
 
     /* What the self-made figure works out to per month. Not a division: each
        month's saving compounds from the month it was made, so this is the level
@@ -1896,19 +1896,19 @@ body.locked .gate{display:flex}
     const mo=Math.max(1,(nd.getFullYear()-sd.getFullYear())*12+(nd.getMonth()-sd.getMonth()));
     const i=Math.pow(1+smRate,1/12)-1;
     const perMo=self*i/(Math.pow(1+i,mo)-1), flatMo=self/mo;
-    set('smPmHint',self>=0?('the level monthly amount that compounds to '+smEur(self)+' at '+(smRate*100).toFixed(0)+'%'):'nothing left to divide at this rate');
+    set('smPmHint',self>=0?('the level monthly amount that compounds to '+eurG(self)+' at '+(smRate*100).toFixed(0)+'%'):'nothing left to divide at this rate');
     set('smPmSince',sd.toLocaleDateString('en-GB',{month:'long',year:'numeric'}));
     set('smPmMonths',String(mo)+' months \u00b7 '+(mo/12).toFixed(1).replace('.',',')+' years');
     const pse=$('smPmSelf');
-    if(pse){pse.textContent=smEur(self);pse.style.color=self>=0?'':'var(--debt)';}
+    if(pse){pse.textContent=eurG(self);pse.style.color=self>=0?'':'var(--debt)';}
     /* A negative self-made figure has no monthly reading - printing one would
        contradict the badge, so both rows go blank instead. */
     const pae=$('smPmAvg');
-    if(pae){pae.textContent=self>=0?smEur(perMo):'\u2014';pae.style.color=self>=0?'var(--grow)':'var(--muted-2)';}
-    set('smPmFlat',self>=0?smEur(flatMo):'\u2014');
+    if(pae){pae.textContent=self>=0?eurG(perMo):'\u2014';pae.style.color=self>=0?'var(--grow)':'var(--muted-2)';}
+    set('smPmFlat',self>=0?eurG(flatMo):'\u2014');
     const pb=$('smPmBadge');
     if(pb)pb.innerHTML=self>=0
-      ? 'Putting aside <b>'+smEur(perMo)+' a month</b> for '+mo+' months, at '+(smRate*100).toFixed(0)+'%, gets you to '+smEur(self)+' \u2014 the compounding supplies the rest. Saving the same total with no growth would have taken '+smEur(flatMo)+' a month, so growth is doing '+smEur(flatMo-perMo)+' of the monthly work for you.'
+      ? 'Putting aside <b>'+eurG(perMo)+' a month</b> for '+mo+' months, at '+(smRate*100).toFixed(0)+'%, gets you to '+eurG(self)+' \u2014 the compounding supplies the rest. Saving the same total with no growth would have taken '+eurG(flatMo)+' a month, so growth is doing '+eurG(flatMo-perMo)+' of the monthly work for you.'
       : 'With the family money and its growth taken out there is nothing left to divide, so there is no meaningful monthly figure at this rate. Try a lower one.';
   }
   function renderSync(){const dot=$('syncDot'),txt=$('syncTxt');if(!dot||!txt)return;
@@ -2208,7 +2208,7 @@ body.locked .gate{display:flex}
      is derived from it, so none of them can fall out of step again. */
   function buildDeploy(){
     const f0=new Date(2026,8,1);      /* Sep 2026 = first month of the recurring 5k plan */
-    const doneThru=new Date(2026,9,1);/* deployed through & including Oct 2026 */
+    const doneThru=new Date(2026,10,1);/* deployed through & including Nov 2026 */
     const pastAmt=[30000,15000,15000];/* Jun / Jul / Aug 2026, oldest first */
     const plan=[];
     for(let k=-3;k<9;k++){const d=new Date(f0.getFullYear(),f0.getMonth()+k,1);
@@ -2232,7 +2232,7 @@ body.locked .gate{display:flex}
     set('depHint',D.nDone+' month'+(D.nDone===1?'':'s')+' done + '+D.nLeft+' to go \u00b7 \u20ac5k VWCE monthly, plus bonds & gold for the first five');
     set('depDone',eur0(D.done)); set('depDone2',eur0(D.done));
     set('depLeft',eur0(D.left)); set('depLeft2',eur0(D.left));
-    const _split=[D.leftV&&eur0(D.leftV)+' VWCE',D.leftB&&eur0(D.leftB)+' bonds',D.leftG&&eur0(D.leftG)+' gold'].filter(Boolean).join(' + ')||'nothing left';
+    const _split=[D.leftV&&eurG(D.leftV)+' VWCE',D.leftB&&eurG(D.leftB)+' bonds',D.leftG&&eurG(D.leftG)+' gold'].filter(Boolean).join(' + ')||'nothing left';
     set('depLeftSplit',_split); set('depLeftSplit2',_split);
     /* the Investments KPI card, same source as the ladder */
     set('kpiLeftDeploy',eur0(D.left)); set('kpiLeftDeploySub',_split);

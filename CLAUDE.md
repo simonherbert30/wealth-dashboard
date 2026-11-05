@@ -74,7 +74,9 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   VWCE/month + €2k bonds + €1k gold for the first 5 forward months — Sep 2026 through
   **May 2027**, €120k in all. Anchored to a fixed `_f0` so month labels don't drift;
   **`_doneThru` in `buildDeploy()` is the only thing to bump** as each month is deployed
-  (Oct 2026 as of Nov 2026), and every “deployed / still to deploy” figure derives from it.
+  (**Nov 2026 deployed** as of 5 Nov 2026 — €84k done, €36k left: €30k VWCE + €4k bonds
+  + €2k gold), and every “deployed / still to deploy” figure derives from it, the KPI card
+  and the dip card's Phase 1 included.
 - **Dip‑buy card** (Investments, reworked 5 Nov 2026). Phase 1 now reads off `buildDeploy()`
   too — last month, months left and € left are all derived, after its hardcoded “through
   November / Buy €20k / €30k” went stale against the €5k rungs. A tier pulls **1 or 2
@@ -152,8 +154,11 @@ cloud, then before working locally again copy git's `index.html` back onto the O
     and the caveat note on the tab says so. Changing the buttons means changing the
     `3% and 7%` wording in that note too.
   - The two **undated** gifts (€7.000) are subtracted at face value — no date to
-    compound from. `smEur()` is a local formatter that groups four‑digit numbers,
-    which es‑ES otherwise leaves as `1000 €` and reads ragged in a column.
+    compound from. Amounts here use **`eurG()`** (defined beside `eur0`), which groups
+    four‑digit numbers — es‑ES otherwise leaves them as `1000 €`, ragged in a column.
+    It started life as `smEur` on this tab and was lifted out on 5 Nov 2026 when the
+    deployment split line needed it too; prefer it over `eur0` wherever amounts are
+    listed side by side.
   - The tab carries **`data-demo-hide`** (like 04 Gifts): the demo strip stays
     01 · 02 · 03 · 05.
   - It is a clean counterfactual, not a forecast: much of the money went into the flat
