@@ -89,6 +89,13 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   Simon's request on 5 Nov 2026** — don't reinstate them unasked. Phase 2's remaining
   rules are: one trigger per tier, monthly closes, never empty at −10%, keep normal
   buying on top.
+- **Invested & investable table** (Investments, 5 Nov 2026). Rows list exactly the ids
+  `heldTot` sums — `vwce`, `vagf`, `gold`, `degiro`, `trade_republic`, `revolut_sav` — so
+  they add up to the *Held now* footer. Before this the Revolut bond and gold legs were
+  counted in the total but had no row, and two hardcoded PLAN rows still showed the full
+  €10k/€5k sleeves after three months had been bought. The PLAN rows now show only what
+  is **still to buy**, read off `buildDeploy()`, and vanish once bonds and gold finish (Jan
+  2027). If you add a held account to one list, add it to the other.
 - **Gifts** total €163k (dad €146k + grandmother €17k); €7k (cash + undated) never
   prescribes. ISD prescription = gift date + 30 business days + 4 years (STS 30‑11‑2020).
   **€155k is "safe" ≈ 6 Nov 2028** (all 2023–2024 gifts prescribed) — the Gifts tab has a

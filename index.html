@@ -671,7 +671,7 @@ body.locked .gate{display:flex}
       <div class="tophold" id="topHold"></div>
     </div>
 
-    <div class="section-head anim"><h2>Invested &amp; investable</h2><span class="hint">Held today, plus the planned bond &amp; gold sleeves</span></div>
+    <div class="section-head anim"><h2>Invested &amp; investable</h2><span class="hint">Held today, plus the bond &amp; gold still to buy</span></div>
     <div class="card holdings anim">
       <table>
         <thead><tr><th>Holding</th><th>Vehicle</th><th class="r">Value</th></tr></thead>
@@ -1675,7 +1675,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 5 Nov 2026 · dip-trim · nov-deployed · self-made-pm · prop-avg</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 5 Nov 2026 · inv-table · dip-trim · nov-deployed · self-made-pm</span></p>
   </div>
 </div>
 
@@ -1688,8 +1688,8 @@ body.locked .gate{display:flex}
   const eur0=n=>eur(n,0);
   /* es-ES leaves four-digit numbers ungrouped (1000 €, not 1.000 €), which reads
      ragged beside 25.000 € in a column or a list. eurG groups them. */
-  const eurG=n=>{const a=Math.abs(Math.round(n)),st=String(a);
-    return (a>=1000&&a<10000)?eur0(n).replace(st,st[0]+'.'+st.slice(1)):eur0(n);};
+  const eurG=(n,dec=0)=>{const a=Math.abs(dec?Math.trunc(n):Math.round(n)),st=String(a),f=eur(n,dec);
+    return (a>=1000&&a<10000)?f.replace(st,st[0]+'.'+st.slice(1)):f;};
   const grp=n=>Math.round(n).toLocaleString('es-ES');
   const V=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2115,11 +2115,20 @@ body.locked .gate{display:flex}
 
     const ib=$('invBody');
     if(ib){ib.innerHTML='';
-      [['vwce','Trade Republic · FTSE All‑World ETF (Acc)'],['degiro','Stocks &amp; emerging markets'],['trade_republic','Savings · deployment fuel'],['revolut_sav','Savings']].forEach(h=>{
+      /* held: the same ids heldTot sums, so the rows add up to the footer */
+      [['vwce','Revolut \u00b7 FTSE All\u2011World ETF (Acc)'],['vagf','Revolut \u00b7 VAGF (EUR\u2011hedged, Acc)'],['gold','Revolut \u00b7 SGLN physical gold'],
+       ['degiro','Stocks &amp; emerging markets'],['trade_republic','Savings \u00b7 deployment fuel'],['revolut_sav','Savings']].forEach(h=>{
         const a=state.accounts.find(x=>x.id===h[0]);if(!a)return;const trr=document.createElement('tr');
-        trr.innerHTML='<td><div style="font-weight:500">'+a.name+'</div><div class="sub">'+h[1]+'</div></td><td></td><td class="r val">'+eur(a.value)+'</td>';ib.appendChild(trr);});
-      [['World bonds','Planned · VAGF (EUR‑hedged, Acc) · €2k/mo × 5',10000],['Gold','Planned · SGLN physical gold · €1k/mo × 5',5000]].forEach(p=>{const trr=document.createElement('tr');trr.setAttribute('style','opacity:.6');
-        trr.innerHTML='<td><div style="font-weight:500">'+p[0]+' <span style="font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--brass);border:1px solid rgba(201,169,106,.4);border-radius:4px;padding:1px 5px;margin-left:6px">PLAN</span></div><div class="sub">'+p[1]+'</div></td><td></td><td class="r val">'+eur(p[2])+'</td>';ib.appendChild(trr);});}
+        trr.innerHTML='<td><div style="font-weight:500">'+a.name+'</div><div class="sub">'+h[1]+'</div></td><td></td><td class="r val">'+eurG(a.value,2)+'</td>';ib.appendChild(trr);});
+      /* plan: only what the ladder has NOT yet bought, read off buildDeploy() so
+         it shrinks as _doneThru moves and the row disappears once it is done */
+      const _D=buildDeploy(),_mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const _left=k=>_D.plan.filter(r=>!r.done&&r[k]);
+      [['bond','Bonds still to buy','VAGF',2000],['gold','Gold still to buy','SGLN',1000]].forEach(p=>{
+        const rs=_left(p[0]);if(!rs.length)return;
+        const when=_mo[rs[0].d.getMonth()]+(rs.length>1?'\u2013'+_mo[rs[rs.length-1].d.getMonth()]:'');
+        const trr=document.createElement('tr');trr.setAttribute('style','opacity:.6');
+        trr.innerHTML='<td><div style="font-weight:500">'+p[1]+' <span style="font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--brass);border:1px solid rgba(201,169,106,.4);border-radius:4px;padding:1px 5px;margin-left:6px">PLAN</span></div><div class="sub">'+p[2]+' \u00b7 \u20ac'+(p[3]/1000)+'k/mo \u00d7 '+rs.length+' \u00b7 '+when+'</div></td><td></td><td class="r val">'+eurG(rs.length*p[3],2)+'</td>';ib.appendChild(trr);});}
 
     const last=state.history[state.history.length-1];
     const dc=$('dateChip');if(dc)dc.textContent='UPDATED · '+fmtDate(last.ts).toUpperCase();
