@@ -84,9 +84,11 @@ cloud, then before working locally again copy git's `index.html` back onto the O
   schedule, and the total never changes. `.dip-phase h3` is **`display:flex`**, so an
   inline `<span>` in a phase heading becomes its own column and shatters the title on a
   phone — the derived dates live in the lead `<p class="pl">` for that reason.
-  The card carries a footnote saying plainly that the tiers are a **discipline, not an
-  edge**: Phase 1 is ~free (money already committed), Phase 2 costs the drag on cash held
-  back. Keep that honesty if the card is rewritten.
+  A footnote spelling out that the tiers are a discipline rather than an edge, and the
+  rules “no leverage, no new debt” and “re‑arm only after recovery”, were **removed at
+  Simon's request on 5 Nov 2026** — don't reinstate them unasked. Phase 2's remaining
+  rules are: one trigger per tier, monthly closes, never empty at −10%, keep normal
+  buying on top.
 - **Gifts** total €163k (dad €146k + grandmother €17k); €7k (cash + undated) never
   prescribes. ISD prescription = gift date + 30 business days + 4 years (STS 30‑11‑2020).
   **€155k is "safe" ≈ 6 Nov 2028** (all 2023–2024 gifts prescribed) — the Gifts tab has a
