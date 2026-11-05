@@ -726,16 +726,20 @@ body.locked .gate{display:flex}
     <div class="section-head anim"><h2>Dip‑buy rules</h2><span class="hint">Pre‑decided, so a falling market becomes a shopping list</span></div>
     <div class="card dip anim">
       <div class="dip-phase">
-        <h3><span class="phasetag">Phase 1</span> During the deployment (through November)</h3>
-        <p class="pl">Your VWCE buys are already committed, so a dip just means front‑loading — more shares while cheaper, no new money.</p>
+        <h3><span class="phasetag">Phase 1</span> During the deployment</h3>
+        <p class="pl"><span id="dipP1Left">—</span> Your VWCE rungs are already committed, so a dip just means front‑loading — the same money, earlier, at a lower price.</p>
         <div class="tiers">
-          <div class="tier t1"><div class="dd">−10%<small>vs recent high</small></div><div class="desc">VWCE 10%+ below its trailing high on your buy date.<small> Pull €5k forward from a later rung.</small></div><div class="act">Buy €20k</div></div>
-          <div class="tier t2"><div class="dd">−20%<small>vs recent high</small></div><div class="desc">Deep discount mid‑plan.<small> Double that month's rung.</small></div><div class="act">Buy €30k</div></div>
+          <div class="tier t1"><div class="dd">−10%<small>vs recent high</small></div><div class="desc">VWCE 10%+ below its trailing high on your buy date.<small id="dipT1Sub"> —</small></div><div class="act" id="dipT1Act">—</div></div>
+          <div class="tier t2"><div class="dd">−20%<small>vs recent high</small></div><div class="desc">Deep discount mid‑plan.<small id="dipT2Sub"> —</small></div><div class="act" id="dipT2Act">—</div></div>
         </div>
+        <ul class="dip-rules">
+          <li><b>VWCE only.</b> The bond and gold rungs keep their schedule — they are not the thing on sale.</li>
+          <li><b>Front‑loading, not extra.</b> A rung pulled forward comes off the end; the total never changes.</li>
+        </ul>
       </div>
       <div class="dip-phase">
         <h3><span class="phasetag b">Phase 2</span> After deployment — spending a dip reserve</h3>
-        <p class="pl">Once you're building a cash reserve again, deploy it in tranches measured from VWCE's all‑time high (monthly close). Weighted to deeper drops.</p>
+        <p class="pl"><span id="dipP2When">—</span> once you're building a cash reserve again, deploy it in tranches measured from VWCE's all‑time high (monthly close). Weighted to deeper drops.</p>
         <div class="tiers">
           <div class="tier t1"><div class="dd">−10%<small>correction</small></div><div class="desc">Ordinary pullback. Dip a toe in.</div><div class="act">15% of reserve</div></div>
           <div class="tier t2"><div class="dd">−20%<small>bear market</small></div><div class="desc">Now it's on sale. Step up.</div><div class="act">25% of reserve</div></div>
@@ -751,6 +755,7 @@ body.locked .gate{display:flex}
           <li><b>No leverage, no new debt</b> to fund a dip.</li>
         </ul>
       </div>
+      <div class="recon" style="background:rgba(110,136,176,.08);border-color:rgba(110,136,176,.28);margin-top:4px"><span class="ic" style="color:var(--cash)">i</span><p><b style="color:var(--text)">What these rules are for — and what they are not.</b> They are a discipline, not an edge. A market down 20% is not cheap <i>because</i> it fell: it fell for a reason the price already reflects, and the evidence that waiting in cash for a dip beats simply investing on schedule is weak at best. What the tiers buy you is a decision made in daylight — when the screen is red you read a checklist instead of inventing a plan, and the plan says buy rather than sell.<br><br><b>Phase 1 is close to free</b>, because that money is committed either way and being invested sooner is a positive‑expectation move on its own. <b>Phase 2 has a price:</b> cash held back for a dip that may never come is cash not compounding. So let a reserve be money you were holding anyway, never a war chest built by skipping contributions.</p></div>
     </div>
 
     <div class="section-head anim" data-demo-hide><h2>The discipline</h2><span class="hint">The rule that makes everything above work</span></div>
@@ -1673,7 +1678,7 @@ body.locked .gate{display:flex}
     <button class="btn-primary" id="gateGo">Unlock</button>
     <button class="btn-demo" id="gateDemo">View the demo</button>
     <div class="gate-err" id="gateErr"></div>
-    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 1 Nov 2026 · self-made-pm · prop-avg · no-zoom · demo-blur2</span></p>
+    <p class="gate-note">Your data is encrypted with this password on your device before it is stored or synced — it never leaves your browser readable. There is no reset: if you forget the password, only an exported backup can restore your data.<br><span style="opacity:.7">Build 5 Nov 2026 · dip-v2 · self-made-pm · prop-avg · no-zoom</span></p>
   </div>
 </div>
 
@@ -2231,6 +2236,16 @@ body.locked .gate{display:flex}
     set('depLeftSplit',_split); set('depLeftSplit2',_split);
     /* the Investments KPI card, same source as the ladder */
     set('kpiLeftDeploy',eur0(D.left)); set('kpiLeftDeploySub',_split);
+
+    /* The dip-buy card's Phase 1 reads off the same ladder, so its months and
+       amounts cannot drift away from the plan the way the old hardcoded
+       €20k/€30k rungs did. One rung is one month's VWCE buy. */
+    const _last=_plan[_plan.length-1].d, _mLong=d=>d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    const _rung=(_plan.find(p=>!p.done)||_plan[_plan.length-1]).vwce, _k=v=>'\u20ac'+(v/1000)+'k';
+    set('dipP1Left',D.nLeft?('Through '+_mLong(_last)+': '+eur0(D.leftV)+' of VWCE still to go, across '+D.nLeft+' month'+(D.nLeft===1?'':'s')+'.'):'The ladder is fully deployed \u2014 Phase 2 applies from here.');
+    set('dipT1Sub',' Pull one later rung forward.'); set('dipT1Act','Buy '+_k(_rung*2)+' VWCE');
+    set('dipT2Sub',' Pull two later rungs forward.'); set('dipT2Act','Buy '+_k(_rung*3)+' VWCE');
+    set('dipP2When','From '+_mLong(new Date(_last.getFullYear(),_last.getMonth()+1,1))+',');
     const rungs=$('rungs');
     if(rungs){rungs.innerHTML='';_plan.forEach(p=>{
       const parts=p.done?['VWCE '+(p.vwce/1000)+'k']:['VWCE 5k'];if(p.bond)parts.push('bonds 2k');if(p.gold)parts.push('gold 1k');
